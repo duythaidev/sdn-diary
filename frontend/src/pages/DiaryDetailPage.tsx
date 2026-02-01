@@ -31,7 +31,7 @@ import {
 import { format } from 'date-fns'
 import { Edit, Trash2, Globe, Lock, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
-import { User } from '@/types'
+import type { User } from '@/types'
 
 export const DiaryDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -67,7 +67,7 @@ export const DiaryDetailPage = () => {
       dispatch(removeDiary(id!))
       toast.success('Diary entry deleted successfully')
       navigate('/diary')
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to delete diary entry')
       setDeleting(false)
     }

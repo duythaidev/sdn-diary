@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Diary, User } from '@/types'
+import type { Diary, User } from '@/types'
 import { Globe, Lock } from 'lucide-react'
 interface DiaryCardProps {
   diary: Diary

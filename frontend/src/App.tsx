@@ -1,37 +1,37 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import { store } from './redux/store'
-import { useAuth } from './hooks/useAuth'
-import { authService } from './services/api/authService'
-import { Toaster } from './components/ui/sonner'
-import { ProtectedRoute } from './components/layout/ProtectedRoute'
-import { PublicRoute } from './components/layout/PublicRoute'
-import { LoginPage } from './pages/LoginPage'
-import { RegisterPage } from './pages/RegisterPage'
-import { DashboardPage } from './pages/DashboardPage'
-import { DiaryListPage } from './pages/DiaryListPage'
-import { DiaryDetailPage } from './pages/DiaryDetailPage'
-import { DiaryCreatePage } from './pages/DiaryCreatePage'
-import { DiaryEditPage } from './pages/DiaryEditPage'
-import { PublicDiariesPage } from './pages/PublicDiariesPage'
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
+import { useAuth } from "./hooks/useAuth";
+import { authService } from "./services/api/authService";
+import { Toaster } from "./components/ui/sonner";
+import { ProtectedRoute } from "./components/layout/ProtectedRoute";
+import { PublicRoute } from "./components/layout/PublicRoute";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { DiaryListPage } from "./pages/DiaryListPage";
+import { DiaryDetailPage } from "./pages/DiaryDetailPage";
+import { DiaryCreatePage } from "./pages/DiaryCreatePage";
+import { DiaryEditPage } from "./pages/DiaryEditPage";
+import { PublicDiariesPage } from "./pages/PublicDiariesPage";
 
 function AppContent() {
-  const { setUser, isAuthenticated } = useAuth()
+  const { setUser, isAuthenticated } = useAuth();
 
   useEffect(() => {
     // Check if user is already authenticated on mount
     const checkAuth = async () => {
       try {
-        const response = await authService.getMe()
-        setUser(response.user)
-      } catch (_error) {
+        const response = await authService.getMe();
+        setUser(response.user);
+      } catch (error) {
         // User is not authenticated
       }
-    }
+    };
 
-    checkAuth()
-  }, [])
+    checkAuth();
+  }, []);
 
   return (
     <>
@@ -95,7 +95,13 @@ function AppContent() {
         {/* Default redirect */}
         <Route
           path="/"
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
         />
 
         {/* 404 */}
@@ -103,7 +109,7 @@ function AppContent() {
       </Routes>
       <Toaster />
     </>
-  )
+  );
 }
 
 function App() {
@@ -113,7 +119,7 @@ function App() {
         <AppContent />
       </BrowserRouter>
     </Provider>
-  )
+  );
 }
 
-export default App
+export default App;

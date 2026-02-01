@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { Comment, User } from '@/types'
+import type { Comment, User } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Trash2 } from 'lucide-react'
