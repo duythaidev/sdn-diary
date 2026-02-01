@@ -1,26 +1,31 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 interface CommentFormData {
-  content: string;
+  content: string
 }
 interface CommentFormProps {
-  onSubmit: (content: string) => Promise<void>;
+  onSubmit: (content: string) => Promise<void>
 }
 export const CommentForm = ({ onSubmit }: CommentFormProps) => {
-  const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CommentFormData>();
+  const [loading, setLoading] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CommentFormData>()
   const handleFormSubmit = async (data: CommentFormData) => {
-    setLoading(true);
+    setLoading(true)
     try {
-      await onSubmit(data.content);
-      reset();
+      await onSubmit(data.content)
+      reset()
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div className="space-y-2">
@@ -29,21 +34,19 @@ export const CommentForm = ({ onSubmit }: CommentFormProps) => {
           id="content"
           placeholder="Write your comment..."
           rows={3}
-          {...register('content', { 
+          {...register('content', {
             required: 'Comment cannot be empty',
             maxLength: {
               value: 500,
-              message: 'Comment cannot exceed 500 characters'
-            }
+              message: 'Comment cannot exceed 500 characters',
+            },
           })}
         />
-        {errors.content && (
-          <p className="text-sm text-destructive">{errors.content.message}</p>
-        )}
+        {errors.content && <p className="text-destructive text-sm">{errors.content.message}</p>}
       </div>
       <Button type="submit" disabled={loading}>
         {loading ? 'Posting...' : 'Post Comment'}
       </Button>
     </form>
-  );
-};
+  )
+}
