@@ -5,8 +5,9 @@ import {
   verifyRefreshToken 
 } from '../middleware/auth.js';
 import { cookieOptions } from '../config/jwt.js';
+import bcrypt from 'bcrypt';
 // Register new user
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
     // Check if user already exists
@@ -18,8 +19,11 @@ export const register = async (req, res) => {
           : 'Username already taken' 
       });
     }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Create new user
-    const user = new User({ username, email, password });
+    const user = new User({ username, email, password: hashedPassword });
     await user.save();
     // Generate tokens
     const accessToken = generateAccessToken(user._id);
@@ -36,11 +40,11 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    next(error);
   }
 };
 // Login user
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     // Find user by email
@@ -68,11 +72,11 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    next(error);
   }
 };
 // Refresh access token
-export const refresh = async (req, res) => {
+export const refresh = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
@@ -85,22 +89,22 @@ export const refresh = async (req, res) => {
     // Set new access token cookie
     res.cookie('accessToken', accessToken, cookieOptions);
     res.json({ message: 'Token refreshed successfully' });
-  } catch (error) {
-    res.status(401).json({ message: 'Invalid refresh token' });
+  } catch (error) { 
+    next(error);
   }
 };
 // Logout user
-export const logout = async (req, res) => {
+export const logout = async (req, res, next) => {
   try {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     res.json({ message: 'Logout successful' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    next(error);
   }
 };
 // Get current user
-export const getMe = async (req, res) => {
+export const getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
     if (!user) {
@@ -115,6 +119,6 @@ export const getMe = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    next(error);
   }
 };

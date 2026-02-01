@@ -25,6 +25,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         // Refresh failed, logout user
         store.dispatch(logout())
+        window.location.href = '/login'
         return Promise.reject(refreshError)
       }
     }

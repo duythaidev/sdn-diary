@@ -6,8 +6,8 @@ import connectDB from './config/database.js';
 import authRoutes from './routes/auth.js';
 import diaryRoutes from './routes/diary.js';
 import commentRoutes from './routes/comment.js';
-// Load environment variables
 dotenv.config();
+// Load environment variables
 // Initialize Express app
 const app = express();
 // Connect to MongoDB

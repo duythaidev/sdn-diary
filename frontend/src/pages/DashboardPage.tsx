@@ -16,9 +16,7 @@ export const DashboardPage = () => {
   const { diaries } = useSelector((state: RootState) => state.diary)
   const { user } = useSelector((state: RootState) => state.auth)
   const [loading, setLoading] = useState(true)
-  useEffect(() => {
-    fetchDiaries()
-  }, [])
+
   const fetchDiaries = async () => {
     try {
       const response = await diaryService.getUserDiaries()
@@ -29,6 +27,11 @@ export const DashboardPage = () => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchDiaries()
+  }, [])
+
   const publicCount = diaries.filter((d) => d.isPublic).length
   const privateCount = diaries.filter((d) => !d.isPublic).length
   const recentDiaries = diaries.slice(0, 3)

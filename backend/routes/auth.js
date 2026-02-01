@@ -1,11 +1,11 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { 
-  register, 
-  login, 
-  refresh, 
-  logout, 
-  getMe 
+import {
+  register,
+  login,
+  refresh,
+  logout,
+  getMe
 } from '../controllers/authController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
