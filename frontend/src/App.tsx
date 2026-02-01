@@ -1,0 +1,119 @@
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { store } from './redux/store'
+import { useAuth } from './hooks/useAuth'
+import { authService } from './services/api/authService'
+import { Toaster } from './components/ui/sonner'
+import { ProtectedRoute } from './components/layout/ProtectedRoute'
+import { PublicRoute } from './components/layout/PublicRoute'
+import { LoginPage } from './pages/LoginPage'
+import { RegisterPage } from './pages/RegisterPage'
+import { DashboardPage } from './pages/DashboardPage'
+import { DiaryListPage } from './pages/DiaryListPage'
+import { DiaryDetailPage } from './pages/DiaryDetailPage'
+import { DiaryCreatePage } from './pages/DiaryCreatePage'
+import { DiaryEditPage } from './pages/DiaryEditPage'
+import { PublicDiariesPage } from './pages/PublicDiariesPage'
+
+function AppContent() {
+  const { setUser, isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    // Check if user is already authenticated on mount
+    const checkAuth = async () => {
+      try {
+        const response = await authService.getMe()
+        setUser(response.user)
+      } catch (_error) {
+        // User is not authenticated
+      }
+    }
+
+    checkAuth()
+  }, [])
+
+  return (
+    <>
+      <Routes>
+        {/* Public routes */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+
+        {/* Public diaries - accessible to all */}
+        <Route path="/public" element={<PublicDiariesPage />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/diary"
+          element={
+            <ProtectedRoute>
+              <DiaryListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/diary/create"
+          element={
+            <ProtectedRoute>
+              <DiaryCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/diary/:id" element={<DiaryDetailPage />} />
+        <Route
+          path="/diary/:id/edit"
+          element={
+            <ProtectedRoute>
+              <DiaryEditPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Default redirect */}
+        <Route
+          path="/"
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
+        />
+
+        {/* 404 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Toaster />
+    </>
+  )
+}
+
+function App() {
+  return (
+    <Provider store={store}>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </Provider>
+  )
+}
+
+export default App
