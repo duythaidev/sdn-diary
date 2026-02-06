@@ -1,12 +1,12 @@
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '@/hooks/useAuth'
+import { useProfile } from '@/hooks/useGetProfile'
 
 interface PublicRouteProps {
   children: React.ReactNode
 }
 
 export const PublicRoute = ({ children }: PublicRouteProps) => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated } = useProfile()
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />
   }
