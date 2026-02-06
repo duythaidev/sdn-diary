@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { authService } from '@/services/api/authService'
-import { useAuth } from '@/hooks/useAuth'
+import { useProfile } from '@/hooks/useGetProfile'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,7 +17,7 @@ interface RegisterForm {
 }
 export const RegisterPage = () => {
   const navigate = useNavigate()
-  const { setUser } = useAuth()
+  const { setUser } = useProfile()
   const [loading, setLoading] = useState(false)
   const {
     register,

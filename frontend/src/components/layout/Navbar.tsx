@@ -1,5 +1,4 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '@/hooks/useAuth'
 import { authService } from '@/services/api/authService'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,8 +12,10 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { BookOpen, LogOut, User, Home, FileText, Globe } from 'lucide-react'
 import { toast } from 'sonner'
+import { useProfile } from '@/hooks/useProfile'
+
 export const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout } = useProfile()
   const navigate = useNavigate()
   const handleLogout = async () => {
     try {

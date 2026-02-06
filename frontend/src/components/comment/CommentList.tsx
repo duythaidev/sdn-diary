@@ -3,7 +3,7 @@ import type { Comment, User } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Trash2 } from 'lucide-react'
-import { useAuth } from '@/hooks/useAuth'
+import { useProfile } from '@/hooks/useGetProfile'
 interface CommentListProps {
   comments: Comment[]
   diaryOwnerId: string
@@ -11,7 +11,7 @@ interface CommentListProps {
   loading?: boolean
 }
 export const CommentList = ({ comments, diaryOwnerId, onDelete, loading }: CommentListProps) => {
-  const { user } = useAuth()
+  const { user } = useProfile()
   const canDelete = (comment: Comment) => {
     if (!user) return false
     const commentUserId = typeof comment.userId === 'object' ? (comment.userId as User).id : comment.userId
