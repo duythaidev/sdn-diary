@@ -1,10 +1,10 @@
 import User from '../models/User.js';
-import { 
-  generateAccessToken, 
-  generateRefreshToken, 
-  verifyRefreshToken 
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken
 } from '../middleware/auth.js';
-import { cookieOptions } from '../config/jwt.js';
+import { accessTokenCookieOptions, refreshTokenCookieOptions } from '../config/jwt.js';
 import bcrypt from 'bcrypt';
 // Register new user
 export const register = async (req, res, next) => {
@@ -13,10 +13,10 @@ export const register = async (req, res, next) => {
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
-      return res.status(400).json({ 
-        message: existingUser.email === email 
-          ? 'Email already registered' 
-          : 'Username already taken' 
+      return res.status(400).json({
+        message: existingUser.email === email
+          ? 'Email already registered'
+          : 'Username already taken'
       });
     }
     const salt = await bcrypt.genSalt(10);
@@ -29,8 +29,8 @@ export const register = async (req, res, next) => {
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
     // Set cookies
-    res.cookie('accessToken', accessToken, cookieOptions);
-    res.cookie('refreshToken', refreshToken, cookieOptions);
+    res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -61,8 +61,8 @@ export const login = async (req, res, next) => {
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
     // Set cookies
-    res.cookie('accessToken', accessToken, cookieOptions);
-    res.cookie('refreshToken', refreshToken, cookieOptions);
+    res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
     res.json({
       message: 'Login successful',
       user: {
@@ -87,9 +87,9 @@ export const refresh = async (req, res, next) => {
     // Generate new access token
     const accessToken = generateAccessToken(decoded.userId);
     // Set new access token cookie
-    res.cookie('accessToken', accessToken, cookieOptions);
+    res.cookie('accessToken', accessToken, accessTokenCookieOptions);
     res.json({ message: 'Token refreshed successfully' });
-  } catch (error) { 
+  } catch (error) {
     next(error);
   }
 };

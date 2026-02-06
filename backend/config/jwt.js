@@ -11,9 +11,18 @@ export const jwtConfig = {
     expiresIn: '7d', // 7 days
   },
 };
-export const cookieOptions = {
+
+
+export const accessTokenCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'strict',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  maxAge: process.env.ACCESS_TOKEN_COOKIE_MAX_AGE ? Number(process.env.ACCESS_TOKEN_COOKIE_MAX_AGE) : 15 * 60 * 1000, // 15 minutes
+};
+
+export const refreshTokenCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  maxAge: process.env.REFRESH_TOKEN_COOKIE_MAX_AGE ? Number(process.env.REFRESH_TOKEN_COOKIE_MAX_AGE) : 7 * 24 * 60 * 60 * 1000, // 7 days
 };
