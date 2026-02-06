@@ -31,7 +31,6 @@ export const DiaryListPage = () => {
   if (loading) return <LoadingSpinner />
   return (
     <div className="bg-background min-h-screen">
-      <Navbar />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>

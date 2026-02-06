@@ -102,7 +102,6 @@ export const DiaryDetailPage = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <Navbar />
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />

@@ -26,7 +26,6 @@ export const DiaryCreatePage = () => {
   }
   return (
     <div className="bg-background min-h-screen">
-      <Navbar />
       <div className="container mx-auto max-w-3xl px-4 py-8">
         <Card>
           <CardHeader>

@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '@/redux/store'
 import { setDiaries } from '@/redux/slices/diarySlice'
 import { diaryService } from '@/services/api/diaryService'
-import { Navbar } from '@/components/layout/Navbar'
 import { DiaryCard } from '@/components/diary/DiaryCard'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Button } from '@/components/ui/button'
@@ -35,10 +34,11 @@ export const DashboardPage = () => {
   const publicCount = diaries.filter((d) => d.isPublic).length
   const privateCount = diaries.filter((d) => !d.isPublic).length
   const recentDiaries = diaries.slice(0, 3)
+
   if (loading) return <LoadingSpinner />
+
   return (
     <div className="bg-background min-h-screen">
-      <Navbar />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold">Welcome back, {user?.username}!</h1>
