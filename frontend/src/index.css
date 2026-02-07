@@ -2,46 +2,49 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ========================================
-   CSS VARIABLES & THEME
-======================================== */
 
 @layer base {
-  :root {
-    /* Color palette - Light theme */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    
-    /* Border radius */
+ :root {
+    --background: 200 40% 6%;       /* #0b1e26 */
+    --foreground: 210 20% 98%;      /* text trắng xám */
+
+    --card: 200 38% 12%;            /* #0f2733 */
+    --card-foreground: 210 20% 96%;
+
+    --popover: 200 30% 14%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 197 86% 60%;         /* #39b7f1 */
+    --primary-foreground: 200 40% 10%; /* chữ đen */
+
+    --secondary: 200 25% 20%;
+    --secondary-foreground: 220 15% 85%;
+
+    --muted: 200 30% 18%;
+    --muted-foreground: 210 15% 55%;
+
+    --accent: 200 32% 18%;
+    --accent-foreground: 210 20% 95%;
+
+    --destructive: 0 80% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 200 33% 26%;          /* #274556 */
+    --input: 200 33% 26%;
+
+    --ring: 197 86% 60%;            /* cùng màu primary */
+
     --radius: 0.5rem;
-    
-    /* Sidebar - Light theme */
-    --sidebar: hsl(0 0% 98%);
+
+    --sidebar: hsl(200 30% 10%);
     --sidebar-width: 16rem;
-    --sidebar-foreground: hsl(240 5.3% 26.1%);
-    --sidebar-primary: hsl(240 5.9% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(240 4.8% 95.9%);
-    --sidebar-accent-foreground: hsl(240 5.9% 10%);
-    --sidebar-border: hsl(220 13% 91%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
+    --sidebar-foreground: hsl(210 10% 90%);
+    --sidebar-primary: hsl(200 30% 96%);
+    --sidebar-primary-foreground: hsl(200 40% 10%);
+    --sidebar-accent: hsl(200 30% 16%);
+    --sidebar-accent-foreground: hsl(210 25% 96%);
+    --sidebar-border: hsl(200 20% 25%);
+    --sidebar-ring: hsl(197 86% 60%);
   }
 
   .dark {
@@ -87,9 +90,6 @@
   }
 }
 
-/* ========================================
-   TAILWIND v4 THEME TOKENS
-======================================== */
 
 @theme {
   /* Container */

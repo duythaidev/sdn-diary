@@ -1,5 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { authService } from '@/services/api/authService'
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import GoogleButton from '@/components/common/GoogleButton'
 
 interface LoginForm {
   email: string
@@ -18,6 +19,7 @@ interface LoginForm {
 export function LoginPage() {
   const navigate = useNavigate()
   const { setUser } = useProfile()
+
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -44,9 +46,9 @@ export function LoginPage() {
   const handleGoogleLogin = () => {}
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0b1e26] bg-gradient-to-b from-[#0d1f27] to-[#0b1c23] p-4">
+    <div className="bg-background flex min-h-screen items-center justify-center bg-gradient-to-b from-[#0d1f27] to-[#0b1c23] p-4">
       <div className="w-full max-w-md">
-        <Card className="rounded-2xl border border-[#1e3a46] bg-[#0f2733]/90 px-2 pt-2 pb-3 shadow-2xl backdrop-blur-md">
+        <Card className="border-border bg-card/90 rounded-2xl border px-2 pt-2 pb-3 shadow-2xl backdrop-blur-md">
           {/* Header */}
           <CardHeader className="space-y-4 pt-6 pb-5 text-center">
             <div className="flex justify-center">
@@ -59,7 +61,7 @@ export function LoginPage() {
 
             <div className="space-y-1">
               <h1 className="text-[22px] font-bold text-white">Welcome Back</h1>
-              <p className="text-sm text-slate-400">Please enter your details to sign in.</p>
+              <p className="text-muted-foreground text-sm">Please enter your details to sign in.</p>
             </div>
           </CardHeader>
 
@@ -68,23 +70,32 @@ export function LoginPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Email */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-[13px] text-slate-200">
+                <Label htmlFor="email" className="text-foreground text-[13px]">
                   Email Address
                 </Label>
+
                 <Input
                   id="email"
                   type="email"
-                  className="h-11 rounded-lg border border-[#274556] bg-[#102530] text-slate-200 placeholder:text-slate-500"
+                  className="border-border bg-muted text-foreground placeholder:text-muted-foreground h-11 rounded-lg border"
                   placeholder="yourname@example.com"
-                  {...register('email')}
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: {
+                      value: /^\S+@\S+\.\S+$/,
+                      message: 'Invalid email address',
+                    },
+                  })}
                 />
+
+                {errors.email && <p className="text-destructive mt-1 text-sm">{errors.email.message}</p>}
               </div>
 
               {/* Password */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-[13px] text-slate-200">Password</Label>
-                  <Link to="/forgot-password" className="text-[12px] text-cyan-400 hover:underline">
+                  <Label className="text-foreground text-[13px]">Password</Label>
+                  <Link to="/forgot-password" className="text-primary text-[12px] hover:underline">
                     Forgot Password?
                   </Link>
                 </div>
@@ -93,63 +104,66 @@ export function LoginPage() {
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="h-11 rounded-lg border border-[#274556] bg-[#102530] pr-10 text-slate-200 placeholder:text-slate-500"
+                    className="border-border bg-muted text-foreground placeholder:text-muted-foreground h-11 rounded-lg border pr-10"
                     placeholder="Enter your password"
-                    {...register('password')}
+                    {...register('password', {
+                      required: 'Password is required',
+                      minLength: {
+                        value: 6,
+                        message: 'Password must be at least 6 characters',
+                      },
+                    })}
                   />
+
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2 text-slate-400 hover:bg-transparent hover:text-slate-300"
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2 hover:bg-transparent"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
+
+                {errors.password && <p className="text-destructive mt-1 text-sm">{errors.password.message}</p>}
               </div>
 
-              {/* Sign In button */}
+              {/* Sign In */}
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-11 w-full rounded-lg bg-[#39b7f1] font-semibold text-[#0f1c24] shadow-md hover:bg-[#2ea3d8]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80 h-11 w-full rounded-lg font-semibold shadow-md"
               >
-                Sign In
+                {loading ? 'Signing in...' : 'Sign In'}
               </Button>
 
-              {/* OR Divider */}
+              {/* Divider */}
               <div className="flex items-center">
-                <div className="flex-1 border-t border-[#274556]"></div>
-                <span className="px-3 text-[12px] text-slate-400">OR</span>
-                <div className="flex-1 border-t border-[#274556]"></div>
+                <div className="border-border flex-1 border-t"></div>
+                <span className="text-muted-foreground px-3 text-[12px]">OR</span>
+                <div className="border-border flex-1 border-t"></div>
               </div>
 
               {/* Google Button */}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogleLogin}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#274556] bg-[#102530] text-white"
-              >
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="h-5 w-5" />
-                Continue with Google
-              </Button>
+              <GoogleButton handleGoogleLogin={handleGoogleLogin} />
             </form>
           </CardContent>
 
           {/* Footer */}
           <CardFooter className="justify-center pb-3 text-center">
-            <p className="text-center text-sm text-slate-400">
+            <p className="text-muted-foreground text-center text-sm">
               Don’t have an account?{' '}
-              <Link to="/register" className="text-cyan-400 hover:underline">
+              <Link to="/register" className="text-primary hover:underline">
                 Create free account
               </Link>
             </p>
           </CardFooter>
         </Card>
 
-        <p className="mt-3 text-center text-[11px] text-slate-500">© 2024 Personal Journal App. All rights reserved.</p>
+        <p className="text-muted-foreground mt-3 text-center text-[11px]">
+          © 2024 Personal Journal App. All rights reserved.
+        </p>
       </div>
     </div>
   )
