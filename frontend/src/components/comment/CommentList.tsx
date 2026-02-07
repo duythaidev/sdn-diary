@@ -3,7 +3,7 @@ import type { Comment, User } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Trash2 } from 'lucide-react'
-import { useProfile } from '@/hooks/useGetProfile'
+import { useProfile } from '@/hooks/useProfile'
 interface CommentListProps {
   comments: Comment[]
   diaryOwnerId: string

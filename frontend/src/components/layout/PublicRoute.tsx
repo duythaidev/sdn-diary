@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { useProfile } from '@/hooks/useGetProfile'
+import { useProfile } from '@/hooks/useProfile'
 
 interface PublicRouteProps {
   children: React.ReactNode

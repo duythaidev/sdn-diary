@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { useProfile } from '@/hooks/useGetProfile'
+import { useProfile } from '@/hooks/useProfile'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 

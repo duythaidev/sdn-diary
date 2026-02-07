@@ -78,7 +78,7 @@ function AppContent() {
         {/* 404 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <Toaster />
+      <Toaster richColors />
     </>
   );
 }
