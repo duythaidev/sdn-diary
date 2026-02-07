@@ -53,4 +53,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = "Button"
 
-export { Button, buttonVariants }
+const PrimaryButton = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps
+>(({ className, size, asChild = false, ...props }, ref) => {
+  return (
+    <Button
+      ref={ref}
+      variant="default"
+      size={size}
+      className={cn("bg-primary text-primary-foreground hover:bg-primary/80 h-11 w-full rounded-lg font-semibold shadow-md", className)}
+      asChild={asChild}
+      {...props}
+    />
+  )
+})
+PrimaryButton.displayName = "PrimaryButton"
+
+export { Button, PrimaryButton, buttonVariants }

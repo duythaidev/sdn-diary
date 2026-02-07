@@ -1,15 +1,15 @@
-import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { authService } from '@/services/api/authService'
 import { useProfile } from '@/hooks/useProfile'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
+import {  PrimaryButton } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import GoogleButton from '@/components/common/GoogleButton'
+import ShowPassword from '@/components/common/ShowPassword'
 
 interface LoginForm {
   email: string
@@ -46,7 +46,7 @@ export function LoginPage() {
   const handleGoogleLogin = () => {}
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center bg-gradient-to-b from-[#0d1f27] to-[#0b1c23] p-4">
+    <div className="bg-background flex min-h-screen items-center justify-center bg-linear-to-b from-[#0d1f27] to-[#0b1c23] p-4">
       <div className="w-full max-w-md">
         <Card className="border-border bg-card/90 rounded-2xl border px-2 pt-2 pb-3 shadow-2xl backdrop-blur-md">
           {/* Header */}
@@ -115,28 +115,20 @@ export function LoginPage() {
                     })}
                   />
 
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2 hover:bg-transparent"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
+                  <ShowPassword
+                    showPassword={showPassword}
+                    setShowPassword={setShowPassword}
+                    className="absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2"
+                  />
                 </div>
 
                 {errors.password && <p className="text-destructive mt-1 text-sm">{errors.password.message}</p>}
               </div>
 
               {/* Sign In */}
-              <Button
-                type="submit"
-                disabled={loading}
-                className="bg-primary text-primary-foreground hover:bg-primary/80 h-11 w-full rounded-lg font-semibold shadow-md"
-              >
+              <PrimaryButton type="submit" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign In'}
-              </Button>
+              </PrimaryButton>
 
               {/* Divider */}
               <div className="flex items-center">
@@ -153,7 +145,7 @@ export function LoginPage() {
           {/* Footer */}
           <CardFooter className="justify-center pb-3 text-center">
             <p className="text-muted-foreground text-center text-sm">
-              Don’t have an account?{' '}
+              Don't have an account?{' '}
               <Link to="/register" className="text-primary hover:underline">
                 Create free account
               </Link>

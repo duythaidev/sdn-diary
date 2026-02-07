@@ -12,6 +12,7 @@ import { DiaryDetailPage } from "./pages/DiaryDetailPage";
 import { DiaryCreatePage } from "./pages/DiaryCreatePage";
 import { DiaryEditPage } from "./pages/DiaryEditPage";
 import { PublicDiariesPage } from "./pages/PublicDiariesPage";
+import NotFound from "./pages/NotFound";
 
 function AppContent() {
 
@@ -76,7 +77,7 @@ function AppContent() {
 
 
         {/* 404 */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster richColors />
     </>

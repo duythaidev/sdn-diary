@@ -1,15 +1,15 @@
-import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { authService } from '@/services/api/authService'
 import { useProfile } from '@/hooks/useProfile'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
+import { PrimaryButton } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import GoogleButton from '@/components/common/GoogleButton'
+import ShowPassword from '@/components/common/ShowPassword'
 
 interface RegisterForm {
   username: string
@@ -130,15 +130,11 @@ export function RegisterPage() {
                       },
                     })}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2 hover:bg-transparent"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
+                  <ShowPassword
+                    showPassword={showPassword}
+                    setShowPassword={setShowPassword}
+                    className="absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2"
+                  />
                 </div>
                 {errors.password && <p className="text-destructive mt-1 text-sm">{errors.password.message}</p>}
               </div>
@@ -157,15 +153,11 @@ export function RegisterPage() {
                       validate: (value) => value === password || 'Passwords do not match',
                     })}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2 hover:bg-transparent"
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
+                  <ShowPassword
+                    showPassword={showConfirmPassword}
+                    setShowPassword={setShowConfirmPassword}
+                    className="absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2"
+                  />
                 </div>
                 {errors.confirmPassword && (
                   <p className="text-destructive mt-1 text-sm">{errors.confirmPassword.message}</p>
@@ -173,13 +165,9 @@ export function RegisterPage() {
               </div>
 
               {/* Submit */}
-              <Button
-                type="submit"
-                disabled={loading}
-                className="bg-primary text-primary-foreground hover:bg-primary/80 h-11 w-full rounded-lg font-semibold shadow-md"
-              >
+              <PrimaryButton type="submit" disabled={loading}>
                 {loading ? 'Creating account...' : 'Create Account'}
-              </Button>
+              </PrimaryButton>
 
               {/* Divider */}
               <div className="flex items-center">

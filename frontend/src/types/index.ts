@@ -1,7 +1,8 @@
 export interface User {
-  id: string
+  id?: string
   username: string
   email: string
+  avatar?: string
   createdAt?: string
 }
 export interface Diary {
