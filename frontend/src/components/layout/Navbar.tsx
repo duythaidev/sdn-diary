@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { BookOpen, LogOut, User, Home, FileText, Globe } from 'lucide-react'
+import { BookOpen, LogOut, User, Home, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import { useProfile } from '@/hooks/useProfile'
 
@@ -58,12 +58,6 @@ export const Navbar = () => {
                     My Diaries
                   </Button>
                 </Link>
-                <Link to="/public">
-                  <Button variant="ghost" size="sm">
-                    <Globe className="mr-2 h-4 w-4" />
-                    Public Diaries
-                  </Button>
-                </Link>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -80,7 +74,7 @@ export const Navbar = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                    <DropdownMenuItem onClick={() => navigate('/profile')}>
                       <User className="mr-2 h-4 w-4" />
                       Profile
                     </DropdownMenuItem>

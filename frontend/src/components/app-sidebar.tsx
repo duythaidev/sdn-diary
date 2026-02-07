@@ -1,8 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { AudioWaveform, Command, Edit, FileText, GalleryVerticalEnd, Globe, Home } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { AudioWaveform, Command, Edit, FileText, GalleryVerticalEnd, Globe, Home, User } from 'lucide-react'
 
 import { NavUser } from '@/components/nav-user'
 import {
@@ -16,6 +16,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { useProfile } from '@/hooks/useProfile'
 import { Separator } from './ui/separator'
@@ -55,12 +56,21 @@ const data = {
       url: '/',
       icon: Globe,
     },
+    {
+      title: 'Profile',
+      url: '/profile',
+      icon: User,
+    },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation()
   const { user } = useProfile()
+  const navigate = useNavigate()
+  const { state } = useSidebar()
+
+  const isCollapsed = state === 'collapsed' // true khi thu sidebar
   return (
     <Sidebar collapsible="icon" {...props}>
       {user && (
@@ -92,9 +102,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenuItem>
-          <PrimaryButton className="bg-primary justify-center p-2 text-lg">
-            <Edit className='size-6!' />
-            <span>New Diary</span>
+          <PrimaryButton onClick={() => navigate('/diary/new')} className="text-md">
+            <Edit className="h-4 w-4!" />
+            {!isCollapsed && <span>New Diary</span>}
           </PrimaryButton>
         </SidebarMenuItem>
       </SidebarFooter>
