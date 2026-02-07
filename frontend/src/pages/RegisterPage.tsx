@@ -52,7 +52,7 @@ export function RegisterPage() {
   const handleGoogleRegister = () => {}
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center bg-gradient-to-b from-[#0d1f27] to-[#0b1c23] p-4">
+    <div className="bg-background flex min-h-screen items-center justify-center bg-linear-to-b from-[#0d1f27] to-[#0b1c23] p-4">
       <div className="w-full max-w-md">
         <Card className="border-border bg-card/90 rounded-2xl border px-2 pt-2 pb-3 shadow-2xl backdrop-blur-md">
           {/* Header */}

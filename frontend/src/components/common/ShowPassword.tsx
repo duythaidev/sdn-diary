@@ -15,7 +15,7 @@ const ShowPassword = ({ showPassword, setShowPassword, className }: ShowPassword
       variant="ghost"
       size="icon"
       onClick={() => setShowPassword(!showPassword)}
-      className={cn("text-muted-foreground hover:text-foreground hover:bg-transparent", className)}
+      className={cn('text-muted-foreground hover:text-foreground hover:bg-transparent', className)}
     >
       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
     </Button>
