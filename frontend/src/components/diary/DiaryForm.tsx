@@ -7,6 +7,8 @@ import { Calendar, Clock, Image, Tag, X, Plus } from 'lucide-react'
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import ImageViewer_Basic from '../commerce-ui/image-viewer-basic'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface DiaryFormData {
   title: string
@@ -79,7 +81,6 @@ export const DiaryForm = ({ initialData, onSubmit, submitLabel = 'Submit', loadi
       reader.readAsDataURL(file)
     }
   }
-  console.log('coverPhoto', coverPhoto)
   // Remove cover photo
   const removeCoverPhoto = () => {
     setCoverPhoto(null)
@@ -262,25 +263,39 @@ export const DiaryForm = ({ initialData, onSubmit, submitLabel = 'Submit', loadi
 
           {coverPhoto ? (
             <div className="group relative overflow-hidden rounded-lg">
-              <img src={coverPhoto} alt="Cover" className="h-40 w-full rounded-lg object-contain" />
-              <div className="bg-opacity-0 group-hover:bg-opacity-50 absolute inset-0 flex items-center justify-center transition-all">
-                <button
-                  type="button"
-                  onClick={removeCoverPhoto}
-                  className="rounded-full bg-red-500 p-2 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+              {/* <img src={coverPhoto} alt="Cover" className="h-40 w-full rounded-lg object-contain" /> */}
+              <ImageViewer_Basic thumbnailUrl={coverPhoto} imageUrl={coverPhoto} className="max-w-[300px]" />
+              {/* <div className="bg-opacity-0 group-hover:bg-opacity-50 absolute inset-0 flex items-center justify-center transition-all"> */}
+              <div className="absolute top-2 right-2">
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={removeCoverPhoto}
+                        className="rounded-full bg-red-500 p-2 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+
+                    <TooltipContent side="left" sideOffset={10}>
+                      <p>Remove cover photo</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
+
+              {/* </div> */}
             </div>
           ) : (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="border-border hover:border-primary/50 flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 transition-colors"
+              className="border-border hover:border-primary/50 flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 transition-colors"
             >
               <Image className="text-muted-foreground h-8 w-8" />
-              <span className="text-muted-foreground text-sm">Add cover photo</span>
+              <span className="text-muted-foreground text-sm">Add cover photo (5MB max)</span>
             </button>
           )}
         </div>
