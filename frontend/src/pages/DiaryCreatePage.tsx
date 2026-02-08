@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { addDiary } from '@/redux/slices/diarySlice'
 import { diaryService } from '@/services/api/diaryService'
-import { Navbar } from '@/components/layout/Navbar'
 import { DiaryForm } from '@/components/diary/DiaryForm'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+
 export const DiaryCreatePage = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(false)
+
   const handleSubmit = async (data: { title: string; content: string; isPublic: boolean }) => {
     setLoading(true)
     try {
@@ -24,19 +24,10 @@ export const DiaryCreatePage = () => {
       setLoading(false)
     }
   }
+
   return (
-    <div className="bg-background min-h-screen">
-      <div className="container mx-auto max-w-3xl px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Create New Diary Entry</CardTitle>
-            <CardDescription>Share your thoughts and experiences</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DiaryForm onSubmit={handleSubmit} submitLabel="Create Entry" loading={loading} />
-          </CardContent>
-        </Card>
-      </div>
+    <div className="min-h-screen bg-background">
+      <DiaryForm onSubmit={handleSubmit} submitLabel="Create Entry" loading={loading} />
     </div>
   )
 }
