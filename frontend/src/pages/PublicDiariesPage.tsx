@@ -9,6 +9,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Globe } from 'lucide-react'
 import { toast } from 'sonner'
+import Editor from '@/components/editor/Editor'
 
 export const PublicDiariesPage = () => {
   const dispatch = useDispatch()
@@ -35,6 +36,7 @@ export const PublicDiariesPage = () => {
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
+      <Editor />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold">Public Diaries</h1>
