@@ -7,6 +7,7 @@ import {
   createDiary,
   updateDiary,
   deleteDiary,
+  getDiariesByTag,
 } from '../controllers/diaryController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -47,9 +48,13 @@ const updateDiaryValidation = [
     .withMessage('isPublic must be a boolean'),
 ];
 // Routes
-router.get('/', verifyAccessToken, getUserDiaries);
 router.get('/public', getPublicDiaries);
-router.get('/:id', getDiaryById);
+router.get('/tag/:tag', getDiariesByTag);
+
+// Protected routes
+router.get('/', verifyAccessToken, getUserDiaries);
+router.get('/mood/:mood', verifyAccessToken, getDiariesByMood);
+router.get('/:id', verifyAccessToken, getDiaryById);
 router.post('/', verifyAccessToken, diaryValidation, validate, createDiary);
 router.put('/:id', verifyAccessToken, updateDiaryValidation, validate, updateDiary);
 router.delete('/:id', verifyAccessToken, deleteDiary);

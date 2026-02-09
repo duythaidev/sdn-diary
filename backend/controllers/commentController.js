@@ -9,7 +9,7 @@ export const createComment = async (req, res) => {
     if (!diary) {
       return res.status(404).json({ message: 'Diary not found' });
     }
-    if (!diary.isPublic) {
+    if (!diary.allowComments) {
       return res.status(403).json({ message: 'Cannot comment on private diary' });
     }
     const comment = new Comment({
@@ -19,9 +19,9 @@ export const createComment = async (req, res) => {
     });
     await comment.save();
     await comment.populate('userId', 'username email');
-    res.status(201).json({ 
-      message: 'Comment added successfully', 
-      comment 
+    res.status(201).json({
+      message: 'Comment added successfully',
+      comment
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -41,8 +41,8 @@ export const deleteComment = async (req, res) => {
     const isCommentAuthor = comment.userId.toString() === req.user.userId;
     const isDiaryOwner = diary && diary.userId.toString() === req.user.userId;
     if (!isCommentAuthor && !isDiaryOwner) {
-      return res.status(403).json({ 
-        message: 'Not authorized to delete this comment' 
+      return res.status(403).json({
+        message: 'Not authorized to delete this comment'
       });
     }
     await Comment.findByIdAndDelete(id);
