@@ -1,5 +1,5 @@
 export interface User {
-  id?: string
+  _id?: string
   username: string
   email: string
   avatar?: string
@@ -13,6 +13,10 @@ export interface Diary {
   userId: User | string
   createdAt: string
   updatedAt: string
+  allowComments: boolean
+  selectedMood: string
+  tags: string[]
+  coverPhoto: string | null
 }
 export interface Comment {
   _id: string

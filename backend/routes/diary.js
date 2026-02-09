@@ -8,6 +8,7 @@ import {
   updateDiary,
   deleteDiary,
   getDiariesByTag,
+  getDiariesByMood,
 } from '../controllers/diaryController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';

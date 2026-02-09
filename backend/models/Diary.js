@@ -43,21 +43,8 @@ const diarySchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+}, { timestamps: true });
 
-// Update the updatedAt timestamp before saving
-diarySchema.pre('save', function (next) {
-  this.updatedAt = Date.now();
-  next();
-});
 
 // Index for better query performance
 diarySchema.index({ userId: 1, createdAt: -1 });

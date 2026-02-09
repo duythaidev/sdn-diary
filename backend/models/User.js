@@ -22,11 +22,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters'],
   },
-  createdAt: {  
-    type: Date,
-    default: Date.now,
-  },
-});
+}, { timestamps: true });
 
 // Method to compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
