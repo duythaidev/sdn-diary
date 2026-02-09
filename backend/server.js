@@ -6,6 +6,7 @@ import connectDB from './config/database.js';
 import authRoutes from './routes/auth.js';
 import diaryRoutes from './routes/diary.js';
 import commentRoutes from './routes/comment.js';
+import morgan from 'morgan';
 dotenv.config();
 // Load environment variables
 // Initialize Express app
@@ -20,6 +21,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(morgan('combined'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/diary', diaryRoutes);
@@ -29,13 +31,18 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 // Error handling middleware
+// app.use((err, req, res, next) => {
+//   console.error(err.stack);
+//   res.status(500).json({ 
+//     message: 'Something went wrong!', 
+//     error: process.env.NODE_ENV === 'development' ? err.message : undefined 
+//   });
+// });
+
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    message: 'Something went wrong!', 
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined 
-  });
-});
+  console.error(err)
+  res.status(500).json({ message: err.message })
+})
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
