@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import GoogleButton from '@/components/common/GoogleButton'
 import ShowPassword from '@/components/common/ShowPassword'
+import { getAxiosErrorMessage } from '@/lib/error'
 
 interface LoginForm {
   email: string
@@ -36,8 +37,8 @@ export function LoginPage() {
       setUser(response.user)
       toast.success('Login successful!')
       navigate('/dashboard')
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Login failed')
+    } catch (error) {
+      toast.error(getAxiosErrorMessage(error, 'Login failed'))
     } finally {
       setLoading(false)
     }
@@ -46,7 +47,7 @@ export function LoginPage() {
   const handleGoogleLogin = () => {}
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center bg-linear-to-b from-[#0d1f27] to-[#0b1c23] p-4">
+    <div className="bg-background flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Card className="border-border bg-card/90 rounded-2xl border px-2 pt-2 pb-3 shadow-2xl backdrop-blur-md">
           {/* Header */}

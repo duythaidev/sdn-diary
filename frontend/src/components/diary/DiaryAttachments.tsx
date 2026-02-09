@@ -7,11 +7,13 @@ interface DiaryAttachmentsProps {
   fileInputRef: React.RefObject<HTMLInputElement | null>
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onRemove: () => void
+  disabled?: boolean
+  className?: string
 }
 
-export const DiaryAttachments = ({ coverPhoto, fileInputRef, onChange, onRemove }: DiaryAttachmentsProps) => {
+export const DiaryAttachments = ({ coverPhoto, fileInputRef, onChange, onRemove, disabled, className }: DiaryAttachmentsProps) => {
   return (
-    <div>
+    <div className={className}>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={onChange} className="hidden" />
 
       {coverPhoto ? (

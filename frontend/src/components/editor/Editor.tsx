@@ -17,7 +17,6 @@ import {
   blockFormatExtension,
   htmlExtension,
   MarkdownExtension,
-  codeExtension,
   codeFormatExtension,
   HTMLEmbedExtension,
   floatingToolbarExtension,
@@ -57,7 +56,6 @@ import {
   Unlink,
   Minus,
   Code,
-  Terminal,
   Table as TableIcon,
   Type,
   Quote,
@@ -103,7 +101,6 @@ export const extensions = [
   blockFormatExtension,
   htmlExtension,
   markdownExt,
-  codeExtension,
   codeFormatExtension,
   new HTMLEmbedExtension().configure({
     markdownExtension: markdownExt,
@@ -439,15 +436,7 @@ function FloatingToolbarRenderer() {
               >
                 <Quote size={14} />
               </button>
-              {hasExtension('code') && (
-                <button
-                  onClick={() => commands.toggleCodeBlock()}
-                  className={`lexkit-toolbar-button ${activeStates.isInCodeBlock ? 'active' : ''}`}
-                  title="Code Block"
-                >
-                  <Terminal size={14} />
-                </button>
-              )}
+
               <div className="bg-border mx-1 h-6 w-px" />
             </>
           )}
@@ -592,15 +581,6 @@ function Toolbar({
               options={blockFormatOptions}
               placeholder="Format"
             />
-            {hasExtension('code') && (
-              <button
-                onClick={() => commands.toggleCodeBlock()}
-                className={`lexkit-toolbar-button ${activeStates.isInCodeBlock ? 'active' : ''}`}
-                title="Code Block"
-              >
-                <Terminal size={16} />
-              </button>
-            )}
           </div>
         )}
 

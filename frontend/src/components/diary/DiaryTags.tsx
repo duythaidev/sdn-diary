@@ -11,6 +11,7 @@ interface DiaryTagsProps {
   onStartAdd: () => void
   onCancelAdd: () => void
   onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void
+  className?: string
 }
 
 export const DiaryTags = ({
@@ -23,9 +24,10 @@ export const DiaryTags = ({
   onStartAdd,
   onCancelAdd,
   onKeyPress,
+  className,
 }: DiaryTagsProps) => {
   return (
-    <div>
+    <div className={className}>
       <div className="mb-3 flex flex-wrap gap-2">
         {tags.map((tag) => (
           <span
