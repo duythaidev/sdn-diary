@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Editor } from '../editor/Editor'
 import { Calendar, Clock, Eye } from 'lucide-react'
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { DiaryTitleInput } from './DiaryTitleInput'
@@ -15,6 +15,10 @@ interface DiaryFormData {
   title: string
   content: string
   isPublic: boolean
+  allowComments: boolean
+  selectedMood: string
+  tags: string[]
+  coverPhoto: string | null
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -37,17 +41,21 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
       title: '',
       content: '',
       isPublic: false,
+      allowComments: true,
+      selectedMood: 'happy',
+      tags: ['reflection', 'gratitude'],
+      coverPhoto: null,
     },
   })
 
   const isPublic = useWatch({ control: control, name: 'isPublic' })
   const content = useWatch({ control: control, name: 'content' })
   const title = useWatch({ control: control, name: 'title' })
+  const allowComments = useWatch({ control: control, name: 'allowComments' })
+  const selectedMood = useWatch({ control: control, name: 'selectedMood' })
+  const tags = useWatch({ control: control, name: 'tags' })
+  const coverPhoto = useWatch({ control: control, name: 'coverPhoto' })
 
-  const [allowComments, setAllowComments] = useState(true)
-  const [selectedMood, setSelectedMood] = useState<string>('happy')
-  const [tags, setTags] = useState<string[]>(['reflection', 'gratitude'])
-  const [coverPhoto, setCoverPhoto] = useState<string | null>(null)
   const [isAddingTag, setIsAddingTag] = useState(false)
   const [newTag, setNewTag] = useState('')
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -84,7 +92,7 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
 
       const reader = new FileReader()
       reader.onloadend = () => {
-        setCoverPhoto(reader.result as string)
+        setValue('coverPhoto', reader.result as string)
       }
       reader.readAsDataURL(file)
     }
@@ -92,7 +100,7 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
 
   // Remove cover photo
   const removeCoverPhoto = () => {
-    setCoverPhoto(null)
+    setValue('coverPhoto', null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -101,7 +109,7 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
   // Add new tag
   const handleAddTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim().toLowerCase())) {
-      setTags([...tags, newTag.trim().toLowerCase()])
+      setValue('tags', [...tags, newTag.trim().toLowerCase()])
       setNewTag('')
       setIsAddingTag(false)
     }
@@ -109,7 +117,7 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
 
   // Remove tag
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove))
+    setValue('tags', tags.filter((tag) => tag !== tagToRemove))
   }
 
   // Handle key press in tag input
@@ -219,7 +227,7 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
                   <button
                     key={mood.value}
                     type="button"
-                    onClick={() => setSelectedMood(mood.value)}
+                    onClick={() => setValue('selectedMood', mood.value)}
                     className="flex cursor-pointer flex-col items-center gap-2"
                   >
                     <div
@@ -265,7 +273,7 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
                   <p className="text-foreground text-sm">Allow Comments</p>
                   <p className="text-muted-foreground text-xs">Others can reply</p>
                 </div>
-                <Switch checked={allowComments} onCheckedChange={setAllowComments} />
+                <Switch checked={allowComments} onCheckedChange={(checked) => setValue('allowComments', checked)} />
               </div>
             </div>
           </div>
