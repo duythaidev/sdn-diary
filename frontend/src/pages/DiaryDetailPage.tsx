@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '@/redux/store'
-import { setCurrentDiary, removeDiary } from '@/redux/slices/diarySlice'
-import {
-  setComments,
-  addComment as addCommentAction,
-  removeComment as removeCommentAction,
-} from '@/redux/slices/commentSlice'
+
 import { diaryService } from '@/services/api/diaryService'
 import { commentService } from '@/services/api/commentService'
 import { Navbar } from '@/components/layout/Navbar'
@@ -31,29 +25,32 @@ import {
 import { format } from 'date-fns'
 import { Edit, Trash2, Globe, Lock, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
-import type { User } from '@/types'
+import type { Diary, User } from '@/types'
+import { useProfile } from '@/hooks/useProfile'
+import { getAxiosErrorMessage } from '@/lib/error'
 
 export const DiaryDetailPage = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { currentDiary } = useSelector((state: RootState) => state.diary)
-  const { comments } = useSelector((state: RootState) => state.comment)
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth)
+  const { user, isAuthenticated } = useProfile()
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
+  const [diary, setDiary] = useState<Diary | null>(null)
+  const [comments, setComments] = useState<Comment[]>([])
 
   useEffect(() => {
-    fetchDiary()
+    if (id) {
+      fetchDiary(id)
+    }
   }, [id])
 
-  const fetchDiary = async () => {
+  const fetchDiary = async (id: string) => {
     try {
-      const response = await diaryService.getDiaryById(id!)
-      dispatch(setCurrentDiary(response.diary))
-      dispatch(setComments(response.comments || []))
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to load diary')
+      const response = await diaryService.getDiaryById(id)
+      setDiary(response.diary)
+      setComments(response.comments || [])
+    } catch (error) {
+      toast.error(getAxiosErrorMessage(error))
       navigate('/diary')
     } finally {
       setLoading(false)
@@ -64,7 +61,6 @@ export const DiaryDetailPage = () => {
     setDeleting(true)
     try {
       await diaryService.deleteDiary(id!)
-      dispatch(removeDiary(id!))
       toast.success('Diary entry deleted successfully')
       navigate('/diary')
     } catch (_error) {
@@ -76,7 +72,6 @@ export const DiaryDetailPage = () => {
   const handleAddComment = async (content: string) => {
     try {
       const response = await commentService.createComment(id!, content)
-      dispatch(addCommentAction(response.comment))
       toast.success('Comment added successfully')
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to add comment')
@@ -87,7 +82,6 @@ export const DiaryDetailPage = () => {
   const handleDeleteComment = async (commentId: string) => {
     try {
       await commentService.deleteComment(commentId)
-      dispatch(removeCommentAction(commentId))
       toast.success('Comment deleted successfully')
     } catch (error) {
       toast.error('Failed to delete comment')
@@ -95,10 +89,10 @@ export const DiaryDetailPage = () => {
   }
 
   if (loading) return <LoadingSpinner />
-  if (!currentDiary) return null
+  if (!diary) return null
 
-  const diaryUser = typeof currentDiary.userId === 'object' ? currentDiary.userId : null
-  const isOwner = user?.id === (diaryUser ? (diaryUser as User).id : currentDiary.userId)
+  const diaryUser = typeof diary.userId === 'object' ? diary.userId : null
+  const isOwner = user?.id === (diaryUser ? (diaryUser as User).id : diary.userId)
 
   return (
     <div className="bg-background min-h-screen">
@@ -113,9 +107,9 @@ export const DiaryDetailPage = () => {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <CardTitle className="text-3xl">{currentDiary.title}</CardTitle>
-                  <Badge variant={currentDiary.isPublic ? 'default' : 'secondary'}>
-                    {currentDiary.isPublic ? (
+                  <CardTitle className="text-3xl">{diary.title}</CardTitle>
+                  <Badge variant={diary.isPublic ? 'default' : 'secondary'}>
+                    {diary.isPublic ? (
                       <>
                         <Globe className="mr-1 h-3 w-3" />
                         Public
@@ -130,9 +124,9 @@ export const DiaryDetailPage = () => {
                 </div>
                 <CardDescription>
                   By {diaryUser ? (diaryUser as User).username : 'Unknown'} •{' '}
-                  {format(new Date(currentDiary.createdAt), 'MMMM dd, yyyy')}
-                  {currentDiary.updatedAt !== currentDiary.createdAt && (
-                    <> • Updated {format(new Date(currentDiary.updatedAt), 'MMM dd, yyyy')}</>
+                  {format(new Date(diary.createdAt), 'MMMM dd, yyyy')}
+                  {diary.updatedAt !== diary.createdAt && (
+                    <> • Updated {format(new Date(diary.updatedAt), 'MMM dd, yyyy')}</>
                   )}
                 </CardDescription>
               </div>
@@ -168,23 +162,23 @@ export const DiaryDetailPage = () => {
           </CardHeader>
           <CardContent>
             <div className="prose max-w-none">
-              <p className="whitespace-pre-wrap">{currentDiary.content}</p>
+              <p className="whitespace-pre-wrap">{diary.content}</p>
             </div>
           </CardContent>
         </Card>
 
-        {currentDiary.isPublic && (
+        {diary.isPublic && (
           <Card>
             <CardHeader>
               <CardTitle>Comments ({comments.length})</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {isAuthenticated && <CommentForm onSubmit={handleAddComment} />}
-              <CommentList
+              {/* <CommentList
                 comments={comments}
-                diaryOwnerId={diaryUser ? (diaryUser as User).id : (currentDiary.userId as string)}
+                diaryOwnerId={diaryUser ? (diaryUser as User).id : (diary.userId as string)}
                 onDelete={handleDeleteComment}
-              />
+              /> */}
             </CardContent>
           </Card>
         )}

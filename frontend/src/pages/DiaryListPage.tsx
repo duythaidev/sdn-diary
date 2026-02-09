@@ -1,29 +1,27 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import type { RootState } from '@/redux/store'
-import { setDiaries } from '@/redux/slices/diarySlice'
 import { diaryService } from '@/services/api/diaryService'
-import { Navbar } from '@/components/layout/Navbar'
 import { DiaryCard } from '@/components/diary/DiaryCard'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Plus, BookOpen } from 'lucide-react'
 import { toast } from 'sonner'
+import type { Diary } from '@/types'
+import { getAxiosErrorMessage } from '@/lib/error'
 export const DiaryListPage = () => {
-  const dispatch = useDispatch()
-  const { diaries } = useSelector((state: RootState) => state.diary)
   const [loading, setLoading] = useState(true)
+  const [diaries, setDiaries] = useState<Diary[]>([])
+
   useEffect(() => {
     fetchDiaries()
   }, [])
   const fetchDiaries = async () => {
     try {
       const response = await diaryService.getUserDiaries()
-      dispatch(setDiaries(response.diaries))
-    } catch (_error) {
-      toast.error('Failed to load diaries')
+      setDiaries(response.diaries)
+    } catch (error) {
+      toast.error(getAxiosErrorMessage(error))
     } finally {
       setLoading(false)
     }

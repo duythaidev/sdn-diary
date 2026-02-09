@@ -1,91 +1,83 @@
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import type { RootState } from '@/redux/store'
-import { updateDiary as updateDiaryAction } from '@/redux/slices/diarySlice'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { diaryService } from '@/services/api/diaryService'
-import { Navbar } from '@/components/layout/Navbar'
 import { DiaryForm } from '@/components/diary/DiaryForm'
-import { LoadingSpinner } from '@/components/common/LoadingSpinner'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { getAxiosErrorMessage } from '@/lib/error'
+
+interface DiaryFormData {
+  title: string
+  content: string
+  isPublic: boolean
+  allowComments: boolean
+  selectedMood: string
+  tags: string[]
+  coverPhoto: string | null
+}
 
 export const DiaryEditPage = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { user } = useSelector((state: RootState) => state.auth)
-  const [diary, setDiary] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [initialData, setInitialData] = useState<DiaryFormData | undefined>(undefined)
+  const [fetchLoading, setFetchLoading] = useState(true)
 
   useEffect(() => {
-    fetchDiary()
-  }, [id])
-
-  const fetchDiary = async () => {
-    try {
-      const response = await diaryService.getDiaryById(id!)
-      const diaryData = response.diary
-
-      // Check if user owns this diary
-      const ownerId = typeof diaryData.userId === 'object' ? diaryData.userId.id : diaryData.userId
-
-      if (ownerId !== user?.id) {
-        toast.error('You are not authorized to edit this diary')
+    const fetchDiary = async () => {
+      if (!id) return
+      
+      try {
+        const response = await diaryService.getDiaryById(id)
+        setInitialData({
+          title: response.diary.title,
+          content: response.diary.content,
+          isPublic: response.diary.isPublic,
+          allowComments: response.diary.allowComments || true,
+          selectedMood: response.diary.selectedMood || 'happy',
+          tags: response.diary.tags || ['reflection', 'gratitude'],
+          coverPhoto: response.diary.coverPhoto || null,
+        })
+      } catch (error) {
+        toast.error(getAxiosErrorMessage(error))
         navigate('/diary')
-        return
+      } finally {
+        setFetchLoading(false)
       }
+    }
 
-      setDiary(diaryData)
-    } catch (error) {
-      toast.error('Failed to load diary')
+    fetchDiary()
+  }, [id, navigate])
+
+  const handleSubmit = async (data: DiaryFormData) => {
+    if (!id) return
+    
+    setLoading(true)
+    try {
+      await diaryService.updateDiary(id, data)
+      toast.success('Diary entry updated successfully!')
       navigate('/diary')
+    } catch (error) {
+      toast.error(getAxiosErrorMessage(error))
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSubmit = async (data: { title: string; content: string; isPublic: boolean }) => {
-    setSubmitting(true)
-    try {
-      const response = await diaryService.updateDiary(id!, data.title, data.content, data.isPublic)
-      dispatch(updateDiaryAction(response.diary))
-      toast.success('Diary entry updated successfully!')
-      navigate(`/diary/${id}`)
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update diary entry')
-    } finally {
-      setSubmitting(false)
-    }
+  if (fetchLoading) {
+    return (
+      <div className="bg-background flex min-h-screen items-center justify-center">
+        <p className="text-muted-foreground">Loading diary entry...</p>
+      </div>
+    )
   }
 
-  if (loading) return <LoadingSpinner />
+  if (!initialData) {
+    return null
+  }
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto max-w-3xl px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Edit Diary Entry</CardTitle>
-            <CardDescription>Update your thoughts and experiences</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {diary && (
-              <DiaryForm
-                initialData={{
-                  title: diary.title,
-                  content: diary.content,
-                  isPublic: diary.isPublic,
-                }}
-                onSubmit={handleSubmit}
-                submitLabel="Update Entry"
-                loading={submitting}
-              />
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <DiaryForm mode="edit" initialData={initialData} onSubmit={handleSubmit} loading={loading} />
     </div>
   )
 }

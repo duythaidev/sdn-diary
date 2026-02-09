@@ -40,5 +40,12 @@ export interface CommentState {
   error: string | null
 }
 
-export interface ErrorResponse {
+export interface DiaryFormData {
+  title: string
+  content: string
+  isPublic: boolean
+  allowComments: boolean
+  selectedMood: string
+  tags: string[]
+  coverPhoto: string | null
 }

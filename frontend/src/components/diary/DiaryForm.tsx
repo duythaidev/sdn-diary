@@ -24,12 +24,13 @@ interface DiaryFormData {
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 interface DiaryFormProps {
+  mode: 'create' | 'edit'
   initialData?: DiaryFormData
   onSubmit: (data: DiaryFormData) => Promise<void>
   loading?: boolean
 }
 
-export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormProps) => {
+export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: DiaryFormProps) => {
   const {
     register,
     handleSubmit,
@@ -140,6 +141,10 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
     setIsPreviewOpen(true)
   }
 
+  // Dynamic text based on mode
+  const submitButtonText = mode === 'create' ? 'Publish' : 'Update'
+  const loadingButtonText = mode === 'create' ? 'Publishing...' : 'Updating...'
+
   return (
     <>
       <div className="bg-background flex min-h-screen">
@@ -184,7 +189,7 @@ export const DiaryForm = ({ initialData, onSubmit, loading = false }: DiaryFormP
                 disabled={loading}
                 className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1"
               >
-                {loading ? 'Publishing...' : 'Publish'}
+                {loading ? loadingButtonText : submitButtonText}
               </Button>
             </div>
             <Button

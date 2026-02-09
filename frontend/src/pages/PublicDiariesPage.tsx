@@ -1,7 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import type { RootState } from '@/redux/store'
-import { setPublicDiaries } from '@/redux/slices/diarySlice'
 import { diaryService } from '@/services/api/diaryService'
 import { Navbar } from '@/components/layout/Navbar'
 import { DiaryCard } from '@/components/diary/DiaryCard'
@@ -9,12 +6,12 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Globe } from 'lucide-react'
 import { toast } from 'sonner'
-import { Editor } from '@/components/editor/Editor'
+import type { Diary } from '@/types'
+import { getAxiosErrorMessage } from '@/lib/error'
 
 export const PublicDiariesPage = () => {
-  const dispatch = useDispatch()
-  const { publicDiaries } = useSelector((state: RootState) => state.diary)
   const [loading, setLoading] = useState(true)
+  const [publicDiaries, setPublicDiaries] = useState<Diary[]>([])
 
   useEffect(() => {
     fetchPublicDiaries()
@@ -23,9 +20,9 @@ export const PublicDiariesPage = () => {
   const fetchPublicDiaries = async () => {
     try {
       const response = await diaryService.getPublicDiaries()
-      dispatch(setPublicDiaries(response.diaries))
+      setPublicDiaries(response.diaries)
     } catch (error) {
-      toast.error('Failed to load public diaries')
+      toast.error(getAxiosErrorMessage(error, 'Failed to load public diaries'))
     } finally {
       setLoading(false)
     }

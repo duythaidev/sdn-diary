@@ -1,22 +1,19 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { addDiary } from '@/redux/slices/diarySlice'
 import { diaryService } from '@/services/api/diaryService'
 import { DiaryForm } from '@/components/diary/DiaryForm'
 import { toast } from 'sonner'
 import { getAxiosErrorMessage } from '@/lib/error'
+import type { DiaryFormData } from '@/types'
 
 export const DiaryCreatePage = () => {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (data: { title: string; content: string; isPublic: boolean }) => {
+  const handleSubmit = async (data: DiaryFormData) => {
     setLoading(true)
     try {
-      const response = await diaryService.createDiary(data.title, data.content, data.isPublic)
-      dispatch(addDiary(response.diary))
+      await diaryService.createDiary(data)
       toast.success('Diary entry created successfully!')
       navigate('/diary')
     } catch (error) {
@@ -28,7 +25,7 @@ export const DiaryCreatePage = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <DiaryForm onSubmit={handleSubmit} loading={loading} />
+      <DiaryForm mode="create" onSubmit={handleSubmit} loading={loading} />
     </div>
   )
 }
