@@ -5,6 +5,7 @@ import { addDiary } from '@/redux/slices/diarySlice'
 import { diaryService } from '@/services/api/diaryService'
 import { DiaryForm } from '@/components/diary/DiaryForm'
 import { toast } from 'sonner'
+import { getAxiosErrorMessage } from '@/lib/error'
 
 export const DiaryCreatePage = () => {
   const navigate = useNavigate()
@@ -18,16 +19,16 @@ export const DiaryCreatePage = () => {
       dispatch(addDiary(response.diary))
       toast.success('Diary entry created successfully!')
       navigate('/diary')
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to create diary entry')
+    } catch (error) {
+      toast.error(getAxiosErrorMessage(error))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <DiaryForm onSubmit={handleSubmit} submitLabel="Create Entry" loading={loading} />
+    <div className="bg-background min-h-screen">
+      <DiaryForm onSubmit={handleSubmit} loading={loading} />
     </div>
   )
 }

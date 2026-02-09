@@ -1,19 +1,21 @@
 import axiosInstance from './axios'
+const URL = '/diary'
+
 export const diaryService = {
   getUserDiaries: async () => {
-    const response = await axiosInstance.get('/diary')
+    const response = await axiosInstance.get(URL)
     return response.data
   },
   getPublicDiaries: async () => {
-    const response = await axiosInstance.get('/diary/public')
+    const response = await axiosInstance.get(`${URL}/public`)
     return response.data
   },
   getDiaryById: async (id: string) => {
-    const response = await axiosInstance.get(`/diary/${id}`)
+    const response = await axiosInstance.get(`${URL}/${id}`)
     return response.data
   },
   createDiary: async (title: string, content: string, isPublic: boolean) => {
-    const response = await axiosInstance.post('/diary', {
+    const response = await axiosInstance.post(URL, {
       title,
       content,
       isPublic,
@@ -21,7 +23,7 @@ export const diaryService = {
     return response.data
   },
   updateDiary: async (id: string, title: string, content: string, isPublic: boolean) => {
-    const response = await axiosInstance.put(`/diary/${id}`, {
+    const response = await axiosInstance.put(`${URL}/${id}`, {
       title,
       content,
       isPublic,
@@ -29,7 +31,7 @@ export const diaryService = {
     return response.data
   },
   deleteDiary: async (id: string) => {
-    const response = await axiosInstance.delete(`/diary/${id}`)
+    const response = await axiosInstance.delete(`${URL}/${id}`)
     return response.data
   },
 }
