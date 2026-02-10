@@ -1,9 +1,12 @@
 export interface User {
-  _id?: string
+  _id: string
   username: string
   email: string
-  avatar?: string
-  createdAt?: string
+  bio?: string
+  profileImage?: string | null
+  urls?: Array<{ value: string }>
+  createdAt: string
+  updatedAt: string
 }
 export interface Diary {
   _id: string
@@ -24,7 +27,7 @@ export interface Comment {
   content: string
   userId: User | string
   diaryId: string
-  createdAt: string
+  createdAt?: string
 }
 export interface AuthState {
   user: User | null

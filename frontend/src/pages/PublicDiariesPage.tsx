@@ -39,7 +39,7 @@ export const PublicDiariesPage = () => {
     <div className="min-h-screen bg-linear-to-br">
       <Navbar />
 
-      <div className="relative container mx-auto max-w-7xl px-6 py-12">
+      <div className="relative container mx-auto max-w-7xl px-6 py-6">
         {/* Header Section */}
         <div className="mb-10 space-y-3">
           <h1 className="text-5xl font-bold tracking-tight text-white">Public Feed</h1>

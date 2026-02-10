@@ -4,12 +4,13 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb'
 import { Separator } from '../ui/separator'
-
+import { useGetPageName } from '@/hooks/useGetPageName'
 interface ProtectedRouteProps {
   children: React.ReactNode
 }
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { isAuthenticated } = useProfile()
+  const { pageName } = useGetPageName()
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
@@ -24,7 +25,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">Build Your Application</BreadcrumbLink>
+                <BreadcrumbLink>{pageName}</BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
