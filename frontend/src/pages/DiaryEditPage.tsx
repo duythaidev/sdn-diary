@@ -4,16 +4,7 @@ import { diaryService } from '@/services/api/diaryService'
 import { DiaryForm } from '@/components/diary/DiaryForm'
 import { toast } from 'sonner'
 import { getAxiosErrorMessage } from '@/lib/error'
-
-interface DiaryFormData {
-  title: string
-  content: string
-  isPublic: boolean
-  allowComments: boolean
-  selectedMood: string
-  tags: string[]
-  coverPhoto: string | null
-}
+import type { DiaryFormData } from '@/types'
 
 export const DiaryEditPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -25,7 +16,7 @@ export const DiaryEditPage = () => {
   useEffect(() => {
     const fetchDiary = async () => {
       if (!id) return
-      
+
       try {
         const response = await diaryService.getDiaryById(id)
         setInitialData({
@@ -36,6 +27,7 @@ export const DiaryEditPage = () => {
           selectedMood: response.diary.selectedMood || 'happy',
           tags: response.diary.tags || ['reflection', 'gratitude'],
           coverPhoto: response.diary.coverPhoto || null,
+          isDraft: response.diary.isDraft || false,
         })
       } catch (error) {
         toast.error(getAxiosErrorMessage(error))
@@ -50,11 +42,17 @@ export const DiaryEditPage = () => {
 
   const handleSubmit = async (data: DiaryFormData) => {
     if (!id) return
-    
+
     setLoading(true)
     try {
       await diaryService.updateDiary(id, data)
-      toast.success('Diary entry updated successfully!')
+
+      if (data.isDraft) {
+        toast.success('Draft saved successfully!')
+      } else {
+        toast.success('Diary entry updated successfully!')
+      }
+
       navigate('/diary')
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))

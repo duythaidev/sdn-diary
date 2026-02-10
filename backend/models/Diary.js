@@ -38,6 +38,10 @@ const diarySchema = new mongoose.Schema({
     type: String, // Base64 string or URL
     default: null,
   },
+  isDraft: {
+    type: Boolean,
+    default: false,
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -50,6 +54,8 @@ const diarySchema = new mongoose.Schema({
 diarySchema.index({ userId: 1, createdAt: -1 });
 diarySchema.index({ isPublic: 1, createdAt: -1 });
 diarySchema.index({ tags: 1 });
+diarySchema.index({ isDraft: 1, userId: 1 });
+
 
 const Diary = mongoose.model('Diary', diarySchema);
 

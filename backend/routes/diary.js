@@ -9,6 +9,8 @@ import {
   deleteDiary,
   getDiariesByTag,
   getDiariesByMood,
+  getUserDrafts,
+  publishDraft,
 } from '../controllers/diaryController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -51,7 +53,7 @@ const updateDiaryValidation = [
 // Routes
 router.get('/public', getPublicDiaries);
 router.get('/tag/:tag', getDiariesByTag);
-
+router.get('/drafts', verifyAccessToken, getUserDrafts);
 // Protected routes
 router.get('/', verifyAccessToken, getUserDiaries);
 router.get('/mood/:mood', verifyAccessToken, getDiariesByMood);
@@ -59,4 +61,5 @@ router.get('/:id', verifyAccessToken, getDiaryById);
 router.post('/', verifyAccessToken, diaryValidation, validate, createDiary);
 router.put('/:id', verifyAccessToken, updateDiaryValidation, validate, updateDiary);
 router.delete('/:id', verifyAccessToken, deleteDiary);
+router.patch('/:id/publish', verifyAccessToken, publishDraft);
 export default router;

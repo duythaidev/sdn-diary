@@ -67,8 +67,8 @@ export const DiaryDetailPage = () => {
       await diaryService.deleteDiary(id!)
       toast.success('Diary entry deleted successfully')
       navigate('/diary')
-    } catch (_error) {
-      toast.error('Failed to delete diary entry')
+    } catch (error) {
+      toast.error(getAxiosErrorMessage(error))
       setDeleting(false)
     }
   }
@@ -78,8 +78,8 @@ export const DiaryDetailPage = () => {
       const response = await commentService.createComment(id!, content)
       setComments([response.comment, ...comments])
       toast.success('Comment added successfully')
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to add comment')
+    } catch (error) {
+      toast.error(getAxiosErrorMessage(error))
       throw error
     }
   }
@@ -90,7 +90,7 @@ export const DiaryDetailPage = () => {
       setComments(comments.filter((c) => c._id !== commentId))
       toast.success('Comment deleted successfully')
     } catch (error) {
-      toast.error('Failed to delete comment')
+      toast.error(getAxiosErrorMessage(error))
     }
   }
 

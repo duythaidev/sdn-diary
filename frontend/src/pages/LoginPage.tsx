@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { authService } from '@/services/api/authService'
 import { useProfile } from '@/hooks/useProfile'
 import { toast } from 'sonner'
-import { PrimaryButton } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
@@ -127,9 +127,9 @@ export function LoginPage() {
               </div>
 
               {/* Sign In */}
-              <PrimaryButton type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign In'}
-              </PrimaryButton>
+              </Button>
 
               {/* Divider */}
               <div className="flex items-center">

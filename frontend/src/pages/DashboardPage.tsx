@@ -33,7 +33,6 @@ export const DashboardPage = () => {
 
   const publicCount = diaries.filter((d) => d.isPublic).length
   const privateCount = diaries.filter((d) => !d.isPublic).length
-  const recentDiaries = diaries.slice(0, 3)
 
   if (loading) return <LoadingSpinner />
 
@@ -82,9 +81,9 @@ export const DashboardPage = () => {
             </Button>
           </Link>
         </div>
-        {recentDiaries.length > 0 ? (
+        {diaries.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {recentDiaries.map((diary) => (
+            {diaries.map((diary) => (
               <DiaryCard key={diary._id} diary={diary} />
             ))}
           </div>

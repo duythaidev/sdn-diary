@@ -15,6 +15,7 @@ export interface Diary {
   updatedAt: string
   allowComments: boolean
   selectedMood: string
+  isDraft: boolean
   tags: string[]
   coverPhoto: string | null
 }
@@ -44,12 +45,4 @@ export interface CommentState {
   error: string | null
 }
 
-export interface DiaryFormData {
-  title: string
-  content: string
-  isPublic: boolean
-  allowComments: boolean
-  selectedMood: string
-  tags: string[]
-  coverPhoto: string | null
-}
+export interface DiaryFormData extends Omit<Diary, '_id' | 'userId' | 'createdAt' | 'updatedAt'> {}

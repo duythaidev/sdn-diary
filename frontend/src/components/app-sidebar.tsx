@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/sidebar'
 import { useProfile } from '@/hooks/useProfile'
 import { Separator } from './ui/separator'
-import { PrimaryButton } from './ui/button'
+import { Button} from './ui/button'
 
 const data = {
   teams: [
@@ -102,10 +102,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenuItem>
-          <PrimaryButton onClick={() => navigate('/diary/new')} className="text-md">
+          <Button onClick={() => navigate('/diary/new')} className="text-md w-full">
             <Edit className="h-4 w-4!" />
             {!isCollapsed && <span>New Diary</span>}
-          </PrimaryButton>
+          </Button>
         </SidebarMenuItem>
       </SidebarFooter>
       <SidebarRail />

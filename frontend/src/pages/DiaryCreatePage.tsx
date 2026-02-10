@@ -14,7 +14,13 @@ export const DiaryCreatePage = () => {
     setLoading(true)
     try {
       await diaryService.createDiary(data)
-      toast.success('Diary entry created successfully!')
+      
+      if (data.isDraft) {
+        toast.success('Draft saved successfully!')
+      } else {
+        toast.success('Diary entry created successfully!')
+      }
+      
       navigate('/diary')
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))

@@ -10,6 +10,7 @@ import { DiaryTitleInput } from './DiaryTitleInput'
 import { DiaryAttachments } from './DiaryAttachments'
 import { DiaryTags } from './DiaryTags'
 import { DiaryPreviewModal } from './DiaryPreviewModal'
+import { getAxiosErrorMessage } from '@/lib/error'
 
 interface DiaryFormData {
   title: string
@@ -19,6 +20,7 @@ interface DiaryFormData {
   selectedMood: string
   tags: string[]
   coverPhoto: string | null
+  isDraft: boolean
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -46,6 +48,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
       selectedMood: 'happy',
       tags: ['reflection', 'gratitude'],
       coverPhoto: null,
+      isDraft: false,
     },
   })
 
@@ -118,7 +121,10 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
 
   // Remove tag
   const removeTag = (tagToRemove: string) => {
-    setValue('tags', tags.filter((tag) => tag !== tagToRemove))
+    setValue(
+      'tags',
+      tags.filter((tag) => tag !== tagToRemove),
+    )
   }
 
   // Handle key press in tag input
@@ -141,7 +147,10 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
     setIsPreviewOpen(true)
   }
 
-  // Dynamic text based on mode
+  const handleSubmitDiary = async (data: DiaryFormData, isDraft: boolean) => {
+    await onSubmit({ ...data, isDraft })
+  }
+
   const submitButtonText = mode === 'create' ? 'Publish' : 'Update'
   const loadingButtonText = mode === 'create' ? 'Publishing...' : 'Updating...'
 
@@ -150,7 +159,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
       <div className="bg-background flex min-h-screen">
         {/* Main Content Area */}
         <div className="flex-1 p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="">
+          <form className="">
             {/* Title Input - Large */}
             <DiaryTitleInput
               register={register('title', {
@@ -180,14 +189,17 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                 variant="outline"
                 className="border-border bg-secondary text-secondary-foreground hover:bg-secondary/80 flex-1"
                 type="button"
-              >
-                Save Draft
-              </Button>
-              <Button
-                type="submit"
-                onClick={handleSubmit(onSubmit)}
+                onClick={handleSubmit((data) => handleSubmitDiary(data, true))} 
                 disabled={loading}
+              >
+                {loading ? 'Saving...' : 'Save Draft'}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleSubmit((data) => handleSubmitDiary(data, false))}
                 className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1"
+                disabled={loading}
               >
                 {loading ? loadingButtonText : submitButtonText}
               </Button>
