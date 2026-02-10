@@ -113,13 +113,11 @@ export const Navbar = () => {
                 <>
                   <Link to="/dashboard">
                     <Button variant="ghost" size="sm">
-                      <Home className="mr-2 h-4 w-4" />
                       Dashboard
                     </Button>
                   </Link>
                   <Link to="/diary">
                     <Button variant="ghost" size="sm">
-                      <FileText className="mr-2 h-4 w-4" />
                       My Diaries
                     </Button>
                   </Link>
@@ -139,15 +137,9 @@ export const Navbar = () => {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => navigate('/profile')}>
-                        <User className="mr-2 h-4 w-4" />
-                        Profile
-                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/profile')}>Profile</DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Logout
-                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </>
