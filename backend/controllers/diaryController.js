@@ -7,27 +7,8 @@ const RECENT_DIARIES_LIMIT = 3;
 
 export const getUserDiaries = async (req, res) => {
   try {
-    const { dateFilter, moodFilter, tagsFilter } = req.query;
+    const { dateFilter, moodFilter, tagsFilter, queryFilter } = req.query;
     const query = { userId: req.user.userId };
-
-    // Date filter
-    if (dateFilter === 'today') {
-      const startOfDay = new Date();
-      startOfDay.setHours(0, 0, 0, 0);
-      query.createdAt = { $gte: startOfDay };
-    } else if (dateFilter === 'this_week') {
-      const startOfWeek = new Date();
-      const day = startOfWeek.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      startOfWeek.setDate(startOfWeek.getDate() + diff);
-      startOfWeek.setHours(0, 0, 0, 0);
-      query.createdAt = { $gte: startOfWeek };
-    } else if (dateFilter === 'this_month') {
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-      query.createdAt = { $gte: startOfMonth };
-    }
 
     // Mood filter
     if (moodFilter && moodFilter !== 'all') {
@@ -39,8 +20,17 @@ export const getUserDiaries = async (req, res) => {
       query.tags = { $in: [tagsFilter] };
     }
 
+    // Query filter
+    if (queryFilter) {
+      query.$or = [
+        { title: { $regex: queryFilter, $options: 'i' } },
+        { content: { $regex: queryFilter, $options: 'i' } },
+      ];
+    }
+
+    const sortBy = dateFilter === 'newest' ? -1 : 1;
     const diaries = await Diary.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: sortBy })
       .populate('userId', 'username email');
     res.json({ diaries });
   } catch (error) {
@@ -89,12 +79,27 @@ export const getUserDrafts = async (req, res) => {
 };
 
 export const getPublicDiaries = async (req, res) => {
+  const { isRecent, isMostLiked, queryFilter } = req.query;
+
+  // Query filter
+
+  const query = {};
+  if (queryFilter) {
+    query.$or = [
+      { title: { $regex: queryFilter, $options: 'i' } },
+      { content: { $regex: queryFilter, $options: 'i' } },
+    ];
+  }
+
+  const sortQuery = isMostLiked ? { likes: -1 } : { updatedAt: -1 };
+
   try {
     const diaries = await Diary.find({
       isPublic: true,
-      isDraft: false
+      isDraft: false,
+      ...query
     })
-      .sort({ createdAt: -1 })
+      .sort(sortQuery)
       .populate('userId', 'username email');
     res.json({ diaries });
   } catch (error) {

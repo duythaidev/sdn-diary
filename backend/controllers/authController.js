@@ -122,3 +122,47 @@ export const getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateProfile = async (req, res, next) => {
+  try {
+    const { username, bio, profileImage, urls } = req.body;
+    const userId = req.user.userId;
+
+    if (username) {
+      const existingUser = await User.findOne({ username, _id: { $ne: userId } });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Username already taken' });
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...(username && { username }),
+        ...(bio !== undefined && { bio }),
+        ...(profileImage !== undefined && { profileImage }),
+        ...(urls !== undefined && { urls }),
+      },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        profileImage: user.profileImage,
+        urls: user.urls,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
