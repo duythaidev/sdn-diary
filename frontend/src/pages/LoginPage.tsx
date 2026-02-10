@@ -127,7 +127,7 @@ export function LoginPage() {
               </div>
 
               {/* Sign In */}
-              <Button type="submit" disabled={loading}>
+              <Button className="w-full" type="submit" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign In'}
               </Button>
 

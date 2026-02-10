@@ -4,19 +4,23 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Trash2 } from 'lucide-react'
 import { useProfile } from '@/hooks/useProfile'
+
 interface CommentListProps {
   comments: Comment[]
   diaryOwnerId: string
   onDelete: (commentId: string) => void
   loading?: boolean
 }
+
 export const CommentList = ({ comments, diaryOwnerId, onDelete, loading }: CommentListProps) => {
   const { user } = useProfile()
+
   const canDelete = (comment: Comment) => {
     if (!user) return false
-    const commentUserId = typeof comment.userId === 'object' ? (comment.userId as User).id : comment.userId
-    return user.id === commentUserId || user.id === diaryOwnerId
+    const commentUserId = typeof comment.userId === 'object' ? (comment.userId as User)._id : comment.userId
+    return user._id === commentUserId || user._id === diaryOwnerId
   }
+
   if (comments.length === 0) {
     return <div className="text-muted-foreground py-8 text-center">No comments yet. Be the first to comment!</div>
   }
@@ -26,7 +30,7 @@ export const CommentList = ({ comments, diaryOwnerId, onDelete, loading }: Comme
         const commentUser = typeof comment.userId === 'object' ? comment.userId : null
         return (
           <Card key={comment._id}>
-            <CardContent className="pt-4">
+            <CardContent className="">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="mb-2 flex items-center gap-2">

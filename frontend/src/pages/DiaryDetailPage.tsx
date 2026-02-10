@@ -240,7 +240,7 @@ export const DiaryDetailPage = () => {
                 </div>
               </div>
 
-              <div className="space-y-6 px-8 py-6">
+              <div className="space-y-6 py-6">
                 {isAuthenticated && (
                   <div className="mb-6">
                     <CommentForm onSubmit={handleAddComment} />

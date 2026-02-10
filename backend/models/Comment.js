@@ -16,10 +16,6 @@ const commentSchema = new mongoose.Schema({
     ref: 'Diary',
     required: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+}, { timestamps: true });
 const Comment = mongoose.model('Comment', commentSchema);
 export default Comment;

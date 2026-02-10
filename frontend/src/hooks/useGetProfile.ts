@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { authService } from '@/services/api/authService'
 import { toast } from 'sonner'
 import { useProfile } from './useProfile'
+import { getAxiosErrorMessage } from '@/lib/error'
 
 export const useGetProfile = () => {
   const { user, isAuthenticated, logout, setUser } = useProfile()
@@ -13,9 +14,10 @@ export const useGetProfile = () => {
     try {
       const response = await authService.getMe()
       setUser(response.user)
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Login failed')
-      setError(error.response?.data?.message || 'Login failed')
+    } catch (error) {
+      const errorMessage = getAxiosErrorMessage(error)
+      toast.error(errorMessage)
+      setError(errorMessage)
       logout()
     } finally {
       setLoading(false)
