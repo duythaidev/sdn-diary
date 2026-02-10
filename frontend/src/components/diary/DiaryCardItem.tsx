@@ -1,5 +1,5 @@
 import { checkIsOwner, cn, getMoodColor, getMoodIcon, getMoodLabel } from '@/lib/utils'
-import type { Diary, User } from '@/types'
+import type { Diary } from '@/types'
 import { format } from 'date-fns'
 import { Globe, Image, Lock, MoreHorizontal, Edit, Trash2, Copy } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -23,7 +23,7 @@ const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    navigate(`/diary/edit/${diary._id}`)
+    navigate(`/diary/${diary._id}/edit`)
   }
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -135,7 +135,7 @@ const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
         {/* Cover Image Section */}
         <div className="relative flex h-64 items-center justify-center overflow-hidden">
           {/* Gradient overlay */}
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-slate-900/80" />
+          <div className="absolute inset-0 z-10 bg-linear-to-b from-transparent via-transparent to-slate-900/80" />
 
           {diary.coverPhoto ? (
             <img
@@ -144,7 +144,7 @@ const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
               className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-800/30 to-slate-900/30">
+            <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-slate-800/30 to-slate-900/30">
               <div className="relative">
                 <div className="absolute inset-0 bg-cyan-500/10 blur-3xl" />
                 <Image className="relative h-20 w-20 text-slate-600" />
@@ -191,7 +191,7 @@ const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
 
         {/* Hover shine effect */}
         <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5" />
+          <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 via-transparent to-blue-500/5" />
         </div>
       </div>
     </Link>
