@@ -18,7 +18,7 @@ export const DashboardPage = () => {
 
   const fetchDiaries = async () => {
     try {
-      const response = await diaryService.getUserDiaries()
+      const response = await diaryService.getUserRecentDiaries()
       setDiaries(response.diaries)
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))

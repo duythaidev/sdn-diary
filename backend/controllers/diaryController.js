@@ -2,11 +2,57 @@ import Diary from '../models/Diary.js';
 import Comment from '../models/Comment.js';
 
 const MAX_COVER_PHOTO_SIZE = 5 * 1024 * 1024;
+const MAX_DIARIES_PER_PAGE = 10;
+const RECENT_DIARIES_LIMIT = 3;
 
 export const getUserDiaries = async (req, res) => {
   try {
-    const diaries = await Diary.find({ userId: req.user.userId })
+    const { dateFilter, moodFilter, tagsFilter } = req.query;
+    const query = { userId: req.user.userId };
+
+    // Date filter
+    if (dateFilter === 'today') {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      query.createdAt = { $gte: startOfDay };
+    } else if (dateFilter === 'this_week') {
+      const startOfWeek = new Date();
+      const day = startOfWeek.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      startOfWeek.setDate(startOfWeek.getDate() + diff);
+      startOfWeek.setHours(0, 0, 0, 0);
+      query.createdAt = { $gte: startOfWeek };
+    } else if (dateFilter === 'this_month') {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      query.createdAt = { $gte: startOfMonth };
+    }
+
+    // Mood filter
+    if (moodFilter && moodFilter !== 'all') {
+      query.selectedMood = moodFilter;
+    }
+
+    // Tags filter
+    if (tagsFilter && tagsFilter !== 'all') {
+      query.tags = { $in: [tagsFilter] };
+    }
+
+    const diaries = await Diary.find(query)
       .sort({ createdAt: -1 })
+      .populate('userId', 'username email');
+    res.json({ diaries });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const getUserRecentDiaries = async (req, res) => {
+  try {
+    const diaries = await Diary.find({ userId: req.user.userId })
+      .sort({ updatedAt: -1 })
+      .limit(RECENT_DIARIES_LIMIT)
       .populate('userId', 'username email');
     res.json({ diaries });
   } catch (error) {

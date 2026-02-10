@@ -11,6 +11,7 @@ import {
   getDiariesByMood,
   getUserDrafts,
   publishDraft,
+  getUserRecentDiaries,
 } from '../controllers/diaryController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -56,6 +57,7 @@ router.get('/tag/:tag', getDiariesByTag);
 router.get('/drafts', verifyAccessToken, getUserDrafts);
 // Protected routes
 router.get('/', verifyAccessToken, getUserDiaries);
+router.get('/recent', verifyAccessToken, getUserRecentDiaries);
 router.get('/mood/:mood', verifyAccessToken, getDiariesByMood);
 router.get('/:id', verifyAccessToken, getDiaryById);
 router.post('/', verifyAccessToken, diaryValidation, validate, createDiary);

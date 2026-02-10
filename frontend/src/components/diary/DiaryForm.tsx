@@ -10,7 +10,7 @@ import { DiaryTitleInput } from './DiaryTitleInput'
 import { DiaryAttachments } from './DiaryAttachments'
 import { DiaryTags } from './DiaryTags'
 import { DiaryPreviewModal } from './DiaryPreviewModal'
-import { getAxiosErrorMessage } from '@/lib/error'
+import { MOODS } from '@/constants'
 
 interface DiaryFormData {
   title: string
@@ -65,18 +65,12 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const moods = [
-    { icon: '😫', label: 'Stressed', value: 'stressed', color: 'orange' },
-    { icon: '😐', label: 'Okay', value: 'okay', color: '#6e6e4e' },
-    { icon: '😌', label: 'Calm', value: 'calm', color: '#1d3a50' },
-    { icon: '😊', label: 'Happy', value: 'happy', color: '#1abc9c' },
-    { icon: '🤩', label: 'Great', value: 'great', color: '#8e44ad' },
-  ]
+
 
   const currentDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
   const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 
-  const selectedMoodData = moods.find((mood) => mood.value === selectedMood)
+  const selectedMoodData = MOODS.find((mood) => mood.value === selectedMood)
 
   // Handle cover photo upload
   const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -237,7 +231,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
             </h3>
 
             <div className="flex items-center justify-between gap-3">
-              {moods.map((mood) => {
+              {MOODS.map((mood) => {
                 const isActive = selectedMood === mood.value
 
                 return (

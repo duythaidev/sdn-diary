@@ -1,67 +1,140 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { diaryService } from '@/services/api/diaryService'
-import { DiaryCard } from '@/components/diary/DiaryCard'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Plus, BookOpen } from 'lucide-react'
-import { toast } from 'sonner'
-import type { Diary } from '@/types'
-import { getAxiosErrorMessage } from '@/lib/error'
-export const DiaryListPage = () => {
-  const [loading, setLoading] = useState(true)
-  const [diaries, setDiaries] = useState<Diary[]>([])
+import { Input } from '@/components/ui/input'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Search, ChevronDown } from 'lucide-react'
+import DiaryCardItem from '@/components/diary/DiaryCardItem'
+import { MOODS } from '@/constants'
+import { useGetUserDiaries } from '@/hooks/useGetUserDiaries'
 
-  useEffect(() => {
-    fetchDiaries()
-  }, [])
-  const fetchDiaries = async () => {
-    try {
-      const response = await diaryService.getUserDiaries()
-      setDiaries(response.diaries)
-    } catch (error) {
-      toast.error(getAxiosErrorMessage(error))
-    } finally {
-      setLoading(false)
-    }
-  }
+export const DiaryListPage = () => {
+  const { diaries, loading, setDateFilter, setMoodFilter, setTagsFilter, searchQuery, setSearchQuery } =
+    useGetUserDiaries()
+
+  const allTags = Array.from(new Set(diaries?.flatMap((d) => d.tags || [])))
+
   if (loading) return <LoadingSpinner />
+
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="mb-2 text-3xl font-bold">My Diaries</h1>
-            <p className="text-muted-foreground">Manage all your diary entries</p>
-          </div>
-          <Link to="/diary/create">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New Entry
-            </Button>
-          </Link>
+      <div className="container mx-auto max-w-7xl px-6 py-12">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="mb-3 text-5xl font-bold">My Entries</h1>
+          <p className="text-lg text-gray-400">Manage your daily reflections and thoughts.</p>
         </div>
+
+        {/* Filters and Search */}
+        <div className="mb-8 flex flex-wrap items-center gap-4">
+          {/* Date Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="border-gray-700 bg-[#1a2332] text-gray-300 hover:bg-[#243447] hover:text-white"
+              >
+                Date
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="border-gray-700 bg-[#1a2332]">
+              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('all')}>
+                All Dates
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('today')}>
+                Today
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('week')}>
+                This Week
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('month')}>
+                This Month
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Mood Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="border-gray-700 bg-[#1a2332] text-gray-300 hover:bg-[#243447] hover:text-white"
+              >
+                Mood
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="border-gray-700 bg-[#1a2332]">
+              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setMoodFilter('all')}>
+                All Moods
+              </DropdownMenuItem>
+              {MOODS.map((mood) => (
+                <DropdownMenuItem
+                  key={mood.value}
+                  className="text-gray-300 hover:bg-[#243447]"
+                  onClick={() => setMoodFilter(mood.value)}
+                >
+                  <span className="mr-2">{mood.icon}</span>
+                  {mood.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Tags Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="border-gray-700 bg-[#1a2332] text-gray-300 hover:bg-[#243447] hover:text-white"
+              >
+                Tags
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="border-gray-700 bg-[#1a2332]">
+              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setTagsFilter('all')}>
+                All Tags
+              </DropdownMenuItem>
+              {allTags.map((tag) => (
+                <DropdownMenuItem
+                  key={tag}
+                  className="text-gray-300 hover:bg-[#243447]"
+                  onClick={() => setTagsFilter(tag)}
+                >
+                  #{tag}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Search */}
+          <div className="relative ml-auto">
+            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Search entries..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="border-gray-700 bg-[#1a2332] pl-10 text-gray-300 placeholder:text-gray-500 focus:border-gray-600"
+            />
+          </div>
+        </div>
+
+        {/* Diary Grid */}
         {diaries.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {diaries.map((diary) => (
-              <DiaryCard key={diary._id} diary={diary} />
+              <DiaryCardItem key={diary._id} diary={diary} />
             ))}
           </div>
         ) : (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <BookOpen className="text-muted-foreground mb-4 h-12 w-12" />
-              <p className="mb-2 text-lg font-medium">No diary entries yet</p>
-              <p className="text-muted-foreground mb-4">Start your journey by creating your first entry</p>
-              <Link to="/diary/create">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create First Entry
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col items-center justify-center py-20">
+            <p className="mb-4 text-lg text-gray-400">No entries found</p>
+            <Link to="/diary/create">
+              <Button className="bg-blue-600 hover:bg-blue-700">Create New Entry</Button>
+            </Link>
+          </div>
         )}
       </div>
     </div>
