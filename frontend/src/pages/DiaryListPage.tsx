@@ -9,12 +9,20 @@ import { MOODS } from '@/constants'
 import { useGetUserDiaries } from '@/hooks/useGetUserDiaries'
 
 export const DiaryListPage = () => {
-  const { diaries, loading, setDateFilter, setMoodFilter, setTagsFilter, searchQuery, setSearchQuery } =
-    useGetUserDiaries()
+  const {
+    diaries,
+    loading,
+    setDateFilter,
+    setMoodFilter,
+    setTagsFilter,
+    searchQuery,
+    setSearchQuery,
+    dateFilter,
+    moodFilter,
+    tagsFilter,
+  } = useGetUserDiaries()
 
   const allTags = Array.from(new Set(diaries?.flatMap((d) => d.tags || [])))
-
-  if (loading) return <LoadingSpinner />
 
   return (
     <div className="bg-background min-h-screen">
@@ -27,29 +35,23 @@ export const DiaryListPage = () => {
 
         {/* Filters and Search */}
         <div className="mb-8 flex flex-wrap items-center gap-4">
-          {/* Date Filter */}
+          {/* Sort by Newest/Oldest Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 className="border-gray-700 bg-[#1a2332] text-gray-300 hover:bg-[#243447] hover:text-white"
               >
-                Date
+                Sort by {dateFilter === 'newest' ? 'newest' : 'oldest'}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="border-gray-700 bg-[#1a2332]">
-              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('all')}>
-                All Dates
+              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('newest')}>
+                Newest
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('today')}>
-                Today
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('week')}>
-                This Week
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('month')}>
-                This Month
+              <DropdownMenuItem className="text-gray-300 hover:bg-[#243447]" onClick={() => setDateFilter('oldest')}>
+                Oldest
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -61,7 +63,7 @@ export const DiaryListPage = () => {
                 variant="outline"
                 className="border-gray-700 bg-[#1a2332] text-gray-300 hover:bg-[#243447] hover:text-white"
               >
-                Mood
+                {MOODS.find((option) => option.value === moodFilter)?.label || 'All Moods'}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -89,7 +91,7 @@ export const DiaryListPage = () => {
                 variant="outline"
                 className="border-gray-700 bg-[#1a2332] text-gray-300 hover:bg-[#243447] hover:text-white"
               >
-                Tags
+                {tagsFilter === 'all' ? 'Tags' : `#${tagsFilter}`}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -122,7 +124,9 @@ export const DiaryListPage = () => {
         </div>
 
         {/* Diary Grid */}
-        {diaries.length > 0 ? (
+        {loading ? (
+          <LoadingSpinner />
+        ) : diaries.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {diaries.map((diary) => (
               <DiaryCardItem key={diary._id} diary={diary} />

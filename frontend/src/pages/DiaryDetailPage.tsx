@@ -2,35 +2,23 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { diaryService } from '@/services/api/diaryService'
 import { commentService } from '@/services/api/commentService'
-import { CommentList } from '@/components/comment/CommentList'
-import { CommentForm } from '@/components/comment/CommentForm'
+import { CommentsSection } from '@/components/comment/CommentsSection'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Button } from '@/components/ui/button'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
 import { format } from 'date-fns'
-import { Edit, Trash2, ArrowLeft, Lock, Bookmark, Share2, MessageCircle } from 'lucide-react'
+import { Edit, ArrowLeft, Lock, Bookmark, Share2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Comment, Diary, User } from '@/types'
+import type { Diary, User, Comment } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
 import { getAxiosErrorMessage } from '@/lib/error'
 import ImageViewer_Basic from '@/components/commerce-ui/image-viewer-basic'
+import TagsList from '@/components/common/TagsList'
 
 export const DiaryDetailPage = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user, isAuthenticated } = useProfile()
   const [loading, setLoading] = useState(true)
-  const [deleting, setDeleting] = useState(false)
   const [diary, setDiary] = useState<Diary | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
 
@@ -61,22 +49,11 @@ export const DiaryDetailPage = () => {
     }
   }
 
-  const handleDelete = async () => {
-    setDeleting(true)
-    try {
-      await diaryService.deleteDiary(id!)
-      toast.success('Diary entry deleted successfully')
-      navigate('/diary')
-    } catch (error) {
-      toast.error(getAxiosErrorMessage(error))
-      setDeleting(false)
-    }
-  }
-
   const handleAddComment = async (content: string) => {
     try {
       const response = await commentService.createComment(id!, content)
       setComments([response.comment, ...comments])
+      fetchDiary(id!)
       toast.success('Comment added successfully')
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))
@@ -88,6 +65,7 @@ export const DiaryDetailPage = () => {
     try {
       await commentService.deleteComment(commentId)
       setComments(comments.filter((c) => c._id !== commentId))
+      fetchDiary(id!)
       toast.success('Comment deleted successfully')
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))
@@ -106,20 +84,20 @@ export const DiaryDetailPage = () => {
   const authorName = diaryUser ? (diaryUser as User).username : 'Unknown'
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen text-white">
       <div className="container mx-auto max-w-4xl px-4 py-8">
         {/* Back Button */}
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 text-gray-300 hover:bg-gray-800">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
 
         {/* Main Content Card */}
-        <div className="bg-background mx-auto max-w-3xl overflow-hidden rounded-lg shadow-lg">
+        <div className="mx-auto max-w-3xl overflow-hidden rounded-lg">
           {/* Private Badge */}
           {!diary.isPublic && (
             <div className="mb-4 flex justify-center">
-              <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium">
+              <span className="inline-flex items-center gap-1 rounded-full bg-gray-800 px-3 py-1 text-xs font-medium text-gray-300">
                 <Lock className="h-3 w-3" />
                 Private – Only You Can See This
               </span>
@@ -127,14 +105,14 @@ export const DiaryDetailPage = () => {
           )}
 
           {/* Header Section with Title and Author */}
-          <div className="mb-6 border-b pb-6">
-            <h1 className="text-foreground mb-6 text-4xl font-bold">{diary.title}</h1>
+          <div className="mb-6 border-b border-gray-800 pb-6">
+            <h1 className="mb-6 text-4xl font-bold text-white">{diary.title}</h1>
 
             {/* Author Info */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="bg-primary flex h-10 w-10 items-center justify-center rounded-full">
-                  <span className="text-primary-foreground text-sm font-medium">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-cyan-500 to-blue-600">
+                  <span className="text-sm font-medium text-white">
                     {authorName
                       .split(' ')
                       .map((n) => n[0])
@@ -142,8 +120,8 @@ export const DiaryDetailPage = () => {
                   </span>
                 </div>
                 <div>
-                  <p className="text-foreground text-sm font-medium">{authorName}</p>
-                  <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                  <p className="text-sm font-medium text-white">{authorName}</p>
+                  <div className="flex items-center gap-2 text-xs text-gray-400">
                     <span>{displayDate}</span>
                     {selectedMoodData && (
                       <>
@@ -167,38 +145,17 @@ export const DiaryDetailPage = () => {
               {/* Action Buttons */}
               <div className="flex items-center gap-2">
                 {isOwner && (
-                  <>
-                    <Link to={`/diary/${id}/edit`}>
-                      <Button variant="outline" size="icon">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="icon" disabled={deleting}>
-                          <Trash2 className="text-destructive h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Diary Entry</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete this diary entry? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </>
+                  <Link to={`/diary/${id}/edit`}>
+                    <Button variant="outline" size="icon" className="border-gray-700 hover:bg-gray-800">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 )}
-                <button className="hover:bg-muted rounded-full p-2 transition-colors">
-                  <Bookmark className="text-foreground/60 h-5 w-5" />
+                <button className="rounded-full p-2 transition-colors hover:bg-gray-800">
+                  <Bookmark className="h-5 w-5 text-gray-400" />
                 </button>
-                <button className="hover:bg-muted rounded-full p-2 transition-colors">
-                  <Share2 className="text-foreground/60 h-5 w-5" />
+                <button className="rounded-full p-2 transition-colors hover:bg-gray-800">
+                  <Share2 className="h-5 w-5 text-gray-400" />
                 </button>
               </div>
             </div>
@@ -212,47 +169,26 @@ export const DiaryDetailPage = () => {
           )}
 
           {/* Content Section */}
-          <div className="bg-background px-8">
+          <div>
             <div
-              className="text-foreground/90 prose prose-lg max-w-none leading-relaxed"
+              className="prose prose-invert prose-lg max-w-none leading-relaxed text-gray-200"
               dangerouslySetInnerHTML={{ __html: diary.content }}
             />
 
             {/* Tags */}
-            {diary.tags && diary.tags.length > 0 && (
-              <div className="mt-8 flex flex-wrap gap-2">
-                {diary.tags.map((tag) => (
-                  <span key={tag} className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
+            <TagsList tags={diary.tags} />
           </div>
-
           {/* Comments Section */}
-          {diary.allowComments && (
-            <div className="border-border mt-8 border-t">
-              <div className="bg-muted/30 flex items-center gap-6 px-8 py-4">
-                <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                  <MessageCircle className="h-4 w-4" />
-                  <span>{comments.length} Comments</span>
-                </div>
-              </div>
-
-              <div className="space-y-6 py-6">
-                {isAuthenticated && (
-                  <div className="mb-6">
-                    <CommentForm onSubmit={handleAddComment} />
-                  </div>
-                )}
-
-                <CommentList
-                  comments={comments}
-                  diaryOwnerId={diaryUser ? ((diaryUser as User)._id as string) : (diary.userId as string)}
-                  onDelete={handleDeleteComment}
-                />
-              </div>
+          {diary.allowComments && !diary.isDraft && (
+            <div className="mt-12">
+              <CommentsSection
+                diaryId={id!}
+                diaryOwnerId={diaryUser ? ((diaryUser as User)._id as string) : (diary.userId as string)}
+                comments={comments}
+                onAddComment={handleAddComment}
+                onDeleteComment={handleDeleteComment}
+                isAuthenticated={isAuthenticated}
+              />
             </div>
           )}
         </div>
