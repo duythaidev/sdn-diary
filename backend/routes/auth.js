@@ -5,7 +5,8 @@ import {
   login,
   refresh,
   logout,
-  getMe
+  getMe,
+  updateProfile
 } from '../controllers/authController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -33,10 +34,40 @@ const loginValidation = [
     .notEmpty()
     .withMessage('Password is required'),
 ];
+
+const updateProfileValidation = [
+  body('username')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 30 })
+    .withMessage('Username must be between 2 and 30 characters'),
+  body('bio')
+    .optional()
+    .isLength({ min: 4, max: 160 })
+    .withMessage('Bio must be between 4 and 160 characters'),
+  body('profileImage')
+    .optional()
+    .custom((value) => {
+      if (value === null) return true; // Allow null to remove image
+      if (typeof value === 'string' && value.startsWith('data:image/')) return true;
+      if (typeof value === 'string' && value.startsWith('http')) return true;
+      throw new Error('Invalid profile image format');
+    }),
+  body('urls')
+    .optional()
+    .isArray()
+    .withMessage('URLs must be an array'),
+  body('urls.*.value')
+    .optional()
+    .isURL()
+    .withMessage('Each URL must be valid'),
+];
 // Routes
 router.post('/register', registerValidation, validate, register);
 router.post('/login', loginValidation, validate, login);
 router.post('/refresh', refresh);
 router.post('/logout', logout);
 router.get('/me', verifyAccessToken, getMe);
+router.put('/profile', verifyAccessToken, updateProfileValidation, validate, updateProfile);
+
 export default router;

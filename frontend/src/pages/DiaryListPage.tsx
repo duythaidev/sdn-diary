@@ -27,20 +27,16 @@ export const DiaryListPage = () => {
   const activeMood = MOODS.find((option) => option.value === moodFilter)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Ambient background effects */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent pointer-events-none" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none" />
-      
+    <div className="min-h-screen">
       <div className="relative container mx-auto max-w-7xl px-6 py-12">
         {/* Header */}
         <div className="mb-12 flex items-end justify-between">
           <div>
-            <h1 className="mb-3 text-5xl font-bold text-white tracking-tight">My Entries</h1>
+            <h1 className="mb-3 text-5xl font-bold tracking-tight text-white">My Entries</h1>
             <p className="text-lg text-slate-400">Manage your daily reflections and thoughts.</p>
           </div>
           <Link to="/diary/create">
-            <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-6 h-12 shadow-lg shadow-cyan-500/25 transition-all">
+            <Button>
               <Plus className="mr-2 h-5 w-5" />
               New Entry
             </Button>
@@ -48,9 +44,9 @@ export const DiaryListPage = () => {
         </div>
 
         {/* Filters Bar */}
-        <div className="mb-10 backdrop-blur-xl bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
-          <div className="flex items-center gap-3 mb-5">
-            <SlidersHorizontal className="h-5 w-5 text-cyan-400" />
+        <div className="mb-10 rounded-2xl border border-slate-700/50 bg-slate-800/40 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="mb-5 flex items-center gap-3">
+            <SlidersHorizontal className="text-primary h-5 w-5" />
             <h2 className="text-lg font-semibold text-white">Filters</h2>
           </div>
 
@@ -61,35 +57,35 @@ export const DiaryListPage = () => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "border backdrop-blur-md transition-all h-11 px-5",
-                    "bg-slate-900/50 border-slate-700 text-slate-300",
-                    "hover:bg-slate-800 hover:border-cyan-500/50 hover:text-white"
+                    'h-11 border px-5 backdrop-blur-md transition-all',
+                    'border-slate-700 bg-slate-900/50 text-slate-300',
+                    'hover:border-cyan-500/50 hover:bg-slate-800 hover:text-white',
                   )}
                 >
-                  <Calendar className="mr-2 h-4 w-4 text-cyan-400" />
+                  <Calendar className="text-primary mr-2 h-4 w-4" />
                   {dateFilter === 'newest' ? 'Newest First' : 'Oldest First'}
                   <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-slate-900/95 backdrop-blur-xl border-slate-700/50 shadow-2xl min-w-[180px]">
-                <DropdownMenuItem 
+              <DropdownMenuContent className="min-w-[180px] border-slate-700/50 bg-slate-900/95 shadow-2xl backdrop-blur-xl">
+                <DropdownMenuItem
                   className={cn(
-                    "text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer",
-                    dateFilter === 'newest' && "bg-slate-800 text-white"
+                    'cursor-pointer text-slate-300 focus:bg-slate-800 focus:text-white',
+                    dateFilter === 'newest' && 'bg-slate-800 text-white',
                   )}
                   onClick={() => setDateFilter('newest')}
                 >
-                  <Calendar className="mr-2 h-4 w-4 text-cyan-400" />
+                  <Calendar className="text-primary mr-2 h-4 w-4" />
                   Newest First
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className={cn(
-                    "text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer",
-                    dateFilter === 'oldest' && "bg-slate-800 text-white"
+                    'cursor-pointer text-slate-300 focus:bg-slate-800 focus:text-white',
+                    dateFilter === 'oldest' && 'bg-slate-800 text-white',
                   )}
                   onClick={() => setDateFilter('oldest')}
                 >
-                  <Calendar className="mr-2 h-4 w-4 text-cyan-400" />
+                  <Calendar className="text-primary mr-2 h-4 w-4" />
                   Oldest First
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -101,13 +97,11 @@ export const DiaryListPage = () => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "border backdrop-blur-md transition-all h-11 px-5",
-                    moodFilter === 'all'
-                      ? "bg-slate-900/50 border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-cyan-500/50 hover:text-white"
-                      : "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500/50 text-white shadow-lg shadow-cyan-500/10"
+                    'h-11 border px-5 backdrop-blur-md transition-all',
+                    'border-slate-700 bg-slate-900/50 text-slate-300 hover:border-cyan-500/50 hover:bg-slate-800 hover:text-white',
                   )}
                 >
-                  <Smile className="mr-2 h-4 w-4 text-cyan-400" />
+                  <Smile className="text-primary mr-2 h-4 w-4" />
                   {activeMood ? (
                     <>
                       <span className="mr-1">{activeMood.icon}</span>
@@ -119,11 +113,11 @@ export const DiaryListPage = () => {
                   <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-slate-900/95 backdrop-blur-xl border-slate-700/50 shadow-2xl min-w-[200px]">
-                <DropdownMenuItem 
+              <DropdownMenuContent className="min-w-[200px] border-slate-700/50 bg-slate-900/95 shadow-2xl backdrop-blur-xl">
+                <DropdownMenuItem
                   className={cn(
-                    "text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer",
-                    moodFilter === 'all' && "bg-slate-800 text-white"
+                    'cursor-pointer text-slate-300 focus:bg-slate-800 focus:text-white',
+                    moodFilter === 'all' && 'bg-slate-800 text-white',
                   )}
                   onClick={() => setMoodFilter('all')}
                 >
@@ -134,8 +128,8 @@ export const DiaryListPage = () => {
                   <DropdownMenuItem
                     key={mood.value}
                     className={cn(
-                      "text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer",
-                      moodFilter === mood.value && "bg-slate-800 text-white"
+                      'cursor-pointer text-slate-300 focus:bg-slate-800 focus:text-white',
+                      moodFilter === mood.value && 'bg-slate-800 text-white',
                     )}
                     onClick={() => setMoodFilter(mood.value)}
                   >
@@ -153,22 +147,20 @@ export const DiaryListPage = () => {
                   <Button
                     variant="outline"
                     className={cn(
-                      "border backdrop-blur-md transition-all h-11 px-5",
-                      tagsFilter === 'all'
-                        ? "bg-slate-900/50 border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-cyan-500/50 hover:text-white"
-                        : "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500/50 text-white shadow-lg shadow-cyan-500/10"
+                      'h-11 border px-5 backdrop-blur-md transition-all',
+                      'border-slate-700 bg-slate-900/50 text-slate-300 hover:border-cyan-500/50 hover:bg-slate-800 hover:text-white',
                     )}
                   >
-                    <Tag className="mr-2 h-4 w-4 text-cyan-400" />
+                    <Tag className="text-primary mr-2 h-4 w-4" />
                     {tagsFilter === 'all' ? 'All Tags' : `#${tagsFilter}`}
                     <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-slate-900/95 backdrop-blur-xl border-slate-700/50 shadow-2xl min-w-[200px] max-h-[300px] overflow-y-auto">
-                  <DropdownMenuItem 
+                <DropdownMenuContent className="max-h-[300px] min-w-[200px] overflow-y-auto border-slate-700/50 bg-slate-900/95 shadow-2xl backdrop-blur-xl">
+                  <DropdownMenuItem
                     className={cn(
-                      "text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer",
-                      tagsFilter === 'all' && "bg-slate-800 text-white"
+                      'cursor-pointer text-slate-300 focus:bg-slate-800 focus:text-white',
+                      tagsFilter === 'all' && 'bg-slate-800 text-white',
                     )}
                     onClick={() => setTagsFilter('all')}
                   >
@@ -179,12 +171,12 @@ export const DiaryListPage = () => {
                     <DropdownMenuItem
                       key={tag}
                       className={cn(
-                        "text-slate-300 focus:bg-slate-800 focus:text-white cursor-pointer",
-                        tagsFilter === tag && "bg-slate-800 text-white"
+                        'cursor-pointer text-slate-300 focus:bg-slate-800 focus:text-white',
+                        tagsFilter === tag && 'bg-slate-800 text-white',
                       )}
                       onClick={() => setTagsFilter(tag)}
                     >
-                      <span className="mr-2 text-cyan-400">#</span>
+                      <span className="text-primary mr-2">#</span>
                       {tag}
                     </DropdownMenuItem>
                   ))}
@@ -199,14 +191,14 @@ export const DiaryListPage = () => {
                 placeholder="Search entries..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-cyan-500 focus:ring-cyan-500/20 h-11 pl-11 pr-4 w-64 transition-all"
+                className="h-11 w-64 border-slate-700 bg-slate-900/50 pr-4 pl-11 text-white transition-all placeholder:text-slate-500 focus:border-cyan-500 focus:ring-cyan-500/20"
               />
             </div>
 
             {/* Active Filters Count */}
             {(moodFilter !== 'all' || tagsFilter !== 'all') && (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-sm font-medium">
-                <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+              <div className="text-primary flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-400" />
                 {[moodFilter !== 'all' && 'mood', tagsFilter !== 'all' && 'tag'].filter(Boolean).length} active
               </div>
             )}
@@ -226,23 +218,23 @@ export const DiaryListPage = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-24">
-            <div className="backdrop-blur-xl bg-slate-800/40 border border-slate-700/50 rounded-2xl p-12 text-center max-w-md shadow-2xl">
+            <div className="max-w-md rounded-2xl border border-slate-700/50 bg-slate-800/40 p-12 text-center shadow-2xl backdrop-blur-xl">
               <div className="mb-6 flex justify-center">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-cyan-500/20 blur-2xl rounded-full" />
-                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-slate-700/50 flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-2xl" />
+                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-slate-700/50 bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
                     <Search className="h-10 w-10 text-slate-500" />
                   </div>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">No entries found</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-6">
+              <h3 className="mb-3 text-xl font-bold text-white">No entries found</h3>
+              <p className="mb-6 text-sm leading-relaxed text-slate-400">
                 {searchQuery || moodFilter !== 'all' || tagsFilter !== 'all'
                   ? 'Try adjusting your filters or search query'
                   : 'Start your journaling journey by creating your first entry'}
               </p>
               <Link to="/diary/create">
-                <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-6 h-11 shadow-lg shadow-cyan-500/25 transition-all">
+                <Button>
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Entry
                 </Button>

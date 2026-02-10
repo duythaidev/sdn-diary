@@ -18,15 +18,11 @@ const DiaryCardItem = ({ diary }: { diary: Diary }) => {
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // Add delete logic here
-    console.log('Delete diary:', diary._id)
   }
 
   const handleDuplicate = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // Add duplicate logic here
-    console.log('Duplicate diary:', diary._id)
   }
 
   return (

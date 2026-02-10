@@ -3,26 +3,30 @@ import { diaryService } from '@/services/api/diaryService'
 import { Navbar } from '@/components/layout/Navbar'
 import DiaryCardItem from '@/components/diary/DiaryCardItem'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
-import { Globe, TrendingUp, Heart, Clock } from 'lucide-react'
+import { Globe, Heart, Clock, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary } from '@/types'
 import { getAxiosErrorMessage } from '@/lib/error'
 import { cn } from '@/lib/utils'
-
-type FilterType = 'recent' | 'trending' | 'most-liked'
+import { Button } from '@/components/ui/button'
+import useDebounce from '@/hooks/useDebounce'
+import { Input } from '@/components/ui/input'
 
 export const PublicDiariesPage = () => {
   const [loading, setLoading] = useState(true)
   const [publicDiaries, setPublicDiaries] = useState<Diary[]>([])
-  const [activeFilter, setActiveFilter] = useState<FilterType>('recent')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isMostLiked, setIsMostLiked] = useState(false)
+  const [isRecent, setIsRecent] = useState(true)
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
 
   useEffect(() => {
     fetchPublicDiaries()
-  }, [])
+  }, [isRecent, isMostLiked, debouncedSearchQuery])
 
   const fetchPublicDiaries = async () => {
     try {
-      const response = await diaryService.getPublicDiaries()
+      const response = await diaryService.getPublicDiaries(isRecent, isMostLiked, debouncedSearchQuery)
       setPublicDiaries(response.diaries)
     } catch (error) {
       toast.error(getAxiosErrorMessage(error, 'Failed to load public diaries'))
@@ -31,29 +35,8 @@ export const PublicDiariesPage = () => {
     }
   }
 
-  const filteredDiaries = () => {
-    switch (activeFilter) {
-      case 'trending':
-        // Sort by views (if available) or recent activity
-        return [...publicDiaries].sort(
-          (a, b) => new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime(),
-        )
-      case 'most-liked':
-        // Sort by likes or comments if available
-        return [...publicDiaries].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      default:
-        return [...publicDiaries].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    }
-  }
-
-  if (loading) return <LoadingSpinner />
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Ambient background effects */}
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent" />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
-
+    <div className="min-h-screen bg-linear-to-br">
       <Navbar />
 
       <div className="relative container mx-auto max-w-7xl px-6 py-12">
@@ -67,54 +50,50 @@ export const PublicDiariesPage = () => {
 
         {/* Filter Tabs */}
         <div className="mb-10 flex flex-wrap gap-3">
-          <button
-            onClick={() => setActiveFilter('recent')}
-            className={cn(
-              'inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-medium transition-all duration-300',
-              'border backdrop-blur-md',
-              activeFilter === 'recent'
-                ? 'border-cyan-400 bg-cyan-500 text-white shadow-lg shadow-cyan-500/25'
-                : 'border-slate-700/50 bg-slate-800/40 text-slate-300 hover:border-slate-600 hover:bg-slate-700/60 hover:text-white',
-            )}
-          >
-            <Clock className="h-4 w-4" />
-            Recent
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant={isRecent ? 'default' : 'outline'}
+              onClick={() => {
+                setIsRecent(true)
+                setIsMostLiked(false)
+              }}
+              className={cn('rounded-full')}
+            >
+              <Clock className="h-4 w-4" />
+              Recent
+            </Button>
 
-          <button
-            onClick={() => setActiveFilter('trending')}
-            className={cn(
-              'inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-medium transition-all duration-300',
-              'border backdrop-blur-md',
-              activeFilter === 'trending'
-                ? 'border-cyan-400 bg-cyan-500 text-white shadow-lg shadow-cyan-500/25'
-                : 'border-slate-700/50 bg-slate-800/40 text-slate-300 hover:border-slate-600 hover:bg-slate-700/60 hover:text-white',
-            )}
-          >
-            <TrendingUp className="h-4 w-4" />
-            Trending
-          </button>
+            <Button
+              onClick={() => {
+                setIsMostLiked(true)
+                setIsRecent(false)
+              }}
+              variant={isMostLiked ? 'default' : 'outline'}
+              className={cn('rounded-full')}
+            >
+              <Heart className="h-4 w-4" />
+              Most Liked
+            </Button>
+          </div>
 
-          <button
-            onClick={() => setActiveFilter('most-liked')}
-            className={cn(
-              'inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-medium transition-all duration-300',
-              'border backdrop-blur-md',
-              activeFilter === 'most-liked'
-                ? 'border-cyan-400 bg-cyan-500 text-white shadow-lg shadow-cyan-500/25'
-                : 'border-slate-700/50 bg-slate-800/40 text-slate-300 hover:border-slate-600 hover:bg-slate-700/60 hover:text-white',
-            )}
-          >
-            <Heart className="h-4 w-4" />
-            Most Liked
-          </button>
+          <div className="relative ml-auto">
+            <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              placeholder="Search entries..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-11 w-64 border-slate-700 bg-slate-900/50 pr-4 pl-11 text-white transition-all placeholder:text-slate-500 focus:border-cyan-500 focus:ring-cyan-500/20"
+            />
+          </div>
         </div>
 
         {/* Diary Cards Grid */}
-        {filteredDiaries().length > 0 ? (
+        {loading ? (
+          <LoadingSpinner />
+        ) : publicDiaries.length > 0 ? (
           <>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-2">
-              {filteredDiaries().map((diary) => (
+              {publicDiaries.map((diary) => (
                 <DiaryCardItem key={diary._id} diary={diary} />
               ))}
             </div>
@@ -140,7 +119,7 @@ export const PublicDiariesPage = () => {
               <div className="mb-6 flex justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-2xl" />
-                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-slate-700/50 bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-slate-700/50 bg-linear-to-br from-cyan-500/20 to-blue-500/20">
                     <Globe className="h-10 w-10 text-slate-500" />
                   </div>
                 </div>
