@@ -120,12 +120,10 @@ export function ProfilePage() {
   const profileImage = form.watch('profileImage')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen">
       {/* Ambient background effects */}
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent" />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
 
-      <div className="relative container mx-auto max-w-4xl px-6 py-16">
+      <div className="relative container mx-auto max-w-4xl px-6 py-6">
         {/* Header */}
         <div className="mb-12 space-y-3">
           <h1 className="text-4xl font-bold tracking-tight text-white">Settings & Profile</h1>
@@ -134,54 +132,45 @@ export function ProfilePage() {
 
         {/* Profile Card */}
         <div className="mb-8 rounded-2xl border border-slate-700/50 bg-slate-800/40 p-8 shadow-2xl backdrop-blur-xl">
-          <h2 className="text-xl font-semibold text-white mb-6">Profile Details</h2>
+          <h2 className="mb-6 text-xl font-semibold text-white">Profile Details</h2>
 
           {/* Avatar Section */}
           <div className="mb-8 flex items-center gap-6 rounded-xl border border-slate-700/30 bg-slate-800/60 p-6">
-            <input 
-              ref={fileInputRef} 
-              type="file" 
-              accept="image/*" 
-              onChange={handleProfileImageChange} 
-              className="hidden" 
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleProfileImageChange}
+              className="hidden"
             />
 
-            <div className="relative group">
+            <div className="group relative">
               {profileImage ? (
-                <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-slate-800/50">
-                  <ImageViewer_Basic 
-                    thumbnailUrl={profileImage} 
-                    imageUrl={profileImage}
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Camera className="w-8 h-8 text-white" />
+                <div className="relative h-24 w-24 overflow-hidden rounded-full ring-4 ring-slate-800/50">
+                  <ImageViewer_Basic thumbnailUrl={profileImage} imageUrl={profileImage} />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Camera className="h-8 w-8 text-white" />
                   </div>
                 </div>
               ) : (
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 ring-4 ring-slate-800/50 group-hover:from-cyan-600 group-hover:to-blue-700 transition-all cursor-pointer">
+                <div className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-full bg-linear-to-br from-cyan-500 to-blue-600 ring-4 ring-slate-800/50 transition-all group-hover:from-cyan-600 group-hover:to-blue-700">
                   <User className="h-12 w-12 text-white" />
                 </div>
               )}
-              <div className="absolute -right-1 -bottom-1 h-7 w-7 rounded-full border-4 border-slate-800 bg-cyan-500 flex items-center justify-center">
-                <div className="w-2.5 h-2.5 bg-white rounded-full" />
+              <div className="absolute -right-1 -bottom-1 flex h-7 w-7 items-center justify-center rounded-full border-4 border-slate-800 bg-cyan-500">
+                <div className="h-2.5 w-2.5 rounded-full bg-white" />
               </div>
             </div>
 
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white">
-                {userData?.username || 'Loading...'}
-              </h3>
+              <h3 className="text-lg font-semibold text-white">{userData?.username || 'Loading...'}</h3>
               <p className="text-sm text-slate-400">
                 Journaling since {userData?.createdAt ? new Date(userData.createdAt).getFullYear() : '2023'}
               </p>
             </div>
 
             <div className="flex gap-3">
-              <Button 
-                onClick={() => fileInputRef.current?.click()}
-                type="button"
-                className="bg-cyan-500 px-6 font-medium text-white transition-all hover:bg-cyan-600 shadow-lg shadow-cyan-500/25"
-              >
+              <Button onClick={() => fileInputRef.current?.click()} type="button">
                 <Camera className="mr-2 h-4 w-4" />
                 {profileImage ? 'Change' : 'Upload'} Avatar
               </Button>
@@ -190,7 +179,7 @@ export function ProfilePage() {
                   type="button"
                   onClick={removeProfileImage}
                   variant="outline"
-                  className="border-slate-600 text-slate-300 transition-all hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/50"
+                  className="border-slate-600 text-slate-300 transition-all hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Remove
@@ -311,11 +300,7 @@ export function ProfilePage() {
               {/* Submit Button */}
               <div className="flex items-center justify-between border-t border-slate-700/50 pt-6">
                 <p className="text-sm text-slate-400">Changes will be saved when you click update</p>
-                <Button 
-                  type="submit"
-                  disabled={loading}
-                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-8 h-12 shadow-lg shadow-cyan-500/25 transition-all disabled:opacity-50"
-                >
+                <Button type="submit" disabled={loading}>
                   {loading ? 'Updating...' : 'Update profile'}
                 </Button>
               </div>

@@ -1,13 +1,24 @@
-import { cn, getMoodColor, getMoodIcon, getMoodLabel } from '@/lib/utils'
-import type { Diary } from '@/types'
+import { checkIsOwner, cn, getMoodColor, getMoodIcon, getMoodLabel } from '@/lib/utils'
+import type { Diary, User } from '@/types'
 import { format } from 'date-fns'
 import { Globe, Image, Lock, MoreHorizontal, Edit, Trash2, Copy } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import { useProfile } from '@/hooks/useProfile'
 
-const DiaryCardItem = ({ diary }: { diary: Diary }) => {
+interface DiaryCardItemProps {
+  diary: Diary
+  showActions?: boolean // Optional prop to force show/hide actions
+}
+
+const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
   const navigate = useNavigate()
+  const { user } = useProfile()
+
+  const isOwner = checkIsOwner(user, diary)
+
+  const shouldShowActions = showActions !== undefined ? showActions : isOwner
 
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -18,18 +29,20 @@ const DiaryCardItem = ({ diary }: { diary: Diary }) => {
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    // Add delete logic here
   }
 
   const handleDuplicate = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    // Add duplicate logic here
   }
 
   return (
     <Link to={`/diary/${diary._id}`} className="group block">
       <div
         className={cn(
-          'relative overflow-hidden rounded-lg transition-all duration-500',
+          'relative overflow-hidden rounded-2xl transition-all duration-500',
           'border border-slate-700/50 bg-slate-800/40 backdrop-blur-xl',
           'hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-500/10',
           'hover:-translate-y-1',
@@ -43,46 +56,48 @@ const DiaryCardItem = ({ diary }: { diary: Diary }) => {
           }}
         />
 
-        {/* Actions Menu */}
-        <div className="absolute top-4 right-4 z-20">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-full border border-slate-700/50 bg-slate-900/80 text-slate-300 opacity-0 shadow-lg backdrop-blur-md transition-all group-hover:opacity-100 hover:border-cyan-500/50 hover:bg-slate-800 hover:text-white"
+        {/* Actions Menu - Only show if user is owner */}
+        {shouldShowActions && (
+          <div className="absolute top-4 right-4 z-20">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-full border border-slate-700/50 bg-slate-900/80 text-slate-300 opacity-0 shadow-lg backdrop-blur-md transition-all group-hover:opacity-100 hover:border-cyan-500/50 hover:bg-slate-800 hover:text-white"
+                >
+                  <MoreHorizontal className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-48 border-slate-700/50 bg-slate-900/95 shadow-2xl backdrop-blur-xl"
               >
-                <MoreHorizontal className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-48 border-slate-700/50 bg-slate-900/95 shadow-2xl backdrop-blur-xl"
-            >
-              <DropdownMenuItem
-                onClick={handleEdit}
-                className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-white"
-              >
-                <Edit className="mr-2 h-4 w-4 text-cyan-400" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleDuplicate}
-                className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-white"
-              >
-                <Copy className="mr-2 h-4 w-4 text-blue-400" />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleDelete}
-                className="cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-300"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                <DropdownMenuItem
+                  onClick={handleEdit}
+                  className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-white"
+                >
+                  <Edit className="mr-2 h-4 w-4 text-cyan-400" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleDuplicate}
+                  className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-white"
+                >
+                  <Copy className="mr-2 h-4 w-4 text-blue-400" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-300"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
 
         {/* Privacy Badge */}
         <div className="absolute top-4 left-4 z-10">

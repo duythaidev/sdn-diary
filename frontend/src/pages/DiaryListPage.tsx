@@ -28,7 +28,7 @@ export const DiaryListPage = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="relative container mx-auto max-w-7xl px-6 py-12">
+      <div className="relative container mx-auto max-w-7xl px-6 py-6">
         {/* Header */}
         <div className="mb-12 flex items-end justify-between">
           <div>

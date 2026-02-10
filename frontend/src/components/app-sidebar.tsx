@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { AudioWaveform, Command, Edit, FileText, GalleryVerticalEnd, Globe, Home, User } from 'lucide-react'
+import { Edit, FileText, Globe, Home, User } from 'lucide-react'
 
 import { NavUser } from '@/components/nav-user'
 import {
@@ -20,26 +20,9 @@ import {
 } from '@/components/ui/sidebar'
 import { useProfile } from '@/hooks/useProfile'
 import { Separator } from './ui/separator'
-import { Button} from './ui/button'
+import { Button } from './ui/button'
 
 const data = {
-  teams: [
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-    {
-      name: 'Evil Corp.',
-      logo: Command,
-      plan: 'Free',
-    },
-  ],
   navTabs: [
     {
       title: 'Dashboard',
@@ -102,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenuItem>
-          <Button onClick={() => navigate('/diary/new')} className="text-md w-full">
+          <Button onClick={() => navigate('/diary/create')} className="text-md w-full">
             <Edit className="h-4 w-4!" />
             {!isCollapsed && <span>New Diary</span>}
           </Button>

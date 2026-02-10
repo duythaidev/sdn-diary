@@ -3,6 +3,7 @@ import { $getRoot, type LexicalEditor } from 'lexical'
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html'
 import { twMerge } from 'tailwind-merge'
 import { MOODS } from '@/constants'
+import type { Diary, User } from '@/types'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -51,4 +52,40 @@ export const getCardGradient = (selectedMood: string) => {
     great: 'from-purple-900/30 to-purple-950/50',
   }
   return gradients[selectedMood] || 'from-gray-800/30 to-gray-900/50'
+}
+
+export const checkIsOwner = (user: User | null, diary: Diary) => {
+  const diaryUser = typeof diary.userId === 'object' ? diary.userId : null
+  const isOwner = user?._id === (diaryUser ? (diaryUser as User)._id : diary.userId)
+  return isOwner
+}
+
+/**
+ * "/" : Public diaries
+ * "/dashboard" : Dashboard
+ * "/diary" : Diary list
+ * "/diary/create" : Create diary
+ * "/diary/:id" : Diary detail
+ * "/diary/:id/edit" : Edit diary
+ * "/profile" : Profile
+ * "/login" : Login
+ * "/register" : Register
+ * "/404" : 404 Not Found
+ */
+
+export const getRouteName = (path: string) => {
+  const routes = {
+    '/': 'Public diaries',
+    '/dashboard': 'Dashboard',
+    '/diary': 'Diary list',
+    '/diary/create': 'Create diary',
+    '/diary/:id': 'Diary detail',
+    '/diary/:id/edit': 'Edit diary',
+    '/profile': 'Profile',
+    '/login': 'Login',
+    '/register': 'Register',
+    '/404': '404 Not Found',
+  }
+
+  return routes[path as keyof typeof routes] || 'Unknown'
 }
