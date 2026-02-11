@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { BookOpen, Search } from 'lucide-react'
+import { BookOpen, LogOut, Search, User } from 'lucide-react'
 import { useProfile } from '@/hooks/useProfile'
 import { Input } from '@/components/ui/input'
 import {
@@ -137,9 +137,15 @@ export const Navbar = () => {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => navigate('/profile')}>Profile</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/profile')}>
+                        <User className="h-4 w-4" />
+                        Profile
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </>

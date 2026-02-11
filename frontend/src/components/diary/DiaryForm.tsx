@@ -153,7 +153,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
       <div className="bg-background flex min-h-screen">
         {/* Main Content Area */}
         <div className="flex-1 p-8">
-          <form className="">
+          <div className="">
             {/* Title Input - Large */}
             <DiaryTitleInput
               register={register('title', {
@@ -171,7 +171,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
               <Editor onChange={(content) => setValue('content', content)} content={content} />
               {errors.content && <p className="text-destructive mt-2 text-sm">{errors.content.message}</p>}
             </div>
-          </form>
+          </div>
         </div>
 
         {/* Right Sidebar */}

@@ -45,15 +45,13 @@ import {
   ListOrdered,
   Undo,
   Redo,
-  Sun,
-  Moon,
   Image as ImageIcon,
   AlignLeft,
   AlignCenter,
   AlignRight,
   Upload,
   Link,
-  Unlink,
+  // Unlink,
   Minus,
   Code,
   Table as TableIcon,
@@ -391,13 +389,13 @@ function FloatingToolbarRenderer() {
           >
             <Code size={14} />
           </button>
-          <button
+          {/* <button
             onClick={() => (activeStates.isLink ? commands.removeLink() : commands.insertLink())}
             className={`lexkit-toolbar-button ${activeStates.isLink ? 'active' : ''}`}
             title={activeStates.isLink ? 'Remove Link' : 'Insert Link'}
           >
             {activeStates.isLink ? <Unlink size={14} /> : <Link size={14} />}
-          </button>
+          </button> */}
           <div className="bg-border mx-1 h-6 w-px" />
           {hasExtension('blockFormat') && (
             <>
@@ -532,6 +530,7 @@ function Toolbar({
             onClick={() => commands.toggleBold()}
             className={`lexkit-toolbar-button ${activeStates.bold ? 'active' : ''}`}
             title="Bold (Ctrl+B)"
+            type='button'
           >
             <Bold size={16} />
           </button>
@@ -539,6 +538,7 @@ function Toolbar({
             onClick={() => commands.toggleItalic()}
             className={`lexkit-toolbar-button ${activeStates.italic ? 'active' : ''}`}
             title="Italic (Ctrl+I)"
+            type='button'
           >
             <Italic size={16} />
           </button>
@@ -546,6 +546,7 @@ function Toolbar({
             onClick={() => commands.toggleUnderline()}
             className={`lexkit-toolbar-button ${activeStates.underline ? 'active' : ''}`}
             title="Underline (Ctrl+U)"
+            type='button'
           >
             <Underline size={16} />
           </button>
@@ -553,6 +554,7 @@ function Toolbar({
             onClick={() => commands.toggleStrikethrough()}
             className={`lexkit-toolbar-button ${activeStates.strikethrough ? 'active' : ''}`}
             title="Strikethrough"
+            type='button'
           >
             <Strikethrough size={16} />
           </button>
@@ -560,16 +562,18 @@ function Toolbar({
             onClick={() => commands.formatText('code')}
             className={`lexkit-toolbar-button ${activeStates.code ? 'active' : ''}`}
             title="Inline Code"
+            type='button'
           >
             <Code size={16} />
           </button>
-          <button
+          {/* <button
             onClick={() => (activeStates.isLink ? commands.removeLink() : commands.insertLink())}
             className={`lexkit-toolbar-button ${activeStates.isLink ? 'active' : ''}`}
             title={activeStates.isLink ? 'Remove Link' : 'Insert Link'}
+            type='button'
           >
             {activeStates.isLink ? <Unlink size={16} /> : <Link size={16} />}
-          </button>
+          </button> */}
         </div>
 
         {/* Block Format */}
@@ -591,6 +595,7 @@ function Toolbar({
               onClick={() => commands.toggleUnorderedList()}
               className={`lexkit-toolbar-button ${activeStates.unorderedList ? 'active' : ''}`}
               title="Bullet List"
+              type='button'
             >
               <List size={16} />
             </button>
@@ -598,15 +603,16 @@ function Toolbar({
               onClick={() => commands.toggleOrderedList()}
               className={`lexkit-toolbar-button ${activeStates.orderedList ? 'active' : ''}`}
               title="Numbered List"
+              type='button'
             >
               <ListOrdered size={16} />
             </button>
             {(activeStates.unorderedList || activeStates.orderedList) && (
               <>
-                <button onClick={() => commands.indentList()} className="lexkit-toolbar-button" title="Indent List">
+                <button onClick={() => commands.indentList()} className="lexkit-toolbar-button" title="Indent List" type='button'>
                   <Indent size={14} />
                 </button>
-                <button onClick={() => commands.outdentList()} className="lexkit-toolbar-button" title="Outdent List">
+                <button onClick={() => commands.outdentList()} className="lexkit-toolbar-button" title="Outdent List" type='button'>
                   <Outdent size={14} />
                 </button>
               </>
@@ -621,6 +627,7 @@ function Toolbar({
               onClick={() => commands.insertHorizontalRule()}
               className="lexkit-toolbar-button"
               title="Insert Horizontal Rule"
+              type='button'
             >
               <Minus size={16} />
             </button>
@@ -634,6 +641,7 @@ function Toolbar({
               onClick={() => setShowTableDialog(true)}
               className="lexkit-toolbar-button"
               title="Insert Table (Ctrl+Shift+T)"
+              type='button'
             >
               <TableIcon size={16} />
             </button>
@@ -648,6 +656,7 @@ function Toolbar({
                 <button
                   className={`lexkit-toolbar-button ${activeStates.imageSelected ? 'active' : ''}`}
                   title="Insert Image"
+                  type='button'
                 >
                   <ImageIcon size={16} />
                 </button>
@@ -661,6 +670,7 @@ function Toolbar({
                   handlers.insertFromUrl()
                   setShowImageDropdown(false)
                 }}
+                type='button'
               >
                 <Link size={16} /> From URL
               </button>
@@ -670,6 +680,7 @@ function Toolbar({
                   handlers.insertFromFile()
                   setShowImageDropdown(false)
                 }}
+                type='button'
               >
                 <Upload size={16} /> Upload File
               </button>
@@ -737,6 +748,7 @@ function Toolbar({
           <div className="lexkit-toolbar-section">
             <button
               onClick={() => commands.undo()}
+              type='button'
               disabled={!activeStates.canUndo}
               className="lexkit-toolbar-button"
               title="Undo (Ctrl+Z)"
@@ -746,6 +758,7 @@ function Toolbar({
             <button
               onClick={() => commands.redo()}
               disabled={!activeStates.canRedo}
+              type='button'
               className="lexkit-toolbar-button"
               title="Redo (Ctrl+Y)"
             >
@@ -755,11 +768,11 @@ function Toolbar({
         )}
 
         {/* Theme Toggle */}
-        <div className="lexkit-toolbar-section">
+        {/* <div className="lexkit-toolbar-section">
           <button onClick={toggleTheme} className="lexkit-toolbar-button" title={isDark ? 'Light Mode' : 'Dark Mode'}>
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Table Dialog */}

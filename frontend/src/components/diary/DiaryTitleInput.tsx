@@ -8,7 +8,7 @@ interface DiaryTitleInputProps {
 
 export function DiaryTitleInput({ register, errors }: DiaryTitleInputProps) {
   return (
-    <div className="group mb-8">
+    <div className="group mb-4">
       <Input
         id="title"
         placeholder="Title your reflection..."

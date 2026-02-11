@@ -46,7 +46,7 @@ export const DiaryView = ({
 
   return (
     <div className={cn('mx-auto max-w-3xl', className)}>
-      <div className="bg-background overflow-hidden rounded-lg shadow-lg">
+      <div className="bg-background overflow-hidden rounded-lg shadow-lgpy-6">
         {!isPublic && (
           <div className="mb-4 flex justify-center">
             <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs">
