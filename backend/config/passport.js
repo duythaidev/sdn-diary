@@ -10,12 +10,22 @@ passport.use(
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback',
         },
+
+        /**
+         * Luồng: 
+         * - Kiểm tra user đã tồn tại với Google ID chưa
+         * - Kiểm tra user đã tồn tại với email chưa
+         * - Nếu đã tồn tại thì return user
+         * - Nếu chưa tồn tại thì tạo user mới và return user
+         */
         async (accessToken, refreshToken, profile, done) => {
             try {
+                console.log('profile', profile)
                 // Extract user information from Google profile
                 const email = profile.emails[0].value;
                 const googleId = profile.id;
                 const username = profile.displayName;
+                const profileImage = profile.photos[0].value;
 
                 // Check if user already exists with this Google ID
                 let user = await User.findOne({ googleId });
@@ -41,6 +51,7 @@ passport.use(
                     username,
                     email,
                     googleId,
+                    profileImage,
                     provider: 'google',
                     // No password needed for OAuth users
                 });

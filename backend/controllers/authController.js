@@ -167,12 +167,6 @@ export const updateProfile = async (req, res, next) => {
   }
 };
 
-// Google OAuth - Initiate authentication
-export const googleAuth = (req, res, next) => {
-  // This will redirect to Google OAuth consent screen
-  // Passport will handle the redirect
-};
-
 // Google OAuth - Callback handler
 export const googleCallback = async (req, res, next) => {
   try {

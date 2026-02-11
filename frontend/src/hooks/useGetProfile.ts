@@ -16,6 +16,7 @@ export const useGetProfile = () => {
       setUser(response.user)
     } catch (error) {
       const errorMessage = getAxiosErrorMessage(error)
+      
       toast.error(errorMessage)
       setError(errorMessage)
       await logout()

@@ -10,9 +10,12 @@ import { toast } from 'sonner'
 import ImageViewer_Basic from '@/components/commerce-ui/image-viewer-basic'
 import { authService } from '@/services/api/authService'
 import { getAxiosErrorMessage } from '@/lib/error'
+import { useProfile } from '@/hooks/useProfile'
+import type { User as UserType } from '@/types'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const profileFormSchema = z.object({
   username: z
     .string('Please enter your username.')
@@ -33,8 +36,9 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 export function ProfilePage() {
   const [loading, setLoading] = useState(false)
-  const [userData, setUserData] = useState<any>(null)
+  const [userData, setUserData] = useState<UserType | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { setUser } = useProfile()
 
   const form = useForm<ProfileFormValues>({
     defaultValues: {
@@ -60,12 +64,14 @@ export function ProfilePage() {
     try {
       const response = await authService.getMe()
       setUserData(response.user)
+      setUser(response.user)
       form.reset({
         username: response.user.username || '',
         bio: response.user.bio || '',
         profileImage: response.user.profileImage || null,
         urls: response.user.urls || [],
       })
+
     } catch (error) {
       toast.error(getAxiosErrorMessage(error, 'Failed to load profile'))
     }
