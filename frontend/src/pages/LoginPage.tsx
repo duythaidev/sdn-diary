@@ -44,7 +44,10 @@ export function LoginPage() {
     }
   }
 
-  const handleGoogleLogin = () => {}
+  const handleGoogleLogin = () => {
+    const googleAuthUrl = authService.getGoogleAuthUrl()
+    window.location.href = googleAuthUrl
+  }
 
   return (
     <div className="bg-background flex min-h-screen items-center justify-center p-4">

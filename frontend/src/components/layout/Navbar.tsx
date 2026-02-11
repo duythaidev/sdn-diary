@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { BookOpen, LogOut, User, Home, FileText, Search } from 'lucide-react'
+import { BookOpen, Search } from 'lucide-react'
 import { useProfile } from '@/hooks/useProfile'
 import { Input } from '@/components/ui/input'
 import {

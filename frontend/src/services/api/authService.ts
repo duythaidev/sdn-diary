@@ -37,4 +37,9 @@ export const authService = {
     const response = await axiosInstance.put('/auth/profile', data)
     return response.data
   },
+
+  // Get Google OAuth URL
+  getGoogleAuthUrl: () => {
+    return `${axiosInstance.defaults.baseURL}/auth/google`
+  },
 }

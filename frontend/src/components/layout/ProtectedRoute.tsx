@@ -1,19 +1,16 @@
 import { Navigate } from 'react-router-dom'
-import { useProfile } from '@/hooks/useProfile'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb'
 import { Separator } from '../ui/separator'
 import { useGetPageName } from '@/hooks/useGetPageName'
+import { useGetProfile } from '@/hooks/useGetProfile'
 interface ProtectedRouteProps {
   children: React.ReactNode
 }
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated } = useProfile()
+  useGetProfile()
   const { pageName } = useGetPageName()
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
-  }
 
   return (
     <SidebarProvider>

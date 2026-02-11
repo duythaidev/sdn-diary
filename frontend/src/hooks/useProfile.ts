@@ -19,6 +19,7 @@ export const useProfile = () => {
     } catch (error) {
       dispatch(logoutAction())
       toast.error(getAxiosErrorMessage(error))
+    } finally {
       navigate('/login')
     }
   }
