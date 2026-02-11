@@ -42,4 +42,14 @@ export const authService = {
   getGoogleAuthUrl: () => {
     return `${axiosInstance.defaults.baseURL}/auth/google`
   },
+
+  forgotPassword: async (email: string) => {
+    const response = await axiosInstance.post('/auth/forgot-password', { email })
+    return response.data
+  },
+
+  resetPassword: async (token: string, newPassword: string) => {
+    const response = await axiosInstance.post('/auth/reset-password', { token, newPassword })
+    return response.data
+  },
 }

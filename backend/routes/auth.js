@@ -8,7 +8,9 @@ import {
   logout,
   getMe,
   updateProfile,
-  googleCallback
+  googleCallback,
+  forgotPassword,
+  resetPassword
 } from '../controllers/authController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -62,6 +64,23 @@ const updateProfileValidation = [
     .isURL()
     .withMessage('Each URL must be valid'),
 ];
+
+const forgotPasswordValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email'),
+];
+
+const resetPasswordValidation = [
+  body('token')
+    .notEmpty()
+    .withMessage('Reset token is required'),
+  body('newPassword')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters'),
+];
+
 // Routes
 router.post('/register', registerValidation, validate, register);
 router.post('/login', loginValidation, validate, login);
@@ -76,5 +95,7 @@ router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   googleCallback
 );
+router.post('/forgot-password', forgotPasswordValidation, validate, forgotPassword);
+router.post('/reset-password', resetPasswordValidation, validate, resetPassword);
 
 export default router;

@@ -14,6 +14,8 @@ import { DiaryEditPage } from './pages/DiaryEditPage'
 import { PublicDiariesPage } from './pages/PublicDiariesPage'
 import NotFound from './pages/NotFound'
 import { ProfilePage } from './pages/ProfilePage'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { ResetPasswordPage } from './pages/ResetPasswordPage'
 
 function AppContent() {
   return (
@@ -33,6 +35,22 @@ function AppContent() {
           element={
             <PublicRoute>
               <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPasswordPage />
             </PublicRoute>
           }
         />

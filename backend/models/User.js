@@ -50,6 +50,14 @@ const userSchema = new mongoose.Schema({
       match: [/^https?:\/\/.+/, 'Please provide a valid URL'],
     }
   }],
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null,
+  },
 }, { timestamps: true });
 // Method to compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
