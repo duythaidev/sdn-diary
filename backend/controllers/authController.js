@@ -166,3 +166,36 @@ export const updateProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+// Google OAuth - Initiate authentication
+export const googleAuth = (req, res, next) => {
+  // This will redirect to Google OAuth consent screen
+  // Passport will handle the redirect
+};
+
+// Google OAuth - Callback handler
+export const googleCallback = async (req, res, next) => {
+  try {
+    // User is authenticated by Passport and available in req.user
+    const user = req.user;
+
+    if (!user) {
+      // Authentication failed
+      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/login?error=auth_failed`);
+    }
+
+    // Generate tokens
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // Set cookies
+    res.cookie('accessToken', accessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
+
+    // Redirect to frontend dashboard
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard`);
+  } catch (error) {
+    console.error('Google OAuth callback error:', error);
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/login?error=server_error`);
+  }
+};

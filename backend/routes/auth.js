@@ -1,12 +1,15 @@
 import express from 'express';
 import { body } from 'express-validator';
+import passport from 'passport';
 import {
   register,
   login,
   refresh,
   logout,
   getMe,
-  updateProfile
+  updateProfile,
+  googleAuth,
+  googleCallback
 } from '../controllers/authController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -69,5 +72,12 @@ router.post('/refresh', refresh);
 router.post('/logout', logout);
 router.get('/me', verifyAccessToken, getMe);
 router.put('/profile', verifyAccessToken, updateProfileValidation, validate, updateProfile);
+
+// Google OAuth routes
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  googleCallback
+);
 
 export default router;

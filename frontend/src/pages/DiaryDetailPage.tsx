@@ -13,6 +13,7 @@ import { useProfile } from '@/hooks/useProfile'
 import { getAxiosErrorMessage } from '@/lib/error'
 import ImageViewer_Basic from '@/components/commerce-ui/image-viewer-basic'
 import TagsList from '@/components/common/TagsList'
+import { MOODS } from '@/constants'
 
 export const DiaryDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -21,14 +22,6 @@ export const DiaryDetailPage = () => {
   const [loading, setLoading] = useState(true)
   const [diary, setDiary] = useState<Diary | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
-
-  const moods = [
-    { icon: '😫', label: 'Stressed', value: 'stressed', color: 'orange' },
-    { icon: '😐', label: 'Okay', value: 'okay', color: '#6e6e4e' },
-    { icon: '😌', label: 'Calm', value: 'calm', color: '#1d3a50' },
-    { icon: '😊', label: 'Happy', value: 'happy', color: '#1abc9c' },
-    { icon: '🤩', label: 'Great', value: 'great', color: '#8e44ad' },
-  ]
 
   useEffect(() => {
     if (id) {
@@ -78,7 +71,7 @@ export const DiaryDetailPage = () => {
   const diaryUser = typeof diary.userId === 'object' ? diary.userId : null
   const isOwner = user?._id === (diaryUser ? (diaryUser as User)._id : diary.userId)
 
-  const selectedMoodData = diary.selectedMood ? moods.find((mood) => mood.value === diary.selectedMood) : undefined
+  const selectedMoodData = diary.selectedMood ? MOODS.find((mood) => mood.value === diary.selectedMood) : undefined
 
   const displayDate = format(new Date(diary.createdAt), 'MMM dd, yyyy')
   const authorName = diaryUser ? (diaryUser as User).username : 'Unknown'

@@ -19,8 +19,21 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    required: function () {
+      // Password is only required for local authentication
+      return this.provider === 'local';
+    },
     minlength: [6, 'Password must be at least 6 characters'],
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows multiple null values
+  },
+  provider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local',
   },
   bio: {
     type: String,
@@ -40,6 +53,10 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 // Method to compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
+  // If user doesn't have a password (OAuth user), return false
+  if (!this.password) {
+    return false;
+  }
   return await bcrypt.compare(candidatePassword, this.password);
 };
 const User = mongoose.model('User', userSchema);
