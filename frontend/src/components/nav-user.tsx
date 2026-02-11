@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, ChevronsUpDown, LogOut, User } from 'lucide-react'
+import { ChevronsUpDown, LogOut, User } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -71,10 +71,10 @@ export function NavUser({ user }: { user: Profile }) {
                 <User />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/notifications')}>
+              {/* <DropdownMenuItem onClick={() => navigate('/notifications')}>
                 <Bell />
                 Notifications
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>

@@ -4,29 +4,29 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const createTransporter = () => {
-    return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT || 587,
-        secure: process.env.EMAIL_PORT == 465,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
+  return nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT || 587,
+    // secure: process.env.EMAIL_PORT == 465,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
 };
 
 export const sendPasswordResetEmail = async (email, resetToken) => {
-    try {
-        const transporter = createTransporter();
+  try {
+    const transporter = createTransporter();
 
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-        const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-        const mailOptions = {
-            from: `"Personal Journal App" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: 'Password Reset Request',
-            html: `
+    const mailOptions = {
+      from: `"Personal Journal App" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Password Reset Request',
+      html: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -57,7 +57,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
                 display: inline-block;
                 padding: 12px 30px;
                 background-color: #0f1c24;
-                color: white;
+                color: white !important;
                 text-decoration: none;
                 border-radius: 6px;
                 margin: 20px 0;
@@ -95,7 +95,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
           </body>
         </html>
       `,
-            text: `
+      text: `
         Password Reset Request
         
         Hello,
@@ -110,12 +110,12 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
         
         © 2024 Personal Journal App. All rights reserved.
       `,
-        };
+    };
 
-        await transporter.sendMail(mailOptions);
-        console.log(`Password reset email sent to ${email}`);
-    } catch (error) {
-        console.error('Error sending password reset email:', error);
-        throw new Error('Failed to send password reset email');
-    }
+    await transporter.sendMail(mailOptions);
+    console.log(`Password reset email sent to ${email}`);
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    throw new Error('Failed to send password reset email');
+  }
 };

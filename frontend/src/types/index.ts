@@ -21,6 +21,8 @@ export interface Diary {
   isDraft: boolean
   tags: string[]
   coverPhoto: string | null
+  likesCount?: number
+  isLiked?: boolean
 }
 export interface Comment {
   _id: string

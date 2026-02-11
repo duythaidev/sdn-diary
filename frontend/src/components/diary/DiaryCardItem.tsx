@@ -1,18 +1,21 @@
 import { checkIsOwner, cn, getMoodColor, getMoodIcon, getMoodLabel } from '@/lib/utils'
 import type { Diary } from '@/types'
 import { format } from 'date-fns'
-import { Globe, Image, Lock, MoreHorizontal, Edit, Trash2, Copy } from 'lucide-react'
+import { Globe, Image, Lock, MoreHorizontal, Edit, Trash2, Copy, MessageCircle } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { useProfile } from '@/hooks/useProfile'
+import { LikeButton } from '@/components/common/LikeButton'
+import { diaryService } from '@/services/api/diaryService'
 
 interface DiaryCardItemProps {
   diary: Diary
-  showActions?: boolean // Optional prop to force show/hide actions
+  showActions?: boolean
+  onLikeUpdate?: (diaryId: string, likesCount: number, isLiked: boolean) => void
 }
 
-const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
+const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps) => {
   const navigate = useNavigate()
   const { user } = useProfile()
 
@@ -29,13 +32,21 @@ const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // Add delete logic here
+    console.log('Delete diary:', diary._id)
   }
 
   const handleDuplicate = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // Add duplicate logic here
+    console.log('Duplicate diary:', diary._id)
+  }
+
+  const handleLike = async (diaryId: string) => {
+    const result = await diaryService.toggleLike(diaryId)
+    if (onLikeUpdate) {
+      onLikeUpdate(diaryId, result.likesCount, result.isLiked)
+    }
+    return result
   }
 
   return (
@@ -134,8 +145,7 @@ const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
 
         {/* Cover Image Section */}
         <div className="relative flex h-64 items-center justify-center overflow-hidden">
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 z-10 bg-linear-to-b from-transparent via-transparent to-slate-900/80" />
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-slate-900/80" />
 
           {diary.coverPhoto ? (
             <img
@@ -144,7 +154,7 @@ const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
               className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-slate-800/30 to-slate-900/30">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-800/30 to-slate-900/30">
               <div className="relative">
                 <div className="absolute inset-0 bg-cyan-500/10 blur-3xl" />
                 <Image className="relative h-20 w-20 text-slate-600" />
@@ -155,43 +165,66 @@ const DiaryCardItem = ({ diary, showActions }: DiaryCardItemProps) => {
 
         {/* Content Section */}
         <div className="relative space-y-4 p-6">
-          {/* Title */}
           <h3 className="line-clamp-2 text-2xl font-bold tracking-tight text-white transition-colors group-hover:text-cyan-100">
             {diary.title}
           </h3>
 
-          {/* Content Preview */}
           <p className="line-clamp-3 text-sm leading-relaxed text-slate-400 transition-colors group-hover:text-slate-300">
             {diary.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
           </p>
 
-          {/* Footer with Date and Mood */}
-          <div className="flex items-center justify-between border-t border-slate-700/50 pt-4">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-cyan-500/60" />
-              <span className="text-xs font-medium tracking-wider text-slate-500 uppercase">
-                {format(new Date(diary.createdAt), 'MMM dd, yyyy')}
-              </span>
+          {/* Footer with Date, Mood, and Interactions */}
+          <div className="space-y-3 border-t border-slate-700/50 pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-cyan-500/60" />
+                <span className="text-xs font-medium tracking-wider text-slate-500 uppercase">
+                  {format(new Date(diary.createdAt), 'MMM dd, yyyy')}
+                </span>
+              </div>
+
+              <div
+                className="flex items-center gap-2 rounded-full border px-3 py-1.5 backdrop-blur-sm transition-all"
+                style={{
+                  backgroundColor: `${getMoodColor(diary.selectedMood)}15`,
+                  borderColor: `${getMoodColor(diary.selectedMood)}30`,
+                }}
+              >
+                <span className="text-xl leading-none">{getMoodIcon(diary.selectedMood)}</span>
+                <span className="text-sm font-semibold" style={{ color: getMoodColor(diary.selectedMood) }}>
+                  {getMoodLabel(diary.selectedMood)}
+                </span>
+              </div>
             </div>
 
-            <div
-              className="flex items-center gap-2 rounded-full border px-3 py-1.5 backdrop-blur-sm transition-all"
-              style={{
-                backgroundColor: `${getMoodColor(diary.selectedMood)}15`,
-                borderColor: `${getMoodColor(diary.selectedMood)}30`,
-              }}
-            >
-              <span className="text-xl leading-none">{getMoodIcon(diary.selectedMood)}</span>
-              <span className="text-sm font-semibold" style={{ color: getMoodColor(diary.selectedMood) }}>
-                {getMoodLabel(diary.selectedMood)}
-              </span>
-            </div>
+            {/* Interaction Stats - Only show for public diaries */}
+            {diary.isPublic && !diary.isDraft && (
+              <div className="flex items-center gap-4">
+                <LikeButton
+                  diaryId={diary._id}
+                  initialLikesCount={diary.likesCount || 0}
+                  initialIsLiked={diary.isLiked || false}
+                  onLike={handleLike}
+                  variant="compact"
+                />
+                
+                {diary.allowComments && (
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <MessageCircle className="h-4 w-4" />
+                    <span className="text-xs font-medium">
+                      {/* You can add comment count here if available */}
+                      Comments
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Hover shine effect */}
         <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-          <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 via-transparent to-blue-500/5" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5" />
         </div>
       </div>
     </Link>

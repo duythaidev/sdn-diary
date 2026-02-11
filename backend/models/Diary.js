@@ -47,15 +47,22 @@ const diarySchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }],
+  likesCount: {
+    type: Number,
+    default: 0,
+  },
 }, { timestamps: true });
 
 
-// Index for better query performance
 diarySchema.index({ userId: 1, createdAt: -1 });
 diarySchema.index({ isPublic: 1, createdAt: -1 });
 diarySchema.index({ tags: 1 });
 diarySchema.index({ isDraft: 1, userId: 1 });
-
+diarySchema.index({ likesCount: -1 });
 
 const Diary = mongoose.model('Diary', diarySchema);
 

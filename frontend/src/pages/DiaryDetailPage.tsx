@@ -4,9 +4,10 @@ import { diaryService } from '@/services/api/diaryService'
 import { commentService } from '@/services/api/commentService'
 import { CommentsSection } from '@/components/comment/CommentsSection'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
+import { LikeButton } from '@/components/common/LikeButton'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { Edit, ArrowLeft, Lock, Bookmark, Share2 } from 'lucide-react'
+import { Edit, ArrowLeft, Lock, Bookmark, Share2, Heart } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary, User, Comment } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
@@ -65,6 +66,18 @@ export const DiaryDetailPage = () => {
     }
   }
 
+  const handleLike = async (diaryId: string) => {
+    const result = await diaryService.toggleLike(diaryId)
+    if (diary) {
+      setDiary({
+        ...diary,
+        likesCount: result.likesCount,
+        isLiked: result.isLiked,
+      })
+    }
+    return result
+  }
+
   if (loading) return <LoadingSpinner />
   if (!diary) return null
 
@@ -97,24 +110,33 @@ export const DiaryDetailPage = () => {
             </div>
           )}
 
-          {/* Header Section with Title and Author */}
-          <div className="mb-6 border-b border-gray-800 pb-6">
-            <h1 className="mb-6 text-4xl font-bold text-white">{diary.title}</h1>
+          {/* Header Section */}
+          <div className="mb-8 border-b border-slate-700/50 pb-8">
+            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-5xl">{diary.title}</h1>
 
-            {/* Author Info */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-cyan-500 to-blue-600">
-                  <span className="text-sm font-medium text-white">
-                    {authorName
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </span>
+            {/* Author Info and Actions */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                {/* Avatar */}
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 ring-2 ring-slate-800/50">
+                  {(diaryUser as User)?.profileImage ? (
+                    <img
+                      src={(diaryUser as User).profileImage!}
+                      alt={authorName}
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-sm font-medium text-white">
+                      {authorName
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')}
+                    </span>
+                  )}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">{authorName}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <p className="text-base font-semibold text-white">{authorName}</p>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
                     <span>{displayDate}</span>
                     {selectedMoodData && (
                       <>
@@ -167,10 +189,28 @@ export const DiaryDetailPage = () => {
               className="prose prose-invert prose-lg max-w-none leading-relaxed text-gray-200"
               dangerouslySetInnerHTML={{ __html: diary.content }}
             />
-
-            {/* Tags */}
-            <TagsList tags={diary.tags} />
           </div>
+
+          {/* Tags */}
+          {diary.tags && diary.tags.length > 0 && (
+            <div className="mb-8">
+              <TagsList tags={diary.tags} />
+            </div>
+          )}
+
+          {/* Like Button - Only show for public diaries */}
+          {diary.isPublic && !diary.isDraft && isAuthenticated && (
+            <div className="mb-8 flex items-center gap-4 border-t border-slate-700/50 pt-6">
+              <LikeButton
+                diaryId={diary._id}
+                initialLikesCount={diary.likesCount || 0}
+                initialIsLiked={diary.isLiked || false}
+                onLike={handleLike}
+                variant="detail"
+              />
+            </div>
+          )}
+
           {/* Comments Section */}
           {diary.allowComments && !diary.isDraft && (
             <div className="mt-12">

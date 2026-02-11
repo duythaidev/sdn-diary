@@ -51,4 +51,19 @@ export const diaryService = {
     const response = await axiosInstance.delete(`${URL}/${id}`)
     return response.data
   },
+
+  toggleLike: async (id: string) => {
+    const response = await axiosInstance.post(`${URL}/${id}/like`)
+    return response.data
+  },
+
+  likeDiary: async (id: string) => {
+    const response = await axiosInstance.post(`${URL}/${id}/like/add`)
+    return response.data
+  },
+
+  unlikeDiary: async (id: string) => {
+    const response = await axiosInstance.delete(`${URL}/${id}/like`)
+    return response.data
+  },
 }

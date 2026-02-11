@@ -12,6 +12,9 @@ import {
   getUserDrafts,
   publishDraft,
   getUserRecentDiaries,
+  toggleLike,
+  likeDiary,
+  unlikeDiary,
 } from '../controllers/diaryController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -64,4 +67,9 @@ router.post('/', verifyAccessToken, diaryValidation, validate, createDiary);
 router.put('/:id', verifyAccessToken, updateDiaryValidation, validate, updateDiary);
 router.delete('/:id', verifyAccessToken, deleteDiary);
 router.patch('/:id/publish', verifyAccessToken, publishDraft);
+
+router.post('/:id/like', verifyAccessToken, toggleLike);
+router.post('/:id/like/add', verifyAccessToken, likeDiary);
+router.delete('/:id/like', verifyAccessToken, unlikeDiary);
+
 export default router;

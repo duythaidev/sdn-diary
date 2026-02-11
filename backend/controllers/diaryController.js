@@ -79,7 +79,7 @@ export const getUserDrafts = async (req, res) => {
 };
 
 export const getPublicDiaries = async (req, res) => {
-  const { isRecent, isMostLiked, queryFilter } = req.query;
+  const { isMostLiked, queryFilter } = req.query;
 
   // Query filter
 
@@ -91,7 +91,7 @@ export const getPublicDiaries = async (req, res) => {
     ];
   }
 
-  const sortQuery = isMostLiked ? { likes: -1 } : { updatedAt: -1 };
+  const sortQuery = isMostLiked === 'true' ? { likesCount: -1, createdAt: -1 } : { createdAt: -1 };
 
   try {
     const diaries = await Diary.find({
@@ -110,7 +110,9 @@ export const getPublicDiaries = async (req, res) => {
 export const getDiaryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const diary = await Diary.findById(id).populate('userId', 'username email');
+    const diary = await Diary.findById(id)
+      .populate('userId', 'username email')
+      .populate('likes', 'username');
 
     if (!diary) {
       return res.status(404).json({ message: 'Diary not found' });
@@ -120,6 +122,8 @@ export const getDiaryById = async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
+    const isLiked = req.user?.userId ? diary.likes.some(like => like._id.toString() === req.user.userId) : false;
+
     let comments = [];
     if (diary.allowComments && !diary.isDraft) {
       comments = await Comment.find({ diaryId: id })
@@ -127,7 +131,13 @@ export const getDiaryById = async (req, res) => {
         .populate('userId', 'username email');
     }
 
-    res.json({ diary, comments });
+    res.json({
+      diary: {
+        ...diary.toObject(),
+        isLiked,
+      },
+      comments
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -160,6 +170,8 @@ export const createDiary = async (req, res) => {
       coverPhoto: coverPhoto || null,
       isDraft: isDraft || false,
       userId: req.user.userId,
+      likes: [],
+      likesCount: 0,
     });
 
     await diary.save();
@@ -263,43 +275,119 @@ export const deleteDiary = async (req, res) => {
   }
 };
 
-// Get diaries by tag (exclude drafts)
-export const getDiariesByTag = async (req, res) => {
+// Like a diary
+export const likeDiary = async (req, res) => {
   try {
-    const { tag } = req.params;
+    const { id } = req.params;
+    const userId = req.user.userId;
 
-    const diaries = await Diary.find({
-      tags: tag.toLowerCase(),
-      isPublic: true,
-      isDraft: false
-    })
-      .sort({ createdAt: -1 })
-      .populate('userId', 'username email');
+    const diary = await Diary.findById(id);
 
-    res.json({ diaries, tag });
+    if (!diary) {
+      return res.status(404).json({ message: 'Diary not found' });
+    }
+
+    // Check if diary is public and not a draft
+    if (!diary.isPublic || diary.isDraft) {
+      return res.status(403).json({ message: 'Cannot like private or draft diaries' });
+    }
+
+    // Check if user already liked this diary
+    const alreadyLiked = diary.likes.includes(userId);
+
+    if (alreadyLiked) {
+      return res.status(400).json({ message: 'You have already liked this diary' });
+    }
+
+    // Add user to likes array
+    diary.likes.push(userId);
+    diary.likesCount = diary.likes.length;
+    await diary.save();
+
+    res.json({
+      message: 'Diary liked successfully',
+      likesCount: diary.likesCount,
+      isLiked: true,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-export const getDiariesByMood = async (req, res) => {
+// Unlike a diary
+export const unlikeDiary = async (req, res) => {
   try {
-    const { mood } = req.params;
+    const { id } = req.params;
+    const userId = req.user.userId;
 
-    // Validate mood
-    const validMoods = ['stressed', 'okay', 'calm', 'happy', 'great'];
-    if (!validMoods.includes(mood)) {
-      return res.status(400).json({ message: 'Invalid mood value' });
+    const diary = await Diary.findById(id);
+
+    if (!diary) {
+      return res.status(404).json({ message: 'Diary not found' });
     }
 
-    const diaries = await Diary.find({
-      userId: req.user.userId,
-      selectedMood: mood
-    })
-      .sort({ createdAt: -1 })
-      .populate('userId', 'username email');
+    // Check if user has liked this diary
+    const likeIndex = diary.likes.indexOf(userId);
 
-    res.json({ diaries, mood });
+    if (likeIndex === -1) {
+      return res.status(400).json({ message: 'You have not liked this diary' });
+    }
+
+    // Remove user from likes array
+    diary.likes.splice(likeIndex, 1);
+    diary.likesCount = diary.likes.length;
+    await diary.save();
+
+    res.json({
+      message: 'Diary unliked successfully',
+      likesCount: diary.likesCount,
+      isLiked: false,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Toggle like (like or unlike in one endpoint)
+export const toggleLike = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const diary = await Diary.findById(id);
+
+    if (!diary) {
+      return res.status(404).json({ message: 'Diary not found' });
+    }
+
+    // Check if diary is public and not a draft
+    if (!diary.isPublic || diary.isDraft) {
+      return res.status(403).json({ message: 'Cannot like private or draft diaries' });
+    }
+
+    // Check if user already liked this diary
+    const likeIndex = diary.likes.indexOf(userId);
+    let isLiked;
+
+    if (likeIndex > -1) {
+      // Unlike
+      diary.likes.splice(likeIndex, 1);
+      diary.likesCount = diary.likes.length;
+      isLiked = false;
+    } else {
+      // Like
+      diary.likes.push(userId);
+      diary.likesCount = diary.likes.length;
+      isLiked = true;
+    }
+
+    await diary.save();
+
+    res.json({
+      message: isLiked ? 'Diary liked successfully' : 'Diary unliked successfully',
+      likesCount: diary.likesCount,
+      isLiked,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -332,6 +420,50 @@ export const publishDraft = async (req, res) => {
       message: 'Diary published successfully',
       diary
     });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+export const getDiariesByMood = async (req, res) => {
+  try {
+    const { mood } = req.params;
+
+    // Validate mood
+    const validMoods = ['stressed', 'okay', 'calm', 'happy', 'great'];
+    if (!validMoods.includes(mood)) {
+      return res.status(400).json({ message: 'Invalid mood value' });
+    }
+
+    const diaries = await Diary.find({
+      userId: req.user.userId,
+      selectedMood: mood
+    })
+      .sort({ createdAt: -1 })
+      .populate('userId', 'username email');
+
+    res.json({ diaries, mood });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+// Get diaries by tag (exclude drafts)
+export const getDiariesByTag = async (req, res) => {
+  try {
+    const { tag } = req.params;
+
+    const diaries = await Diary.find({
+      tags: tag.toLowerCase(),
+      isPublic: true,
+      isDraft: false
+    })
+      .sort({ createdAt: -1 })
+      .populate('userId', 'username email');
+
+    res.json({ diaries, tag });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
