@@ -116,6 +116,9 @@ export const getMe = async (req, res, next) => {
         username: user.username,
         email: user.email,
         createdAt: user.createdAt,
+        bio: user.bio,
+        profileImage: user.profileImage,
+        urls: user.urls,
       },
     });
   } catch (error) {
