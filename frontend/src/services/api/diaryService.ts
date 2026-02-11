@@ -21,12 +21,20 @@ export const diaryService = {
     return response.data
   },
 
-  getPublicDiaries: async (isRecent?: boolean, isMostLiked?: boolean, searchQuery?: string) => {
+  getPublicDiaries: async (
+    isRecent?: boolean,
+    isMostLiked?: boolean,
+    searchQuery?: string,
+    page?: number,
+    limit?: number,
+  ) => {
     const response = await axiosInstance.get(`${URL}/public`, {
       params: {
         isRecent,
         isMostLiked,
-        searchQuery,
+        queryFilter: searchQuery,
+        page,
+        limit,
       },
     })
     return response.data
