@@ -1,4 +1,3 @@
-import { Navigate } from 'react-router-dom'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb'
@@ -8,6 +7,7 @@ import { useGetProfile } from '@/hooks/useGetProfile'
 interface ProtectedRouteProps {
   children: React.ReactNode
 }
+
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useGetProfile()
   const { pageName } = useGetPageName()

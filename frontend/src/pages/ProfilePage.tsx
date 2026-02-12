@@ -130,7 +130,7 @@ export function ProfilePage() {
 
       <div className="relative container mx-auto max-w-4xl px-6 py-6">
         {/* Header */}
-        <div className="mb-12 space-y-3">
+        <div className="mb-6 space-y-3">
           <h1 className="text-4xl font-bold tracking-tight text-white">Settings & Profile</h1>
           <p className="text-lg text-slate-400">Manage your personal details and privacy preferences.</p>
         </div>

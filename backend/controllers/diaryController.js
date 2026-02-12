@@ -7,7 +7,13 @@ const RECENT_DIARIES_LIMIT = 3;
 
 export const getUserDiaries = async (req, res) => {
   try {
-    const { dateFilter, moodFilter, tagsFilter, queryFilter } = req.query;
+    const { dateFilter, moodFilter, tagsFilter, queryFilter, page = 1, limit = 10 } = req.query;
+
+    // Parse pagination parameters
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
     const query = { userId: req.user.userId };
 
     // Mood filter
@@ -28,11 +34,30 @@ export const getUserDiaries = async (req, res) => {
       ];
     }
 
+    // Get total count
+    const totalCount = await Diary.countDocuments(query);
+
+    // Get paginated diaries
     const sortBy = dateFilter === 'newest' ? -1 : 1;
     const diaries = await Diary.find(query)
       .sort({ createdAt: sortBy })
+      .skip(skip)
+      .limit(limitNum)
       .populate('userId', 'username email');
-    res.json({ diaries });
+
+    // Calculate if there are more pages
+    const hasMore = skip + diaries.length < totalCount;
+
+    res.json({
+      diaries,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalCount / limitNum),
+        totalCount,
+        hasMore,
+        limit: limitNum
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

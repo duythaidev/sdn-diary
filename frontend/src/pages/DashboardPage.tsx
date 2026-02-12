@@ -10,6 +10,7 @@ import type { Diary } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
 import { getAxiosErrorMessage } from '@/lib/error'
 import StatisticCard from '@/components/common/StatisticsCard'
+import CreateDiaryButton from '@/components/common/CreateDiaryButton'
 
 export const DashboardPage = () => {
   const [diaries, setDiaries] = useState<Diary[]>([])
@@ -51,7 +52,7 @@ export const DashboardPage = () => {
     <div className="min-h-screen">
       <div className="relative container mx-auto max-w-7xl px-6 py-6">
         {/* Header */}
-        <div className="mb-12">
+        <div className="mb-6">
           <div className="mb-3 flex items-center gap-3">
             <Sparkles className="text-primary h-8 w-8" />
             <h1 className="text-5xl font-bold tracking-tight text-white">Welcome back, {user?.username}!</h1>
@@ -60,7 +61,7 @@ export const DashboardPage = () => {
         </div>
 
         {/* Statistics Cards */}
-        <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatisticCard
             title="Total Entries"
             value={diaries.length}
@@ -152,6 +153,7 @@ export const DashboardPage = () => {
           </div>
         )}
       </div>
+      <CreateDiaryButton />
     </div>
   )
 }
