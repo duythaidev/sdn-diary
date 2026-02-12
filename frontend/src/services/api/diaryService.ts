@@ -11,6 +11,7 @@ export const diaryService = {
     searchQuery?: string,
     page?: number,
     limit?: number,
+    specificDate?: Date,
   ) => {
     const response = await axiosInstance.get(URL, {
       params: {
@@ -20,6 +21,7 @@ export const diaryService = {
         queryFilter: searchQuery,
         page,
         limit,
+        date: specificDate ? specificDate.toISOString() : undefined,
       },
     })
     return response.data

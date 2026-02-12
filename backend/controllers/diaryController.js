@@ -1,5 +1,5 @@
-import Diary from '../models/Diary.js';
-import Comment from '../models/Comment.js';
+import Diary from "../models/Diary.js";
+import Comment from "../models/Comment.js";
 
 const MAX_COVER_PHOTO_SIZE = 5 * 1024 * 1024;
 const MAX_USER_DIARIES_PER_PAGE = 10;
@@ -8,7 +8,14 @@ const RECENT_DIARIES_LIMIT = 3;
 
 export const getUserDiaries = async (req, res) => {
   try {
-    const { dateFilter, moodFilter, tagsFilter, queryFilter, page = 1, limit = MAX_USER_DIARIES_PER_PAGE } = req.query;
+    const {
+      dateFilter,
+      moodFilter,
+      tagsFilter,
+      queryFilter,
+      page = 1,
+      limit = MAX_USER_DIARIES_PER_PAGE,
+    } = req.query;
 
     // Parse pagination parameters
     const pageNum = parseInt(page);
@@ -17,21 +24,33 @@ export const getUserDiaries = async (req, res) => {
 
     const query = { userId: req.user.userId };
 
+    // Date filter (specific date)
+    if (req.query.date) {
+      const date = new Date(req.query.date);
+      const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+
+      query.createdAt = {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      };
+    }
+
     // Mood filter
-    if (moodFilter && moodFilter !== 'all') {
+    if (moodFilter && moodFilter !== "all") {
       query.selectedMood = moodFilter;
     }
 
     // Tags filter
-    if (tagsFilter && tagsFilter !== 'all') {
+    if (tagsFilter && tagsFilter !== "all") {
       query.tags = { $in: [tagsFilter] };
     }
 
     // Query filter
     if (queryFilter) {
       query.$or = [
-        { title: { $regex: queryFilter, $options: 'i' } },
-        { content: { $regex: queryFilter, $options: 'i' } },
+        { title: { $regex: queryFilter, $options: "i" } },
+        { content: { $regex: queryFilter, $options: "i" } },
       ];
     }
 
@@ -39,12 +58,12 @@ export const getUserDiaries = async (req, res) => {
     const totalCount = await Diary.countDocuments(query);
 
     // Get paginated diaries
-    const sortBy = dateFilter === 'newest' ? -1 : 1;
+    const sortBy = dateFilter === "newest" ? -1 : 1;
     const diaries = await Diary.find(query)
       .sort({ createdAt: sortBy })
       .skip(skip)
       .limit(limitNum)
-      .populate('userId', 'username email');
+      .populate("userId", "username email");
 
     // Calculate if there are more pages
     const hasMore = skip + diaries.length < totalCount;
@@ -56,11 +75,11 @@ export const getUserDiaries = async (req, res) => {
         totalPages: Math.ceil(totalCount / limitNum),
         totalCount,
         hasMore,
-        limit: limitNum
-      }
+        limit: limitNum,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -69,10 +88,10 @@ export const getUserRecentDiaries = async (req, res) => {
     const diaries = await Diary.find({ userId: req.user.userId })
       .sort({ updatedAt: -1 })
       .limit(RECENT_DIARIES_LIMIT)
-      .populate('userId', 'username email');
+      .populate("userId", "username email");
     res.json({ diaries });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -80,13 +99,13 @@ export const getUserPublishedDiaries = async (req, res) => {
   try {
     const diaries = await Diary.find({
       userId: req.user.userId,
-      isDraft: false
+      isDraft: false,
     })
       .sort({ createdAt: -1 })
-      .populate('userId', 'username email');
+      .populate("userId", "username email");
     res.json({ diaries });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -94,18 +113,23 @@ export const getUserDrafts = async (req, res) => {
   try {
     const diaries = await Diary.find({
       userId: req.user.userId,
-      isDraft: true
+      isDraft: true,
     })
       .sort({ updatedAt: -1 })
-      .populate('userId', 'username email');
+      .populate("userId", "username email");
     res.json({ diaries });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 export const getPublicDiaries = async (req, res) => {
-  const { isMostLiked, queryFilter, page = 1, limit = MAX_PUBLIC_DIARIES_PER_PAGE } = req.query;
+  const {
+    isMostLiked,
+    queryFilter,
+    page = 1,
+    limit = MAX_PUBLIC_DIARIES_PER_PAGE,
+  } = req.query;
 
   // Parse pagination parameters
   const pageNum = parseInt(page);
@@ -116,18 +140,21 @@ export const getPublicDiaries = async (req, res) => {
   const query = {};
   if (queryFilter) {
     query.$or = [
-      { title: { $regex: queryFilter, $options: 'i' } },
-      { content: { $regex: queryFilter, $options: 'i' } },
+      { title: { $regex: queryFilter, $options: "i" } },
+      { content: { $regex: queryFilter, $options: "i" } },
     ];
   }
 
-  const sortQuery = isMostLiked === 'true' ? { likesCount: -1, createdAt: -1 } : { createdAt: -1 };
+  const sortQuery =
+    isMostLiked === "true"
+      ? { likesCount: -1, createdAt: -1 }
+      : { createdAt: -1 };
 
   try {
     const baseQuery = {
       isPublic: true,
       isDraft: false,
-      ...query
+      ...query,
     };
 
     // Get total count for pagination
@@ -138,7 +165,7 @@ export const getPublicDiaries = async (req, res) => {
       .sort(sortQuery)
       .skip(skip)
       .limit(limitNum)
-      .populate('userId', 'username email');
+      .populate("userId", "username email");
 
     // Calculate if there are more pages
     const hasMore = skip + diaries.length < totalCount;
@@ -150,11 +177,11 @@ export const getPublicDiaries = async (req, res) => {
         totalPages: Math.ceil(totalCount / limitNum),
         totalCount,
         hasMore,
-        limit: limitNum
-      }
+        limit: limitNum,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -162,24 +189,29 @@ export const getDiaryById = async (req, res) => {
   try {
     const { id } = req.params;
     const diary = await Diary.findById(id)
-      .populate('userId', 'username email')
-      .populate('likes', 'username');
+      .populate("userId", "username email")
+      .populate("likes", "username");
 
     if (!diary) {
-      return res.status(404).json({ message: 'Diary not found' });
+      return res.status(404).json({ message: "Diary not found" });
     }
 
-    if ((!diary.isPublic || diary.isDraft) && diary.userId._id.toString() !== req.user?.userId) {
-      return res.status(403).json({ message: 'Access denied' });
+    if (
+      (!diary.isPublic || diary.isDraft) &&
+      diary.userId._id.toString() !== req.user?.userId
+    ) {
+      return res.status(403).json({ message: "Access denied" });
     }
 
-    const isLiked = req.user?.userId ? diary.likes.some(like => like._id.toString() === req.user.userId) : false;
+    const isLiked = req.user?.userId
+      ? diary.likes.some((like) => like._id.toString() === req.user.userId)
+      : false;
 
     let comments = [];
     if (diary.allowComments && !diary.isDraft) {
       comments = await Comment.find({ diaryId: id })
         .sort({ createdAt: -1 })
-        .populate('userId', 'username email');
+        .populate("userId", "username email");
     }
 
     res.json({
@@ -187,10 +219,10 @@ export const getDiaryById = async (req, res) => {
         ...diary.toObject(),
         isLiked,
       },
-      comments
+      comments,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -204,11 +236,13 @@ export const createDiary = async (req, res) => {
       selectedMood,
       tags,
       coverPhoto,
-      isDraft
+      isDraft,
     } = req.body;
 
     if (coverPhoto && coverPhoto.length > MAX_COVER_PHOTO_SIZE) {
-      return res.status(400).json({ message: 'Cover photo is too large. Maximum size is 5MB.' });
+      return res
+        .status(400)
+        .json({ message: "Cover photo is too large. Maximum size is 5MB." });
     }
 
     const diary = new Diary({
@@ -216,7 +250,7 @@ export const createDiary = async (req, res) => {
       content,
       isPublic: isPublic || false,
       allowComments: allowComments !== undefined ? allowComments : true,
-      selectedMood: selectedMood || 'happy',
+      selectedMood: selectedMood || "happy",
       tags: tags || [],
       coverPhoto: coverPhoto || null,
       isDraft: isDraft || false,
@@ -226,20 +260,22 @@ export const createDiary = async (req, res) => {
     });
 
     await diary.save();
-    await diary.populate('userId', 'username email');
+    await diary.populate("userId", "username email");
 
     res.status(201).json({
-      message: isDraft ? 'Draft saved successfully' : 'Diary created successfully',
-      diary
+      message: isDraft
+        ? "Draft saved successfully"
+        : "Diary created successfully",
+      diary,
     });
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       return res.status(400).json({
-        message: 'Validation error',
-        error: error.message
+        message: "Validation error",
+        error: error.message,
       });
     }
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -254,20 +290,24 @@ export const updateDiary = async (req, res) => {
       selectedMood,
       tags,
       coverPhoto,
-      isDraft
+      isDraft,
     } = req.body;
 
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: 'Diary not found' });
+      return res.status(404).json({ message: "Diary not found" });
     }
 
     if (diary.userId.toString() !== req.user.userId) {
-      return res.status(403).json({ message: 'Not authorized to update this diary' });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to update this diary" });
     }
     if (coverPhoto && coverPhoto.length > MAX_COVER_PHOTO_SIZE) {
-      return res.status(400).json({ message: 'Cover photo is too large. Maximum size is 5MB.' });
+      return res
+        .status(400)
+        .json({ message: "Cover photo is too large. Maximum size is 5MB." });
     }
 
     // Update fields
@@ -283,20 +323,22 @@ export const updateDiary = async (req, res) => {
     diary.updatedAt = Date.now();
 
     await diary.save();
-    await diary.populate('userId', 'username email');
+    await diary.populate("userId", "username email");
 
     res.json({
-      message: isDraft ? 'Draft saved successfully' : 'Diary updated successfully',
-      diary
+      message: isDraft
+        ? "Draft saved successfully"
+        : "Diary updated successfully",
+      diary,
     });
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       return res.status(400).json({
-        message: 'Validation error',
-        error: error.message
+        message: "Validation error",
+        error: error.message,
       });
     }
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -307,12 +349,14 @@ export const deleteDiary = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: 'Diary not found' });
+      return res.status(404).json({ message: "Diary not found" });
     }
 
     // Check if user is the owner
     if (diary.userId.toString() !== req.user.userId) {
-      return res.status(403).json({ message: 'Not authorized to delete this diary' });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this diary" });
     }
 
     await diary.deleteOne();
@@ -320,9 +364,9 @@ export const deleteDiary = async (req, res) => {
     // Optionally delete all comments associated with this diary
     await Comment.deleteMany({ diaryId: id });
 
-    res.json({ message: 'Diary deleted successfully' });
+    res.json({ message: "Diary deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -335,19 +379,23 @@ export const likeDiary = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: 'Diary not found' });
+      return res.status(404).json({ message: "Diary not found" });
     }
 
     // Check if diary is public and not a draft
     if (!diary.isPublic || diary.isDraft) {
-      return res.status(403).json({ message: 'Cannot like private or draft diaries' });
+      return res
+        .status(403)
+        .json({ message: "Cannot like private or draft diaries" });
     }
 
     // Check if user already liked this diary
     const alreadyLiked = diary.likes.includes(userId);
 
     if (alreadyLiked) {
-      return res.status(400).json({ message: 'You have already liked this diary' });
+      return res
+        .status(400)
+        .json({ message: "You have already liked this diary" });
     }
 
     // Add user to likes array
@@ -356,12 +404,12 @@ export const likeDiary = async (req, res) => {
     await diary.save();
 
     res.json({
-      message: 'Diary liked successfully',
+      message: "Diary liked successfully",
       likesCount: diary.likesCount,
       isLiked: true,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -374,14 +422,14 @@ export const unlikeDiary = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: 'Diary not found' });
+      return res.status(404).json({ message: "Diary not found" });
     }
 
     // Check if user has liked this diary
     const likeIndex = diary.likes.indexOf(userId);
 
     if (likeIndex === -1) {
-      return res.status(400).json({ message: 'You have not liked this diary' });
+      return res.status(400).json({ message: "You have not liked this diary" });
     }
 
     // Remove user from likes array
@@ -390,12 +438,12 @@ export const unlikeDiary = async (req, res) => {
     await diary.save();
 
     res.json({
-      message: 'Diary unliked successfully',
+      message: "Diary unliked successfully",
       likesCount: diary.likesCount,
       isLiked: false,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -408,12 +456,14 @@ export const toggleLike = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: 'Diary not found' });
+      return res.status(404).json({ message: "Diary not found" });
     }
 
     // Check if diary is public and not a draft
     if (!diary.isPublic || diary.isDraft) {
-      return res.status(403).json({ message: 'Cannot like private or draft diaries' });
+      return res
+        .status(403)
+        .json({ message: "Cannot like private or draft diaries" });
     }
 
     // Check if user already liked this diary
@@ -435,12 +485,14 @@ export const toggleLike = async (req, res) => {
     await diary.save();
 
     res.json({
-      message: isLiked ? 'Diary liked successfully' : 'Diary unliked successfully',
+      message: isLiked
+        ? "Diary liked successfully"
+        : "Diary unliked successfully",
       likesCount: diary.likesCount,
       isLiked,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -450,56 +502,58 @@ export const publishDraft = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: 'Diary not found' });
+      return res.status(404).json({ message: "Diary not found" });
     }
 
     if (diary.userId.toString() !== req.user.userId) {
-      return res.status(403).json({ message: 'Not authorized to publish this diary' });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to publish this diary" });
     }
 
     if (!diary.isDraft) {
-      return res.status(400).json({ message: 'This diary is already published' });
+      return res
+        .status(400)
+        .json({ message: "This diary is already published" });
     }
 
     diary.isDraft = false;
     diary.updatedAt = Date.now();
 
     await diary.save();
-    await diary.populate('userId', 'username email');
+    await diary.populate("userId", "username email");
 
     res.json({
-      message: 'Diary published successfully',
-      diary
+      message: "Diary published successfully",
+      diary,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 export const getDiariesByMood = async (req, res) => {
   try {
     const { mood } = req.params;
 
     // Validate mood
-    const validMoods = ['stressed', 'okay', 'calm', 'happy', 'great'];
+    const validMoods = ["stressed", "okay", "calm", "happy", "great"];
     if (!validMoods.includes(mood)) {
-      return res.status(400).json({ message: 'Invalid mood value' });
+      return res.status(400).json({ message: "Invalid mood value" });
     }
 
     const diaries = await Diary.find({
       userId: req.user.userId,
-      selectedMood: mood
+      selectedMood: mood,
     })
       .sort({ createdAt: -1 })
-      .populate('userId', 'username email');
+      .populate("userId", "username email");
 
     res.json({ diaries, mood });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 // Get diaries by tag (exclude drafts)
 export const getDiariesByTag = async (req, res) => {
@@ -509,13 +563,13 @@ export const getDiariesByTag = async (req, res) => {
     const diaries = await Diary.find({
       tags: tag.toLowerCase(),
       isPublic: true,
-      isDraft: false
+      isDraft: false,
     })
       .sort({ createdAt: -1 })
-      .populate('userId', 'username email');
+      .populate("userId", "username email");
 
     res.json({ diaries, tag });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

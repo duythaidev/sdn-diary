@@ -4,13 +4,14 @@ import { diaryService } from '@/services/api/diaryService'
 import DiaryCardItem from '@/components/diary/DiaryCardItem'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Button } from '@/components/ui/button'
-import { Plus, BookOpen, Globe, Lock, TrendingUp, Calendar, Sparkles } from 'lucide-react'
+import { Plus, Sparkles, BookOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
 import { getAxiosErrorMessage } from '@/lib/error'
-import StatisticCard from '@/components/common/StatisticsCard'
 import CreateDiaryButton from '@/components/common/CreateDiaryButton'
+import MoodBarChart from '@/components/dashboard/MoodBarChart'
+import DashboardCalendar from '@/components/dashboard/DashboardCalendar'
 
 export const DashboardPage = () => {
   const [diaries, setDiaries] = useState<Diary[]>([])
@@ -32,14 +33,6 @@ export const DashboardPage = () => {
     fetchDiaries()
   }, [])
 
-  const publicCount = diaries.filter((d) => d.isPublic).length
-  const privateCount = diaries.filter((d) => !d.isPublic).length
-
-  // Calculate this week's entries
-  const oneWeekAgo = new Date()
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-  const thisWeekCount = diaries.filter((d) => new Date(d.createdAt) >= oneWeekAgo).length
-
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -60,36 +53,10 @@ export const DashboardPage = () => {
           <p className="text-lg text-slate-400">Here's an overview of your journaling journey</p>
         </div>
 
-        {/* Statistics Cards */}
-        <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <StatisticCard
-            title="Total Entries"
-            value={diaries.length}
-            icon={<BookOpen className="text-primary h-6 w-6" />}
-            color="cyan"
-            secondaryIcon={<TrendingUp className="text-primary h-5 w-5 opacity-50" />}
-          />
-          <StatisticCard
-            title="Public Entries"
-            value={publicCount}
-            icon={<Globe className="h-6 w-6 text-green-400" />}
-            color="green"
-            badge="Shared"
-          />
-          <StatisticCard
-            title="Private Entries"
-            value={privateCount}
-            icon={<Lock className="h-6 w-6 text-purple-400" />}
-            color="purple"
-            badge="Private"
-          />
-          <StatisticCard
-            title="This Week"
-            value={thisWeekCount}
-            icon={<Calendar className="h-6 w-6 text-amber-400" />}
-            color="amber"
-            badge="7 days"
-          />
+        {/* Analytics & Calendar Section */}
+        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <MoodBarChart diaries={diaries} />
+          <DashboardCalendar />
         </div>
 
         {/* Recent Entries Section */}
@@ -144,7 +111,7 @@ export const DashboardPage = () => {
                 Start your journaling journey by creating your first entry
               </p>
               <Link to="/diary/create">
-                <Button className="h-11 bg-primary px-6 font-semibold shadow-lg">
+                <Button className="bg-primary h-11 px-6 font-semibold shadow-lg">
                   <Plus className="mr-2 h-4 w-4" />
                   Create First Entry
                 </Button>
