@@ -2,12 +2,13 @@ import Diary from '../models/Diary.js';
 import Comment from '../models/Comment.js';
 
 const MAX_COVER_PHOTO_SIZE = 5 * 1024 * 1024;
-const MAX_DIARIES_PER_PAGE = 10;
+const MAX_USER_DIARIES_PER_PAGE = 10;
+const MAX_PUBLIC_DIARIES_PER_PAGE = 12;
 const RECENT_DIARIES_LIMIT = 3;
 
 export const getUserDiaries = async (req, res) => {
   try {
-    const { dateFilter, moodFilter, tagsFilter, queryFilter, page = 1, limit = 10 } = req.query;
+    const { dateFilter, moodFilter, tagsFilter, queryFilter, page = 1, limit = MAX_USER_DIARIES_PER_PAGE } = req.query;
 
     // Parse pagination parameters
     const pageNum = parseInt(page);
@@ -104,7 +105,7 @@ export const getUserDrafts = async (req, res) => {
 };
 
 export const getPublicDiaries = async (req, res) => {
-  const { isMostLiked, queryFilter, page = 1, limit = 10 } = req.query;
+  const { isMostLiked, queryFilter, page = 1, limit = MAX_PUBLIC_DIARIES_PER_PAGE } = req.query;
 
   // Parse pagination parameters
   const pageNum = parseInt(page);
