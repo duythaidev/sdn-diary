@@ -2,12 +2,19 @@ import Diary from '../models/Diary.js';
 import Comment from '../models/Comment.js';
 
 const MAX_COVER_PHOTO_SIZE = 5 * 1024 * 1024;
-const MAX_DIARIES_PER_PAGE = 10;
+const MAX_USER_DIARIES_PER_PAGE = 10;
+const MAX_PUBLIC_DIARIES_PER_PAGE = 12;
 const RECENT_DIARIES_LIMIT = 3;
 
 export const getUserDiaries = async (req, res) => {
   try {
-    const { dateFilter, moodFilter, tagsFilter, queryFilter } = req.query;
+    const { dateFilter, moodFilter, tagsFilter, queryFilter, page = 1, limit = MAX_USER_DIARIES_PER_PAGE } = req.query;
+
+    // Parse pagination parameters
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
     const query = { userId: req.user.userId };
 
     // Mood filter
@@ -28,11 +35,30 @@ export const getUserDiaries = async (req, res) => {
       ];
     }
 
+    // Get total count
+    const totalCount = await Diary.countDocuments(query);
+
+    // Get paginated diaries
     const sortBy = dateFilter === 'newest' ? -1 : 1;
     const diaries = await Diary.find(query)
       .sort({ createdAt: sortBy })
+      .skip(skip)
+      .limit(limitNum)
       .populate('userId', 'username email');
-    res.json({ diaries });
+
+    // Calculate if there are more pages
+    const hasMore = skip + diaries.length < totalCount;
+
+    res.json({
+      diaries,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalCount / limitNum),
+        totalCount,
+        hasMore,
+        limit: limitNum
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -79,10 +105,14 @@ export const getUserDrafts = async (req, res) => {
 };
 
 export const getPublicDiaries = async (req, res) => {
-  const { isMostLiked, queryFilter } = req.query;
+  const { isMostLiked, queryFilter, page = 1, limit = MAX_PUBLIC_DIARIES_PER_PAGE } = req.query;
+
+  // Parse pagination parameters
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const skip = (pageNum - 1) * limitNum;
 
   // Query filter
-
   const query = {};
   if (queryFilter) {
     query.$or = [
@@ -94,14 +124,35 @@ export const getPublicDiaries = async (req, res) => {
   const sortQuery = isMostLiked === 'true' ? { likesCount: -1, createdAt: -1 } : { createdAt: -1 };
 
   try {
-    const diaries = await Diary.find({
+    const baseQuery = {
       isPublic: true,
       isDraft: false,
       ...query
-    })
+    };
+
+    // Get total count for pagination
+    const totalCount = await Diary.countDocuments(baseQuery);
+
+    // Get paginated diaries
+    const diaries = await Diary.find(baseQuery)
       .sort(sortQuery)
+      .skip(skip)
+      .limit(limitNum)
       .populate('userId', 'username email');
-    res.json({ diaries });
+
+    // Calculate if there are more pages
+    const hasMore = skip + diaries.length < totalCount;
+
+    res.json({
+      diaries,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalCount / limitNum),
+        totalCount,
+        hasMore,
+        limit: limitNum
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

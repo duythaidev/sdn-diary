@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CommentForm } from './CommentForm'
 import { CommentList } from './CommentList'
 import type { Comment } from '@/types'
+import { Link } from 'react-router-dom'
 
 interface CommentsSectionProps {
   diaryId: string
@@ -13,7 +14,6 @@ interface CommentsSectionProps {
 }
 
 export const CommentsSection = ({
-  diaryId,
   diaryOwnerId,
   comments = [],
   onAddComment,
@@ -59,7 +59,7 @@ export const CommentsSection = ({
       {!isAuthenticated && (
         <div className="mb-10 rounded-lg border border-gray-700 bg-[#1a2837] px-6 py-4">
           <p className="text-center text-gray-400">
-            Please <span className="text-cyan-400">sign in</span> to leave a comment
+            Please <Link to="/login" className="text-primary hover:text-primary/80">sign in</Link> to leave a comment
           </p>
         </div>
       )}

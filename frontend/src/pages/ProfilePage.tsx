@@ -71,7 +71,6 @@ export function ProfilePage() {
         profileImage: response.user.profileImage || null,
         urls: response.user.urls || [],
       })
-
     } catch (error) {
       toast.error(getAxiosErrorMessage(error, 'Failed to load profile'))
     }
@@ -131,7 +130,7 @@ export function ProfilePage() {
 
       <div className="relative container mx-auto max-w-4xl px-6 py-6">
         {/* Header */}
-        <div className="mb-12 space-y-3">
+        <div className="mb-6 space-y-3">
           <h1 className="text-4xl font-bold tracking-tight text-white">Settings & Profile</h1>
           <p className="text-lg text-slate-400">Manage your personal details and privacy preferences.</p>
         </div>
@@ -154,9 +153,6 @@ export function ProfilePage() {
               {profileImage ? (
                 <div className="relative h-24 w-24 overflow-hidden rounded-full ring-4 ring-slate-800/50">
                   <ImageViewer_Basic thumbnailUrl={profileImage} imageUrl={profileImage} />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                    <Camera className="h-8 w-8 text-white" />
-                  </div>
                 </div>
               ) : (
                 <div className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-full bg-linear-to-br from-cyan-500 to-blue-600 ring-4 ring-slate-800/50 transition-all group-hover:from-cyan-600 group-hover:to-blue-700">

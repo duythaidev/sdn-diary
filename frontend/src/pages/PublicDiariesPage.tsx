@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { diaryService } from '@/services/api/diaryService'
 import { Navbar } from '@/components/layout/Navbar'
 import DiaryCardItem from '@/components/diary/DiaryCardItem'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
-import { Globe, Heart, Clock, Search } from 'lucide-react'
+import { Globe, Heart, Clock, Search, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary } from '@/types'
 import { getAxiosErrorMessage } from '@/lib/error'
@@ -11,28 +11,73 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import useDebounce from '@/hooks/useDebounce'
 import { Input } from '@/components/ui/input'
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 
 export const PublicDiariesPage = () => {
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [publicDiaries, setPublicDiaries] = useState<Diary[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [isMostLiked, setIsMostLiked] = useState(false)
   const [isRecent, setIsRecent] = useState(true)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
 
-  useEffect(() => {
-    fetchPublicDiaries()
-  }, [isRecent, isMostLiked, debouncedSearchQuery])
+  const fetchPublicDiaries = useCallback(
+    async (pageNum: number, isInitial = false) => {
+      try {
+        if (isInitial) {
+          setLoading(true)
+        } else {
+          setLoadingMore(true)
+        }
 
-  const fetchPublicDiaries = async () => {
-    try {
-      const response = await diaryService.getPublicDiaries(isRecent, isMostLiked, debouncedSearchQuery)
-      setPublicDiaries(response.diaries)
-    } catch (error) {
-      toast.error(getAxiosErrorMessage(error, 'Failed to load public diaries'))
-    } finally {
-      setLoading(false)
+        const response = await diaryService.getPublicDiaries(isRecent, isMostLiked, debouncedSearchQuery, pageNum, 10)
+
+        if (isInitial) {
+          setPublicDiaries(response.diaries)
+        } else {
+          setPublicDiaries((prev) => [...prev, ...response.diaries])
+        }
+
+        setHasMore(response.pagination.hasMore)
+      } catch (error) {
+        toast.error(getAxiosErrorMessage(error, 'Failed to load public diaries'))
+      } finally {
+        setLoading(false)
+        setLoadingMore(false)
+      }
+    },
+    [isRecent, isMostLiked, debouncedSearchQuery],
+  )
+
+  // Reset and fetch when filters change
+  useEffect(() => {
+    setPage(1)
+    setPublicDiaries([])
+    fetchPublicDiaries(1, true)
+  }, [isRecent, isMostLiked, debouncedSearchQuery, fetchPublicDiaries])
+
+  // Load more handler
+  const handleLoadMore = useCallback(() => {
+    if (!loadingMore && hasMore) {
+      const nextPage = page + 1
+      setPage(nextPage)
+      fetchPublicDiaries(nextPage, false)
     }
+  }, [page, loadingMore, hasMore, fetchPublicDiaries])
+
+  // Infinite scroll sentinel ref
+  const sentinelRef = useInfiniteScroll({
+    loading: loadingMore,
+    hasMore,
+    onLoadMore: handleLoadMore,
+    rootMargin: '200px',
+  })
+
+  const handleLikeUpdate = (diaryId: string, likesCount: number, isLiked: boolean) => {
+    setPublicDiaries((prev) => prev.map((diary) => (diary._id === diaryId ? { ...diary, likesCount, isLiked } : diary)))
   }
 
   return (
@@ -94,24 +139,31 @@ export const PublicDiariesPage = () => {
           <>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-2">
               {publicDiaries.map((diary) => (
-                <DiaryCardItem key={diary._id} diary={diary} />
+                <DiaryCardItem key={diary._id} diary={diary} onLikeUpdate={handleLikeUpdate} />
               ))}
             </div>
 
-            {/* Load More Button */}
-            <div className="mt-12 flex justify-center">
-              <button className="group inline-flex items-center gap-2 rounded-full border border-slate-700/50 bg-slate-800/40 px-8 py-3.5 font-medium text-slate-300 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-cyan-500/50 hover:bg-slate-700/60 hover:text-white">
-                Load More Entries
-                <svg
-                  className="h-4 w-4 transition-transform group-hover:translate-y-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
+            {/* Loading More Indicator */}
+            {loadingMore && (
+              <div className="mt-8 flex justify-center">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span className="text-sm">Loading more entries...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Infinite Scroll Sentinel */}
+            {hasMore && !loadingMore && <div ref={sentinelRef} className="h-10" />}
+
+            {/* End of Results */}
+            {!hasMore && publicDiaries.length > 0 && (
+              <div className="mt-12 flex justify-center">
+                <div className="rounded-full border border-slate-700/50 bg-slate-800/40 px-6 py-3 text-sm text-slate-400 backdrop-blur-md">
+                  You've reached the end
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-24">

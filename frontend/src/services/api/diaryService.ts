@@ -4,13 +4,22 @@ import axiosInstance from './axios'
 const URL = '/diary'
 
 export const diaryService = {
-  getUserDiaries: async (dateFilter?: string, moodFilter?: string, tagsFilter?: string, searchQuery?: string) => {
+  getUserDiaries: async (
+    dateFilter?: string,
+    moodFilter?: string,
+    tagsFilter?: string,
+    searchQuery?: string,
+    page?: number,
+    limit?: number,
+  ) => {
     const response = await axiosInstance.get(URL, {
       params: {
         dateFilter,
         moodFilter,
         tagsFilter,
-        searchQuery,
+        queryFilter: searchQuery,
+        page,
+        limit,
       },
     })
     return response.data
@@ -21,12 +30,20 @@ export const diaryService = {
     return response.data
   },
 
-  getPublicDiaries: async (isRecent?: boolean, isMostLiked?: boolean, searchQuery?: string) => {
+  getPublicDiaries: async (
+    isRecent?: boolean,
+    isMostLiked?: boolean,
+    searchQuery?: string,
+    page?: number,
+    limit?: number,
+  ) => {
     const response = await axiosInstance.get(`${URL}/public`, {
       params: {
         isRecent,
         isMostLiked,
-        searchQuery,
+        queryFilter: searchQuery,
+        page,
+        limit,
       },
     })
     return response.data

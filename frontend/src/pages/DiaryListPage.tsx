@@ -3,16 +3,20 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Search, ChevronDown, Calendar, Smile, Tag, Plus, SlidersHorizontal } from 'lucide-react'
+import { Search, ChevronDown, Calendar, Smile, Tag, Plus, SlidersHorizontal, Loader2 } from 'lucide-react'
 import DiaryCardItem from '@/components/diary/DiaryCardItem'
 import { MOODS } from '@/constants'
 import { useGetUserDiaries } from '@/hooks/useGetUserDiaries'
 import { cn } from '@/lib/utils'
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
+import CreateDiaryButton from '@/components/common/CreateDiaryButton'
 
 export const DiaryListPage = () => {
   const {
     diaries,
     loading,
+    loadingMore,
+    hasMore,
     setDateFilter,
     setMoodFilter,
     setTagsFilter,
@@ -21,16 +25,25 @@ export const DiaryListPage = () => {
     dateFilter,
     moodFilter,
     tagsFilter,
+    loadMore,
   } = useGetUserDiaries()
 
   const allTags = Array.from(new Set(diaries?.flatMap((d) => d.tags || [])))
   const activeMood = MOODS.find((option) => option.value === moodFilter)
 
+  // Infinite scroll sentinel ref
+  const sentinelRef = useInfiniteScroll({
+    loading: loadingMore,
+    hasMore,
+    onLoadMore: loadMore,
+    rootMargin: '200px',
+  })
+
   return (
     <div className="min-h-screen">
       <div className="relative container mx-auto max-w-7xl px-6 py-6">
         {/* Header */}
-        <div className="mb-12 flex items-end justify-between">
+        <div className="mb-6 flex items-end justify-between">
           <div>
             <h1 className="mb-3 text-5xl font-bold tracking-tight text-white">My Entries</h1>
             <p className="text-lg text-slate-400">Manage your daily reflections and thoughts.</p>
@@ -211,11 +224,35 @@ export const DiaryListPage = () => {
             <LoadingSpinner />
           </div>
         ) : diaries.length > 0 ? (
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {diaries.map((diary) => (
-              <DiaryCardItem key={diary._id} diary={diary} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {diaries.map((diary) => (
+                <DiaryCardItem key={diary._id} diary={diary} />
+              ))}
+            </div>
+
+            {/* Loading More Indicator */}
+            {loadingMore && (
+              <div className="mt-8 flex justify-center">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span className="text-sm">Loading more entries...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Infinite Scroll Sentinel */}
+            {hasMore && !loadingMore && <div ref={sentinelRef} className="h-10" />}
+
+            {/* End of Results */}
+            {!hasMore && diaries.length > 0 && (
+              <div className="mt-12 flex justify-center">
+                <div className="rounded-full border border-slate-700/50 bg-slate-800/40 px-6 py-3 text-sm text-slate-400 backdrop-blur-md">
+                  You've reached the end
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center py-24">
             <div className="max-w-md rounded-2xl border border-slate-700/50 bg-slate-800/40 p-12 text-center shadow-2xl backdrop-blur-xl">
@@ -243,6 +280,7 @@ export const DiaryListPage = () => {
           </div>
         )}
       </div>
+      <CreateDiaryButton />
     </div>
   )
 }

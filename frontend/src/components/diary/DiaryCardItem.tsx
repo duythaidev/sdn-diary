@@ -29,18 +29,6 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
     navigate(`/diary/${diary._id}/edit`)
   }
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    console.log('Delete diary:', diary._id)
-  }
-
-  const handleDuplicate = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    console.log('Duplicate diary:', diary._id)
-  }
-
   const handleLike = async (diaryId: string) => {
     const result = await diaryService.toggleLike(diaryId)
     if (onLikeUpdate) {
@@ -55,18 +43,10 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
         className={cn(
           'relative overflow-hidden rounded-2xl transition-all duration-500',
           'border border-slate-700/50 bg-slate-800/40 backdrop-blur-xl',
-          'hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-500/10',
+          'hover:border-primary/50 hover:shadow-primary/10 hover:shadow-2xl',
           'hover:-translate-y-1',
         )}
       >
-        {/* Gradient overlay matching mood */}
-        <div
-          className="absolute inset-0 opacity-20 transition-opacity duration-500 group-hover:opacity-30"
-          style={{
-            background: `linear-gradient(135deg, ${getMoodColor(diary.selectedMood)}20 0%, transparent 100%)`,
-          }}
-        />
-
         {/* Actions Menu - Only show if user is owner */}
         {shouldShowActions && (
           <div className="absolute top-4 right-4 z-20">
@@ -91,20 +71,14 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
                   <Edit className="mr-2 h-4 w-4 text-cyan-400" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleDuplicate}
-                  className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-white"
-                >
-                  <Copy className="mr-2 h-4 w-4 text-blue-400" />
-                  Duplicate
-                </DropdownMenuItem>
+                {/* 
                 <DropdownMenuItem
                   onClick={handleDelete}
                   className="cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-300"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -145,7 +119,7 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
 
         {/* Cover Image Section */}
         <div className="relative flex h-64 items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-slate-900/80" />
+          <div className="absolute inset-0 z-10 bg-linear-to-b from-transparent via-transparent to-slate-900/80" />
 
           {diary.coverPhoto ? (
             <img
@@ -154,7 +128,7 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
               className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-800/30 to-slate-900/30">
+            <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-slate-800/30 to-slate-900/30">
               <div className="relative">
                 <div className="absolute inset-0 bg-cyan-500/10 blur-3xl" />
                 <Image className="relative h-20 w-20 text-slate-600" />
@@ -207,7 +181,7 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
                   onLike={handleLike}
                   variant="compact"
                 />
-                
+
                 {diary.allowComments && (
                   <div className="flex items-center gap-1.5 text-slate-400">
                     <MessageCircle className="h-4 w-4" />
