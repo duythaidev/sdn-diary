@@ -1,7 +1,7 @@
 import { checkIsOwner, cn, getMoodColor, getMoodIcon, getMoodLabel } from '@/lib/utils'
 import type { Diary } from '@/types'
 import { format } from 'date-fns'
-import { Globe, Image, Lock, MoreHorizontal, Edit, Trash2, Copy, MessageCircle } from 'lucide-react'
+import { Globe, Image, Lock, MoreHorizontal, Edit, Trash2, Copy, MessageCircle, FileText } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
@@ -85,33 +85,33 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
         )}
 
         {/* Privacy Badge */}
-        <div className="absolute top-4 left-4 z-10">
-          <span
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold backdrop-blur-md transition-all',
-              diary.isPublic
-                ? 'border-cyan-500/30 bg-cyan-500/20 text-cyan-200'
-                : 'border-slate-600/50 bg-slate-700/60 text-slate-300',
-            )}
-          >
-            {diary.isPublic ? (
-              <>
-                <Globe className="h-3.5 w-3.5" />
-                Public
-              </>
-            ) : (
-              <>
-                <Lock className="h-3.5 w-3.5" />
-                Private
-              </>
-            )}
-          </span>
-        </div>
-
-        {/* Draft Badge */}
-        {diary.isDraft && (
-          <div className="absolute top-4 left-24 z-10">
+        {!diary.isDraft ? (
+          <div className="absolute top-4 left-4 z-10">
+            <span
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold backdrop-blur-md transition-all',
+                diary.isPublic
+                  ? 'border-cyan-500/30 bg-cyan-500/20 text-cyan-200'
+                  : 'border-slate-600/50 bg-slate-700/60 text-slate-300',
+              )}
+            >
+              {diary.isPublic ? (
+                <>
+                  <Globe className="h-3.5 w-3.5" />
+                  Public
+                </>
+              ) : (
+                <>
+                  <Lock className="h-3.5 w-3.5" />
+                  Private
+                </>
+              )}
+            </span>
+          </div>
+        ) : (
+          <div className="absolute top-4 left-4 z-10">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/20 px-3 py-1.5 text-xs font-semibold text-amber-200 backdrop-blur-md">
+              <FileText className="h-3.5 w-3.5" />
               Draft
             </span>
           </div>

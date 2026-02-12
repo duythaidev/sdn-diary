@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { LikeButton } from '@/components/common/LikeButton'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { Edit, ArrowLeft, Lock, Bookmark, Share2, Heart } from 'lucide-react'
+import { Edit, ArrowLeft, Lock, Bookmark, Share2, Heart, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary, User, Comment } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
@@ -101,13 +101,22 @@ export const DiaryDetailPage = () => {
         {/* Main Content Card */}
         <div className="mx-auto max-w-3xl overflow-hidden rounded-lg">
           {/* Private Badge */}
-          {!diary.isPublic && (
+          {diary.isDraft ? (
             <div className="mb-4 flex justify-center">
               <span className="inline-flex items-center gap-1 rounded-full bg-gray-800 px-3 py-1 text-xs font-medium text-gray-300">
-                <Lock className="h-3 w-3" />
-                Private – Only You Can See This
+                <FileText className="h-3 w-3" />
+                Draft – This is a draft
               </span>
             </div>
+          ) : (
+            !diary.isPublic && (
+              <div className="mb-4 flex justify-center">
+                <span className="inline-flex items-center gap-1 rounded-full bg-gray-800 px-3 py-1 text-xs font-medium text-gray-300">
+                  <Lock className="h-3 w-3" />
+                  Private – Only You Can See This
+                </span>
+              </div>
+            )
           )}
 
           {/* Header Section */}

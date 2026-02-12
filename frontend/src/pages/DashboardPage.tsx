@@ -144,7 +144,7 @@ export const DashboardPage = () => {
                 Start your journaling journey by creating your first entry
               </p>
               <Link to="/diary/create">
-                <Button className="h-11 bg-gradient-to-r from-cyan-500 to-blue-600 px-6 font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all hover:from-cyan-600 hover:to-blue-700">
+                <Button className="h-11 bg-primary px-6 font-semibold shadow-lg">
                   <Plus className="mr-2 h-4 w-4" />
                   Create First Entry
                 </Button>

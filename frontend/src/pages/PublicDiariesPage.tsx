@@ -153,7 +153,7 @@ export const PublicDiariesPage = () => {
               </div>
             )}
 
-            {/* Infinite Scroll Sentinel */}
+            {/* Cho 1 element cuối cùng (sentinel) để theo dõi */}
             {hasMore && !loadingMore && <div ref={sentinelRef} className="h-10" />}
 
             {/* End of Results */}
