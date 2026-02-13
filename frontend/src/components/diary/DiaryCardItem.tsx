@@ -1,7 +1,7 @@
 import { checkIsOwner, cn, getMoodColor, getMoodIcon, getMoodLabel } from '@/lib/utils'
 import type { Diary } from '@/types'
 import { format } from 'date-fns'
-import { Globe, Image, Lock, MoreHorizontal, Edit, Trash2, Copy, MessageCircle, FileText } from 'lucide-react'
+import { Globe, Image, Lock, MoreHorizontal, Edit, MessageCircle, FileText } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
@@ -198,7 +198,7 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
 
         {/* Hover shine effect */}
         <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5" />
+          <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 via-transparent to-blue-500/5" />
         </div>
       </div>
     </Link>

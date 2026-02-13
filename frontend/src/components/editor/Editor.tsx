@@ -64,7 +64,7 @@ import { Select, Dropdown, Dialog } from './components'
 import { createPortal } from 'react-dom'
 import { defaultTheme } from './theme'
 import './styles.css'
-import { cn, getHTMLFromEditor, setHTMLToEditor } from '@/lib/utils'
+import { cn, getHTMLFromEditor, setHTMLToEditor, toBase64 } from '@/lib/utils'
 
 type TableConfig = {
   rows?: number
@@ -251,17 +251,7 @@ function useImageHandlers(commands: EditorCommands, editor: LexicalEditor | null
       handleUpload: async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) return
-        let src: string
-        if (imageExtension.config.uploadHandler) {
-          try {
-            src = await imageExtension.config.uploadHandler(file)
-          } catch (error) {
-            alert('Failed to upload image')
-            return
-          }
-        } else {
-          src = URL.createObjectURL(file)
-        }
+        const src = await toBase64(file)
         commands.insertImage({ src, alt: file.name, file })
         e.target.value = ''
       },
@@ -321,7 +311,7 @@ function FloatingToolbarRenderer() {
     >
       {isImageSelected ? (
         <>
-          <button
+          {/* <button
             onClick={() => commands.setImageAlignment('left')}
             className={`lexkit-toolbar-button ${activeStates.isImageAlignedLeft ? 'active' : ''}`}
             title="Align Left"
@@ -341,8 +331,8 @@ function FloatingToolbarRenderer() {
             title="Align Right"
           >
             <AlignRight size={14} />
-          </button>
-          <div className="bg-border mx-1 h-6 w-px" />
+          </button> */}
+          {/* <div className="bg-border mx-1 h-6 w-px" /> */}
           <button
             onClick={() => commands.setImageCaption(prompt('Enter caption:') || '')}
             className="lexkit-toolbar-button"

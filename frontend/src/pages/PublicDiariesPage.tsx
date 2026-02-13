@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, forwardRef } from 'react'
+import { VirtuosoGrid } from 'react-virtuoso'
 import { diaryService } from '@/services/api/diaryService'
 import { Navbar } from '@/components/layout/Navbar'
 import DiaryCardItem from '@/components/diary/DiaryCardItem'
@@ -11,17 +12,46 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import useDebounce from '@/hooks/useDebounce'
 import { Input } from '@/components/ui/input'
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
+
+// Define grid components outside the component to prevent remounting
+const gridComponents = {
+  List: forwardRef<HTMLDivElement>(({ style, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      {...props}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 500px), 1fr))',
+        gap: '2rem',
+        ...style,
+      }}
+      className="w-full"
+    >
+      {children}
+    </div>
+  )),
+  // Item: ({ children, ...props }: any) => (
+  //   <div
+  //     {...props}
+  //     style={{
+  //       display: 'flex',
+  //       flexDirection: 'column',
+  //     }}
+  //   >
+  //     {children}
+  //   </div>
+  // ),
+}
 
 export const PublicDiariesPage = () => {
   const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
   const [publicDiaries, setPublicDiaries] = useState<Diary[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [isMostLiked, setIsMostLiked] = useState(false)
   const [isRecent, setIsRecent] = useState(true)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
 
   const fetchPublicDiaries = useCallback(
@@ -30,13 +60,27 @@ export const PublicDiariesPage = () => {
         if (isInitial) {
           setLoading(true)
         } else {
-          setLoadingMore(true)
+          setIsLoadingMore(true)
         }
 
         const response = await diaryService.getPublicDiaries(isRecent, isMostLiked, debouncedSearchQuery, pageNum, 10)
 
         if (isInitial) {
-          setPublicDiaries(response.diaries)
+          setPublicDiaries([
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+            ...response.diaries,
+          ])
+          setPage(1)
         } else {
           setPublicDiaries((prev) => [...prev, ...response.diaries])
         }
@@ -46,7 +90,7 @@ export const PublicDiariesPage = () => {
         toast.error(getAxiosErrorMessage(error, 'Failed to load public diaries'))
       } finally {
         setLoading(false)
-        setLoadingMore(false)
+        setIsLoadingMore(false)
       }
     },
     [isRecent, isMostLiked, debouncedSearchQuery],
@@ -59,22 +103,14 @@ export const PublicDiariesPage = () => {
     fetchPublicDiaries(1, true)
   }, [isRecent, isMostLiked, debouncedSearchQuery, fetchPublicDiaries])
 
-  // Load more handler
-  const handleLoadMore = useCallback(() => {
-    if (!loadingMore && hasMore) {
+  // Load more handler for infinite scroll
+  const loadMore = useCallback(() => {
+    if (!isLoadingMore && hasMore) {
       const nextPage = page + 1
       setPage(nextPage)
       fetchPublicDiaries(nextPage, false)
     }
-  }, [page, loadingMore, hasMore, fetchPublicDiaries])
-
-  // Infinite scroll sentinel ref
-  const sentinelRef = useInfiniteScroll({
-    loading: loadingMore,
-    hasMore,
-    onLoadMore: handleLoadMore,
-    rootMargin: '200px',
-  })
+  }, [page, isLoadingMore, hasMore, fetchPublicDiaries])
 
   const handleLikeUpdate = (diaryId: string, likesCount: number, isLiked: boolean) => {
     setPublicDiaries((prev) => prev.map((diary) => (diary._id === diaryId ? { ...diary, likesCount, isLiked } : diary)))
@@ -136,35 +172,39 @@ export const PublicDiariesPage = () => {
         {loading ? (
           <LoadingSpinner />
         ) : publicDiaries.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-2">
-              {publicDiaries.map((diary) => (
-                <DiaryCardItem key={diary._id} diary={diary} onLikeUpdate={handleLikeUpdate} />
-              ))}
-            </div>
-
-            {/* Loading More Indicator */}
-            {loadingMore && (
-              <div className="mt-8 flex justify-center">
-                <div className="flex items-center gap-2 text-slate-400">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span className="text-sm">Loading more entries...</span>
-                </div>
-              </div>
-            )}
-
-            {/* Cho 1 element cuối cùng (sentinel) để theo dõi */}
-            {hasMore && !loadingMore && <div ref={sentinelRef} className="h-10" />}
-
-            {/* End of Results */}
-            {!hasMore && publicDiaries.length > 0 && (
-              <div className="mt-12 flex justify-center">
-                <div className="rounded-full border border-slate-700/50 bg-slate-800/40 px-6 py-3 text-sm text-slate-400 backdrop-blur-md">
-                  You've reached the end
-                </div>
-              </div>
-            )}
-          </>
+          <VirtuosoGrid
+            useWindowScroll
+            totalCount={publicDiaries.length}
+            endReached={loadMore}
+            data={publicDiaries}
+            itemContent={(_, diary) => <DiaryCardItem key={diary._id} diary={diary} onLikeUpdate={handleLikeUpdate} />}
+            overscan={100}
+            components={{
+              ...gridComponents,
+              Footer: () => {
+                if (isLoadingMore) {
+                  return (
+                    <div className="col-span-full flex justify-center py-8">
+                      <div className="flex items-center gap-2 text-slate-400">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span className="text-sm">Loading more entries...</span>
+                      </div>
+                    </div>
+                  )
+                }
+                if (!hasMore && publicDiaries.length > 0) {
+                  return (
+                    <div className="col-span-full flex justify-center py-12">
+                      <div className="rounded-full border border-slate-700/50 bg-slate-800/40 px-6 py-3 text-sm text-slate-400 backdrop-blur-md">
+                        You've reached the end
+                      </div>
+                    </div>
+                  )
+                }
+                return null
+              },
+            }}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center py-24">
             <div className="max-w-md rounded-2xl border border-slate-700/50 bg-slate-800/40 p-12 text-center shadow-2xl backdrop-blur-xl">

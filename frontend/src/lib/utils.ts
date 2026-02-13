@@ -89,3 +89,11 @@ export const getRouteName = (path: string) => {
 
   return routes[path as keyof typeof routes] || 'Unknown'
 }
+
+export const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = (error) => reject(error)
+  })
