@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { LikeButton } from '@/components/common/LikeButton'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { Edit, ArrowLeft, Lock, Bookmark, Share2, Heart, FileText } from 'lucide-react'
+import { Edit, ArrowLeft, Lock, Bookmark, Share2, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary, User, Comment } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
@@ -119,12 +119,25 @@ export const DiaryDetailPage = () => {
             )
           )}
 
-          {/* Header Section */}
-          <div className="mb-8 border-b border-slate-700/50 pb-8">
+          {/* Header Section with Background Image and Gradient Overlay */}
+          <div className="relative mb-8 flex min-h-[300px] flex-col justify-end overflow-hidden rounded-xl px-4 pb-8">
+            {diary.coverPhoto && (
+              <div
+                className="absolute inset-0 -z-10 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(${diary.coverPhoto})`,
+                }}
+              />
+            )}
+            {/* Gradient Overlay */}
+            {diary.coverPhoto && (
+              <div
+                className="absolute inset-0 -z-10 bg-linear-to-b from-black/20 to-black/80" // Adjusted for fade effect, top slight dark to bottom darker
+              />
+            )}
             <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-5xl">{diary.title}</h1>
-
             {/* Author Info and Actions */}
-            <div className="flex items-start justify-between gap-4">
+            <div className="0 flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
                 {/* Avatar */}
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 ring-2 ring-slate-800/50">
@@ -185,15 +198,8 @@ export const DiaryDetailPage = () => {
             </div>
           </div>
 
-          {/* Cover Photo */}
-          {diary.coverPhoto && (
-            <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-lg">
-              <ImageViewer_Basic thumbnailUrl={diary.coverPhoto} imageUrl={diary.coverPhoto} />
-            </div>
-          )}
-
           {/* Content Section */}
-          <div>
+          <div className="border-secondary border-t pt-4">
             <div
               className="prose prose-invert prose-lg max-w-none leading-relaxed text-gray-200"
               dangerouslySetInnerHTML={{ __html: diary.content }}

@@ -91,8 +91,8 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold backdrop-blur-md transition-all',
                 diary.isPublic
-                  ? 'border-cyan-500/30 bg-cyan-500/20 text-cyan-200'
-                  : 'border-slate-600/50 bg-slate-700/60 text-slate-300',
+                  ? 'border-cyan-500/30 bg-cyan-500 text-cyan-200'
+                  : 'border-slate-600/50 bg-slate-700 text-slate-300',
               )}
             >
               {diary.isPublic ? (
@@ -110,7 +110,7 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
           </div>
         ) : (
           <div className="absolute top-4 left-4 z-10">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/20 px-3 py-1.5 text-xs font-semibold text-amber-200 backdrop-blur-md">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/80 px-3 py-1.5 text-xs font-semibold text-amber-200 backdrop-blur-md">
               <FileText className="h-3.5 w-3.5" />
               Draft
             </span>
@@ -125,7 +125,7 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
             <img
               src={diary.coverPhoto}
               alt={diary.title}
-              className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110"
+              className="h-full w-full object-cover transition-all duration-700"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-slate-800/30 to-slate-900/30">
