@@ -101,7 +101,7 @@ export const DashboardPage = () => {
               <div className="mb-6 flex justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-2xl" />
-                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-slate-700/50 bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-slate-700/50 bg-linear-to-br from-cyan-500/20 to-blue-500/20">
                     <BookOpen className="h-10 w-10 text-slate-500" />
                   </div>
                 </div>

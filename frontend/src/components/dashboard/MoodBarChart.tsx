@@ -1,7 +1,7 @@
 import { Bar, BarChart, CartesianGrid, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { MOODS } from '@/constants'
-import { Diary } from '@/types'
+import type { Diary } from '@/types'
 
 interface MoodBarChartProps {
   diaries: Diary[]
@@ -12,7 +12,7 @@ const MoodBarChart = ({ diaries }: MoodBarChartProps) => {
   const moodData = MOODS.map((mood) => {
     const count = diaries.filter((diary) => diary.selectedMood === mood.value).length
     return {
-      mood: mood.label,
+      mood: mood.label + ' ' + mood.icon,
       count: count,
       fill: mood.color,
       icon: mood.icon,
