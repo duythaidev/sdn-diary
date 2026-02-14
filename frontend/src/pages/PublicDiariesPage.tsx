@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import useDebounce from '@/hooks/useDebounce'
 import { Input } from '@/components/ui/input'
 
-// Define grid components outside the component to prevent remounting
+// Define grid components outside the component to prevent remounting, and use masonry layout
 const gridComponents = {
   List: forwardRef<HTMLDivElement>(({ style, children, ...props }, ref) => (
     <div
@@ -22,6 +22,7 @@ const gridComponents = {
       style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 500px), 1fr))',
+
         gap: '2rem',
         ...style,
       }}
@@ -178,7 +179,7 @@ export const PublicDiariesPage = () => {
             endReached={loadMore}
             data={publicDiaries}
             itemContent={(_, diary) => <DiaryCardItem key={diary._id} diary={diary} onLikeUpdate={handleLikeUpdate} />}
-            overscan={100}
+            overscan={200} // 200px trên và dưới để render thêm 
             components={{
               ...gridComponents,
               Footer: () => {

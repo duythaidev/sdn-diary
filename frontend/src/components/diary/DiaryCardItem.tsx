@@ -118,22 +118,16 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
         )}
 
         {/* Cover Image Section */}
-        <div className="relative flex h-64 items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-10 bg-linear-to-b from-transparent via-transparent to-slate-900/80" />
-
-          {diary.coverPhoto ? (
-            <img
-              src={diary.coverPhoto}
-              alt={diary.title}
-              className="h-full w-full object-cover transition-all duration-700"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-slate-800/30 to-slate-900/30">
-              <div className="relative">
-                <div className="absolute inset-0 bg-cyan-500/10 blur-3xl" />
-                <Image className="relative h-20 w-20 text-slate-600" />
-              </div>
-            </div>
+        <div className="relative flex max-h-64 min-h-8 items-center justify-center overflow-hidden">
+          {diary.coverPhoto && (
+            <>
+              <div className="absolute inset-0 z-10 bg-linear-to-b from-transparent via-transparent to-slate-900/80" />
+              <img
+                src={diary.coverPhoto}
+                alt={diary.title}
+                className="h-full w-full object-cover transition-all duration-700"
+              />
+            </>
           )}
         </div>
 
