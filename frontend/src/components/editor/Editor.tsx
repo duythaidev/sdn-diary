@@ -200,7 +200,7 @@ interface EditorProps {
   content?: string
 }
 
-export const Editor = forwardRef<EditorRef, EditorProps>(({ className, content, onChange }, ref) => {
+export const Editor = forwardRef<EditorRef, EditorProps>(({ className, content, onChange }, _ref) => {
   const [editorTheme, setEditorTheme] = useState<'light' | 'dark'>('dark')
 
   const isDark = editorTheme === 'dark'
@@ -235,7 +235,7 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ className, content, 
 Editor.displayName = 'Editor'
 
 // Hook for image handling logic
-function useImageHandlers(commands: EditorCommands, editor: LexicalEditor | null) {
+function useImageHandlers(commands: EditorCommands, _editor: LexicalEditor | null) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handlers = useMemo(
@@ -458,8 +458,8 @@ function Toolbar({
   commands,
   hasExtension,
   activeStates,
-  isDark,
-  toggleTheme,
+  // isDark,
+  // toggleTheme,
 }: {
   commands: EditorCommands
   hasExtension: (name: ExtensionNames) => boolean

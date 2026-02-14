@@ -119,7 +119,7 @@ export function CommandPalette({
                 <div className="lexkit-command-palette-group-title">
                   {category}
                 </div>
-                {commands.map((cmd, cmdIndex) => {
+                {commands.map((cmd) => {
                   const globalIndex = flatCommands.indexOf(cmd);
                   return (
                     <div

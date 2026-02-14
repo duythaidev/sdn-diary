@@ -11,7 +11,7 @@ interface DiaryAttachmentsProps {
   className?: string
 }
 
-export const DiaryAttachments = ({ coverPhoto, fileInputRef, onChange, onRemove, disabled, className }: DiaryAttachmentsProps) => {
+export const DiaryAttachments = ({ coverPhoto, fileInputRef, onChange, onRemove, className }: DiaryAttachmentsProps) => {
   return (
     <div className={className}>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={onChange} className="hidden" />

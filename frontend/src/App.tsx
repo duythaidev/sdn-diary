@@ -1,25 +1,42 @@
+import { lazy, Suspense } from 'react'
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from './redux/store'
-import { Toaster } from './components/ui/sonner'
-import { ProtectedRoute } from './components/layout/ProtectedRoute'
-import { PublicRoute } from './components/layout/PublicRoute'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
-import { DashboardPage } from './pages/DashboardPage'
-import { DiaryListPage } from './pages/DiaryListPage'
-import { DiaryDetailPage } from './pages/DiaryDetailPage'
-import { DiaryCreatePage } from './pages/DiaryCreatePage'
-import { DiaryEditPage } from './pages/DiaryEditPage'
-import { PublicDiariesPage } from './pages/PublicDiariesPage'
 import NotFound from './pages/NotFound'
-import { ProfilePage } from './pages/ProfilePage'
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
-import { ResetPasswordPage } from './pages/ResetPasswordPage'
+import { Toaster } from './components/ui/sonner'
+
+const ProtectedRoute = lazy(() =>
+  import('./components/layout/ProtectedRoute').then((module) => ({ default: module.ProtectedRoute })),
+)
+const PublicRoute = lazy(() =>
+  import('./components/layout/PublicRoute').then((module) => ({ default: module.PublicRoute })),
+)
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then((module) => ({ default: module.DashboardPage })))
+const DiaryListPage = lazy(() => import('./pages/DiaryListPage').then((module) => ({ default: module.DiaryListPage })))
+const DiaryDetailPage = lazy(() =>
+  import('./pages/DiaryDetailPage').then((module) => ({ default: module.DiaryDetailPage })),
+)
+const DiaryCreatePage = lazy(() =>
+  import('./pages/DiaryCreatePage').then((module) => ({ default: module.DiaryCreatePage })),
+)
+const DiaryEditPage = lazy(() => import('./pages/DiaryEditPage').then((module) => ({ default: module.DiaryEditPage })))
+const PublicDiariesPage = lazy(() =>
+  import('./pages/PublicDiariesPage').then((module) => ({ default: module.PublicDiariesPage })),
+)
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then((module) => ({ default: module.ProfilePage })))
+const ForgotPasswordPage = lazy(() =>
+  import('./pages/ForgotPasswordPage').then((module) => ({ default: module.ForgotPasswordPage })),
+)
+const ResetPasswordPage = lazy(() =>
+  import('./pages/ResetPasswordPage').then((module) => ({ default: module.ResetPasswordPage })),
+)
 
 function AppContent() {
   return (
-    <>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
       <Routes>
         {/* Public routes */}
         <Route
@@ -106,7 +123,7 @@ function AppContent() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster richColors />
-    </>
+    </Suspense>
   )
 }
 

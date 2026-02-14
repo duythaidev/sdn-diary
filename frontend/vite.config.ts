@@ -26,5 +26,14 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       allowedHosts: ['admin.tinz.vn'],
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) return 'vendor' // Đưa các module đc build từ node_modules vào vendor
+          },
+        },
+      },
+    },
   }
 })

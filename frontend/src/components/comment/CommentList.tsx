@@ -85,7 +85,7 @@ interface CommentItemProps {
 
 const CommentItem = ({ comment, username, initials, avatarColor, canDelete, onDelete, loading }: CommentItemProps) => {
   // Format time ago
-  const timeAgo = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })
+  const timeAgo = formatDistanceToNow(new Date(comment.createdAt as string), { addSuffix: true })
     .replace('about ', '')
     .replace('less than a minute ago', 'just now')
 

@@ -1,4 +1,4 @@
-import { Calendar, MessageCircle, Share2, Bookmark, Lock } from 'lucide-react'
+import { MessageCircle, Share2, Bookmark, Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import ImageViewer_Basic from '../commerce-ui/image-viewer-basic'
 
