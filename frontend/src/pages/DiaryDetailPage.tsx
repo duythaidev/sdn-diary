@@ -12,9 +12,9 @@ import { toast } from 'sonner'
 import type { Diary, User, Comment } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
 import { getAxiosErrorMessage } from '@/lib/error'
-import ImageViewer_Basic from '@/components/commerce-ui/image-viewer-basic'
 import TagsList from '@/components/common/TagsList'
 import { MOODS } from '@/constants'
+import { cn } from '@/lib/utils'
 
 export const DiaryDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -120,7 +120,12 @@ export const DiaryDetailPage = () => {
           )}
 
           {/* Header Section with Background Image and Gradient Overlay */}
-          <div className="relative mb-8 flex min-h-[300px] flex-col justify-end overflow-hidden rounded-xl px-4 pb-8">
+          <div
+            className={cn(
+              'relative mb-8 flex flex-col justify-end overflow-hidden rounded-xl px-4 pb-8',
+              diary.coverPhoto && 'min-h-[300px]',
+            )}
+          >
             {diary.coverPhoto && (
               <div
                 className="absolute inset-0 -z-10 bg-cover bg-center"
@@ -140,7 +145,7 @@ export const DiaryDetailPage = () => {
             <div className="0 flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
                 {/* Avatar */}
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 ring-2 ring-slate-800/50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-cyan-500 to-blue-600 ring-2 ring-slate-800/50">
                   {(diaryUser as User)?.profileImage ? (
                     <img
                       src={(diaryUser as User).profileImage!}

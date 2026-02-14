@@ -1,7 +1,7 @@
 import { checkIsOwner, cn, getMoodColor, getMoodIcon, getMoodLabel } from '@/lib/utils'
 import type { Diary } from '@/types'
 import { format } from 'date-fns'
-import { Globe, Image, Lock, MoreHorizontal, Edit, MessageCircle, FileText } from 'lucide-react'
+import { Globe, Lock, MoreHorizontal, Edit, MessageCircle, FileText } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
@@ -13,9 +13,10 @@ interface DiaryCardItemProps {
   diary: Diary
   showActions?: boolean
   onLikeUpdate?: (diaryId: string, likesCount: number, isLiked: boolean) => void
+  className?: string
 }
 
-const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps) => {
+const DiaryCardItem = ({ diary, showActions, onLikeUpdate, className }: DiaryCardItemProps) => {
   const navigate = useNavigate()
   const { user } = useProfile()
 
@@ -38,7 +39,7 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
   }
 
   return (
-    <Link to={`/diary/${diary._id}`} className="group block">
+    <Link to={`/diary/${diary._id}`} className={cn("group block", className)}>
       <div
         className={cn(
           'relative overflow-hidden rounded-2xl transition-all duration-500',
