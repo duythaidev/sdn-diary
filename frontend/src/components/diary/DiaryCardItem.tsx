@@ -1,7 +1,7 @@
 import { checkIsOwner, cn, getMoodColor, getMoodIcon, getMoodLabel } from '@/lib/utils'
 import type { Diary } from '@/types'
 import { format } from 'date-fns'
-import { Globe, Image, Lock, MoreHorizontal, Edit, MessageCircle, FileText } from 'lucide-react'
+import { Globe, Lock, MoreHorizontal, Edit, MessageCircle, FileText } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
@@ -13,9 +13,10 @@ interface DiaryCardItemProps {
   diary: Diary
   showActions?: boolean
   onLikeUpdate?: (diaryId: string, likesCount: number, isLiked: boolean) => void
+  className?: string
 }
 
-const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps) => {
+const DiaryCardItem = ({ diary, showActions, onLikeUpdate, className }: DiaryCardItemProps) => {
   const navigate = useNavigate()
   const { user } = useProfile()
 
@@ -38,7 +39,7 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
   }
 
   return (
-    <Link to={`/diary/${diary._id}`} className="group block">
+    <Link to={`/diary/${diary._id}`} className={cn("group block", className)}>
       <div
         className={cn(
           'relative overflow-hidden rounded-2xl transition-all duration-500',
@@ -118,22 +119,16 @@ const DiaryCardItem = ({ diary, showActions, onLikeUpdate }: DiaryCardItemProps)
         )}
 
         {/* Cover Image Section */}
-        <div className="relative flex h-64 items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-10 bg-linear-to-b from-transparent via-transparent to-slate-900/80" />
-
-          {diary.coverPhoto ? (
-            <img
-              src={diary.coverPhoto}
-              alt={diary.title}
-              className="h-full w-full object-cover transition-all duration-700"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-slate-800/30 to-slate-900/30">
-              <div className="relative">
-                <div className="absolute inset-0 bg-cyan-500/10 blur-3xl" />
-                <Image className="relative h-20 w-20 text-slate-600" />
-              </div>
-            </div>
+        <div className="relative flex max-h-64 min-h-8 items-center justify-center overflow-hidden">
+          {diary.coverPhoto && (
+            <>
+              <div className="absolute inset-0 z-10 bg-linear-to-b from-transparent via-transparent to-slate-900/80" />
+              <img
+                src={diary.coverPhoto}
+                alt={diary.title}
+                className="h-full w-full object-cover transition-all duration-700"
+              />
+            </>
           )}
         </div>
 
