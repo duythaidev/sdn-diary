@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    networks:
+      - diary-network
+    environment:
+      - VITE_API_URL: 
+      - VITE_PORT: 
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - diary-network
+    environment:
+      - PORT: 
+      - MONGODB_URI: 
+      - JWT_ACCESS_SECRET: 
+      - JWT_REFRESH_SECRET: 
+      - CLIENT_URL: 
+      - NODE_ENV: 
+      - COOKIE_MAX_AGE: 
+      - ACCESS_TOKEN_COOKIE_MAX_AGE: 
+      - REFRESH_TOKEN_COOKIE_MAX_AGE: 
+      - GOOGLE_CLIENT_ID: 
+      - GOOGLE_CLIENT_SECRET: 
+      - GOOGLE_CALLBACK_URL: 
+      - SESSION_SECRET: 
+      - EMAIL_HOST: 
+      - EMAIL_PORT: 
+      - EMAIL_USER: 
+      - EMAIL_PASS: 
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - diary-network
+
+networks:
+  diary-network:
+    driver: bridge
