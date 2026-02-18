@@ -1,6 +1,11 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
 [functions]
   external_node_modules = ["express", "@supabase/supabase-js", "cors", "body-parser", "dotenv", "serverless-http"] 
   node_bundler = "esbuild"
+
 [[redirects]]
   force = true
   from = "/*"

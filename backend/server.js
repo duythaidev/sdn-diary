@@ -44,6 +44,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "Welcome to Diary API! 🚀",
+    status: "online",
+  });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/diary", diaryRoutes);
