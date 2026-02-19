@@ -91,9 +91,9 @@ export const DiaryView = ({
 
             {showActions && (
               <div className="flex items-center gap-2">
-                <button className="hover:bg-muted rounded-full p-2 transition-colors">
+                {/* <button className="hover:bg-muted rounded-full p-2 transition-colors">
                   <Bookmark className="text-foreground/60 h-5 w-5" />
-                </button>
+                </button> */}
                 <button className="hover:bg-muted rounded-full p-2 transition-colors">
                   <Share2 className="text-foreground/60 h-5 w-5" />
                 </button>

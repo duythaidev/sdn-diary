@@ -61,16 +61,12 @@ export const CommentForm = ({ onSubmit }: CommentFormProps) => {
             disabled={submitting}
             maxLength={500}
             rows={3}
-            className="resize-none rounded-lg border-gray-700 bg-[#1a2837] pr-4 text-gray-100 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
+            className="resize-none rounded-lg border bg-gray-50 pr-4 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
           />
         </div>
 
         <div className="mt-4 flex justify-end">
-          <Button
-            type="submit"
-            disabled={!content.trim() || submitting}
-            className="rounded-lg bg-cyan-500 px-6 py-2 font-medium text-white hover:bg-cyan-600"
-          >
+          <Button type="submit" disabled={!content.trim() || submitting}>
             {submitting ? 'Posting...' : 'Post Comment'}
           </Button>
         </div>

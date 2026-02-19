@@ -19,15 +19,15 @@
 [data-theme="dark"],
 .dark,
 .lexkit-editor-wrapper[data-editor-theme="dark"] {
-  --lexkit-bg: #0a0a0a;
-  --lexkit-fg: #ededed;
+  --lexkit-bg: #ffffff;
+  --lexkit-fg: #0a0a0a;
   --lexkit-border: #262626;
   --lexkit-border-hover: #404040;
   --lexkit-border-active: #525252;
-  --lexkit-accent: #ededed;
+  --lexkit-accent: #a3a3a3;
   --lexkit-accent-hover: #d4d4d8;
   --lexkit-shadow: rgba(0, 0, 0, 0.5);
-  --lexkit-muted: #171717;
+  --lexkit-muted: #a3a3a3;
   --lexkit-muted-fg: #a3a3a3;
 }
 
@@ -112,7 +112,7 @@
   height: 36px;
   border: 1px solid transparent;
   border-radius: 6px;
-  background-color: transparent;
+  background-color: var(--lexkit-bg);
   color: var(--lexkit-fg);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

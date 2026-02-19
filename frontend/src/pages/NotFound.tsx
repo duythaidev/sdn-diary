@@ -16,7 +16,7 @@ const NotFound = () => {
       </div>
 
       <div className="relative max-h-screen w-full p-2 max-lg:hidden">
-        <div className="bg-card h-full w-full rounded-2xl"></div>
+        <div className="bg-black h-full w-full rounded-2xl"></div>
         <img
           src="https://cdn.shadcnstudio.com/ss-assets/blocks/marketing/error/image-1.png"
           alt="404 illustration"

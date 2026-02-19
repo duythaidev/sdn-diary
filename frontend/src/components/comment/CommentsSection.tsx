@@ -44,7 +44,7 @@ export const CommentsSection = ({
   return (
     <>
       <div className="mb-8 flex items-center gap-3">
-        <h2 className="text-3xl font-bold text-white">Comments</h2>
+        <h2 className="text-xl text-3xl text-primary">Comments</h2>
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-700 text-sm font-medium text-gray-300">
           {comments.length}
         </span>
@@ -57,9 +57,13 @@ export const CommentsSection = ({
       )}
 
       {!isAuthenticated && (
-        <div className="mb-10 rounded-lg border border-gray-700 bg-[#1a2837] px-6 py-4">
+        <div className="mb-10 rounded-lg border bg-gray-50 py-4">
           <p className="text-center text-gray-400">
-            Please <Link to="/login" className="text-primary hover:text-primary/80">sign in</Link> to leave a comment
+            Please{' '}
+            <Link to="/login" className="text-primary hover:text-primary/80">
+              sign in
+            </Link>{' '}
+            to leave a comment
           </p>
         </div>
       )}

@@ -1,5 +1,4 @@
 import { lazy, Suspense } from 'react'
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from './redux/store'
@@ -7,6 +6,7 @@ import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import NotFound from './pages/NotFound'
 import { Toaster } from './components/ui/sonner'
+import AppLayout from './components/layout/AppLayout'
 
 const ProtectedRoute = lazy(() =>
   import('./components/layout/ProtectedRoute').then((module) => ({ default: module.ProtectedRoute })),
@@ -36,7 +36,7 @@ const ResetPasswordPage = lazy(() =>
 
 function AppContent() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+    <>
       <Routes>
         {/* Public routes */}
         <Route
@@ -72,58 +72,61 @@ function AppContent() {
           }
         />
 
-        {/* Public diaries - accessible to all */}
-        <Route path="/" element={<PublicDiariesPage />} />
+        {/* Layout wrapped routes */}
+        <Route element={<AppLayout />}>
+          {/* Public diaries - accessible to all */}
+          <Route path="/" element={<PublicDiariesPage />} />
 
-        {/* Protected routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/diary"
-          element={
-            <ProtectedRoute>
-              <DiaryListPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/diary/create"
-          element={
-            <ProtectedRoute>
-              <DiaryCreatePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/diary/:id" element={<DiaryDetailPage />} />
-        <Route
-          path="/diary/:id/edit"
-          element={
-            <ProtectedRoute>
-              <DiaryEditPage />
-            </ProtectedRoute>
-          }
-        />
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/diary"
+            element={
+              <ProtectedRoute>
+                <DiaryListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/diary/create"
+            element={
+              <ProtectedRoute>
+                <DiaryCreatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/diary/:id" element={<DiaryDetailPage />} />
+          <Route
+            path="/diary/:id/edit"
+            element={
+              <ProtectedRoute>
+                <DiaryEditPage />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster richColors />
-    </Suspense>
+    </>
   )
 }
 

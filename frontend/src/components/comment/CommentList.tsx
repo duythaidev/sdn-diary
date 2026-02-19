@@ -2,6 +2,7 @@ import { formatDistanceToNow } from 'date-fns'
 import type { Comment, User } from '@/types'
 import { MessageCircle, Trash } from 'lucide-react'
 import { useProfile } from '@/hooks/useProfile'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 interface CommentListProps {
   comments: Comment[]
@@ -21,20 +22,18 @@ export const CommentList = ({ comments, diaryOwnerId, onDelete, loading }: Comme
 
   if (comments.length === 0) {
     return (
-      <div className="py-12 text-center">
-        <MessageCircle className="mx-auto mb-3 h-12 w-12 text-gray-600" />
-        <p className="text-gray-400">No comments yet. Be the first to comment!</p>
+      <div className="py-8 text-center">
+        <MessageCircle className="text-muted-foreground/40 mx-auto mb-2 h-8 w-8" />
+        <p className="text-muted-foreground font-serif text-sm italic">No comments yet. Be the first!</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mb-6 space-y-4">
       {comments.map((comment) => {
         const commentUser = typeof comment.userId === 'object' ? comment.userId : null
         const username = commentUser ? (commentUser as User).username : 'Unknown'
-
-        // Generate avatar initials
         const initials = username
           .split(' ')
           .map((n) => n[0])
@@ -42,7 +41,6 @@ export const CommentList = ({ comments, diaryOwnerId, onDelete, loading }: Comme
           .toUpperCase()
           .substring(0, 2)
 
-        // Generate random pastel color for avatar (deterministic based on username)
         const getAvatarColor = (name: string) => {
           const colors = [
             'from-orange-300 to-pink-300',
@@ -52,8 +50,7 @@ export const CommentList = ({ comments, diaryOwnerId, onDelete, loading }: Comme
             'from-pink-300 to-rose-300',
             'from-purple-300 to-indigo-300',
           ]
-          const index = name.charCodeAt(0) % colors.length
-          return colors[index]
+          return colors[name.charCodeAt(0) % colors.length]
         }
 
         return (
@@ -84,38 +81,35 @@ interface CommentItemProps {
 }
 
 const CommentItem = ({ comment, username, initials, avatarColor, canDelete, onDelete, loading }: CommentItemProps) => {
-  // Format time ago
   const timeAgo = formatDistanceToNow(new Date(comment.createdAt as string), { addSuffix: true })
     .replace('about ', '')
     .replace('less than a minute ago', 'just now')
 
+  const commentUser = typeof comment.userId === 'object' ? (comment.userId as User) : null
+
   return (
-    <div className="flex gap-4">
-      {/* Avatar */}
-      <div className="shrink-0">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br ${avatarColor}`}>
-          <span className="text-lg font-semibold text-gray-800">{initials}</span>
-        </div>
-      </div>
+    <div className="flex items-start gap-3">
+      <Avatar className="mt-1 h-8 w-8 shrink-0">
+        <AvatarImage src={commentUser?.profileImage ?? undefined} alt={username} />
+        <AvatarFallback className={`bg-gradient-to-br ${avatarColor} text-xs font-semibold text-gray-800`}>
+          {initials}
+        </AvatarFallback>
+      </Avatar>
 
-      {/* Comment Content */}
-      <div className="flex-1">
-        {/* Header */}
-        <div className="mb-2 flex items-center gap-2">
-          <span className="text-base font-semibold text-white">{username}</span>
-          <span className="text-sm text-gray-500">• {timeAgo}</span>
+      <div className="flex-1 rounded-lg rounded-tl-none bg-gray-50 p-3">
+        <div className="mb-1 flex items-baseline justify-between">
+          <span className="text-xs font-bold">{username}</span>
+          <span className="text-muted-foreground text-[10px]">{timeAgo}</span>
         </div>
-
-        {/* Content */}
-        <div className="mb-3 flex items-center rounded-lg bg-[#1a2837] px-4 py-3">
-          <p className="flex-1 leading-relaxed text-gray-200">{comment.content}</p>
+        <div className="flex items-start gap-2">
+          <p className="text-foreground/80 flex-1 text-sm leading-relaxed">{comment.content}</p>
           {canDelete && (
             <button
               onClick={() => onDelete(comment._id)}
               disabled={loading}
-              className="ml-auto text-sm text-gray-400 transition-colors hover:text-red-400 disabled:opacity-50"
+              className="text-muted-foreground/50 mt-0.5 shrink-0 transition-colors hover:text-red-500 disabled:opacity-50"
             >
-              <Trash className="h-4 w-4" />
+              <Trash className="h-3.5 w-3.5" />
             </button>
           )}
         </div>

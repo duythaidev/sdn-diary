@@ -1,17 +1,16 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Masonry, useInfiniteLoader } from 'masonic'
-import { diaryService } from '@/services/api/diaryService'
-import { Navbar } from '@/components/layout/Navbar'
 import DiaryCardItem from '@/components/diary/DiaryCardItem'
-import { LoadingSpinner } from '@/components/common/LoadingSpinner'
-import { Globe, Heart, Clock, Search, Loader2 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Heart, Clock, Search, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary } from '@/types'
 import { getAxiosErrorMessage } from '@/lib/error'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { diaryService } from '@/services/api/diaryService'
 import useDebounce from '@/hooks/useDebounce'
-import { Input } from '@/components/ui/input'
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 export const PublicDiariesPage = () => {
   const [loading, setLoading] = useState(true)
@@ -37,9 +36,10 @@ export const PublicDiariesPage = () => {
 
         if (isInitial) {
           setPublicDiaries(response.diaries)
-          setPage(1)
+          setPage(2)
         } else {
           setPublicDiaries((prev) => [...prev, ...response.diaries])
+          setPage((prev) => prev + 1)
         }
 
         setHasMore(response.pagination.hasMore)
@@ -53,138 +53,166 @@ export const PublicDiariesPage = () => {
     [isRecent, isMostLiked, debouncedSearchQuery],
   )
 
-  // Reset and fetch when filters change
   useEffect(() => {
-    setPage(1)
-    setPublicDiaries([])
     fetchPublicDiaries(1, true)
   }, [isRecent, isMostLiked, debouncedSearchQuery, fetchPublicDiaries])
 
-  const fetchMoreItems = async () => {
-    if (!hasMore) return
-    const nextPage = page + 1
-    setPage(nextPage)
-    await fetchPublicDiaries(nextPage, false)
+  const handleLoadMore = () => {
+    if (!hasMore || isLoadingMore) return
+    fetchPublicDiaries(page, false)
   }
-
-  const loadMore = useInfiniteLoader(fetchMoreItems, {
-    isItemLoaded: (index, items) => !!items[index],
-    minimumBatchSize: 10,
-    threshold: 3,
-  })
 
   const handleLikeUpdate = (diaryId: string, likesCount: number, isLiked: boolean) => {
     setPublicDiaries((prev) => prev.map((diary) => (diary._id === diaryId ? { ...diary, likesCount, isLiked } : diary)))
   }
 
-  const MasonryCard = ({ data }: { data: Diary }) => {
-    return <DiaryCardItem diary={data} onLikeUpdate={handleLikeUpdate} />
-  }
-
   return (
-    <div className="min-h-screen bg-linear-to-br">
-      <Navbar />
+    <div className="min-h-screen">
+      <div className="animate-in fade-in container mx-auto max-w-7xl space-y-8 px-6 py-6 duration-500">
+        {/* Header */}
+        <div className="mx-auto mb-12 max-w-2xl pt-8 text-center">
+          <h2 className="text-foreground/80 mb-4 font-serif text-5xl font-bold">
+            Explore thoughts, <br />
+            <span className="relative inline-block">
+              <span className="relative z-10">memories & ideas</span>
+              <span className="absolute right-0 bottom-1 left-0 -z-0 h-3 -rotate-1 bg-yellow-200/60"></span>
+            </span>
+          </h2>
 
-      <div className="relative container mx-auto max-w-7xl px-6 py-6">
-        {/* Header Section */}
-        <div className="mb-10 space-y-3">
-          <h1 className="text-5xl font-bold tracking-tight text-white">Public Feed</h1>
-          <p className="max-w-2xl text-lg text-slate-400">
-            Explore reflections from the community. Find inspiration, empathy, and connection in shared stories.
-          </p>
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="mb-10 flex flex-wrap gap-3">
-          <div className="flex flex-wrap gap-3">
-            <Button
-              variant={isRecent ? 'default' : 'outline'}
-              onClick={() => {
-                setIsRecent(true)
-                setIsMostLiked(false)
-              }}
-              className={cn('rounded-full')}
-            >
-              <Clock className="h-4 w-4" />
-              Recent
-            </Button>
-
-            <Button
-              onClick={() => {
-                setIsMostLiked(true)
-                setIsRecent(false)
-              }}
-              variant={isMostLiked ? 'default' : 'outline'}
-              className={cn('rounded-full')}
-            >
-              <Heart className="h-4 w-4" />
-              Most Liked
-            </Button>
-          </div>
-
-          <div className="relative ml-auto">
-            <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              placeholder="Search entries..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-11 w-64 border-slate-700 bg-slate-900/50 pr-4 pl-11 text-white transition-all placeholder:text-slate-500 focus:border-cyan-500 focus:ring-cyan-500/20"
-            />
-          </div>
-        </div>
-
-        {/* Diary Cards Grid */}
-        {loading ? (
-          <LoadingSpinner />
-        ) : publicDiaries.length > 0 ? (
-          <>
-            <Masonry
-              items={[...publicDiaries]}
-              render={MasonryCard}
-              columnGutter={32}
-              columnWidth={500}
-              overscanBy={2}
-              onRender={loadMore}
-              itemKey={(data, index) => data._id + index}
-            />
-
-            {/* Loading More Indicator */}
-            {isLoadingMore && (
-              <div className="flex justify-center py-8">
-                <div className="flex items-center gap-2 text-slate-400">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span className="text-sm">Loading more entries...</span>
-                </div>
+          <div className="group relative mx-auto mt-8 max-w-lg">
+            <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 opacity-25 blur transition duration-1000 group-hover:opacity-50 group-hover:duration-200"></div>
+            <div className="relative">
+              <Search className="text-muted-foreground group-focus-within:text-foreground absolute top-1/2 left-4 size-5 -translate-y-1/2 transition-colors" />
+              <Input
+                type="search"
+                placeholder="Search for stories..."
+                className="h-14 rounded-xl border-2 border-black/5 bg-white pl-12 font-serif text-base shadow-sm focus:border-black/20"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <div className="absolute top-1/2 right-4 flex -translate-y-1/2 gap-2">
+                <TooltipProvider>
+                  {/* Most Liked */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size={'icon'}
+                        variant={isMostLiked ? 'default' : 'outline'}
+                        onClick={() => {
+                          setIsMostLiked(true)
+                          setIsRecent(false)
+                        }}
+                        className={cn(
+                          'rounded-full',
+                          !isMostLiked && 'border-black/10 bg-transparent hover:bg-black/5',
+                        )}
+                      >
+                        <Heart className="size-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <p>Most Liked</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  {/* Recent */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={isRecent ? 'default' : 'outline'}
+                        size={'icon'}
+                        onClick={() => {
+                          setIsRecent(true)
+                          setIsMostLiked(false)
+                        }}
+                        className={cn('rounded-full', !isRecent && 'border-black/10 bg-transparent hover:bg-black/5')}
+                      >
+                        <Clock className="size-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <p>Newest Posts</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
-            )}
-
-            {/* End Message */}
-            {!hasMore && publicDiaries.length > 0 && !isLoadingMore && (
-              <div className="flex justify-center py-12">
-                <div className="rounded-full border border-slate-700/50 bg-slate-800/40 px-6 py-3 text-sm text-slate-400 backdrop-blur-md">
-                  You've reached the end
-                </div>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-24">
-            <div className="max-w-md rounded-2xl border border-slate-700/50 bg-slate-800/40 p-12 text-center shadow-2xl backdrop-blur-xl">
-              <div className="mb-6 flex justify-center">
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-2xl" />
-                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-slate-700/50 bg-linear-to-br from-cyan-500/20 to-blue-500/20">
-                    <Globe className="h-10 w-10 text-slate-500" />
-                  </div>
-                </div>
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-white">No public diaries yet</h3>
-              <p className="text-sm leading-relaxed text-slate-400">
-                Be the first to share your story with the community
-              </p>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* Grid */}
+        <div className="min-h-[400px]">
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2" />
+            </div>
+          ) : publicDiaries.length > 0 ? (
+            <>
+              <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 1024: 3 }}>
+                <Masonry gutter="24px">
+                  {publicDiaries.map((diary, index) => (
+                    <DiaryCardItem
+                      key={diary._id + index}
+                      diary={diary}
+                      onLikeUpdate={handleLikeUpdate}
+                      className="w-full"
+                      showActions={false}
+                      rotation={index % 2 === 0 ? -1 : 1}
+                      color={index % 3 === 0 ? 'bg-[#fefce8]' : index % 3 === 1 ? 'bg-[#fdf2f8]' : 'bg-white'}
+                      texture={index % 2 === 0 ? 'plain' : 'dotted'}
+                      decoration={
+                        Math.floor(Math.random() * 4) + 1 === 1
+                          ? 'clip'
+                          : Math.floor(Math.random() * 4) + 1 === 2
+                            ? 'pin'
+                            : Math.floor(Math.random() * 4) + 1 === 3
+                              ? 'tape'
+                              : 'none'
+                      }
+                      delay={index % 10}
+                    />
+                  ))}
+                </Masonry>
+              </ResponsiveMasonry>
+
+              {isLoadingMore && (
+                <div className="flex justify-center py-8">
+                  <div className="text-muted-foreground flex items-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span className="text-sm">Loading more stories...</span>
+                  </div>
+                </div>
+              )}
+
+              {!isLoadingMore && hasMore && (
+                <div className="flex justify-center py-12">
+                  <Button
+                    variant="outline"
+                    onClick={handleLoadMore}
+                    disabled={isLoadingMore}
+                    className="h-12 rounded-full border-black/10 px-8 transition-all hover:bg-white hover:shadow-md"
+                  >
+                    Load More Stories
+                  </Button>
+                </div>
+              )}
+
+              {!hasMore && publicDiaries.length > 0 && !isLoadingMore && (
+                <div className="flex justify-center py-12">
+                  <p className="text-muted-foreground font-serif text-sm">You've reached the end ✦</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="rounded-3xl border-2 border-dashed border-black/5 bg-white/50 py-20 text-center">
+              <p className="text-muted-foreground font-serif text-xl">No public stories found.</p>
+              {searchQuery && (
+                <Button variant="link" onClick={() => setSearchQuery('')} className="text-primary mt-2">
+                  Clear search
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

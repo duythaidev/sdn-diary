@@ -30,7 +30,7 @@ export const DiaryCreatePage = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen">
       <DiaryForm mode="create" onSubmit={handleSubmit} loading={loading} />
     </div>
   )
