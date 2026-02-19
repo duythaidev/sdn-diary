@@ -5,28 +5,28 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { User, Link as LinkIcon, FileText, Plus, X, Camera, Trash2 } from 'lucide-react'
+import { User, Link as LinkIcon, FileText, Plus, X, Camera, Trash2, Settings, UserCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import ImageViewer_Basic from '@/components/commerce-ui/image-viewer-basic'
 import { authService } from '@/services/api/authService'
 import { getAxiosErrorMessage } from '@/lib/error'
 import { useProfile } from '@/hooks/useProfile'
 import type { User as UserType } from '@/types'
+import { motion } from 'motion/react'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const profileFormSchema = z.object({
   username: z
-    .string('Please enter your username.')
+    .string({ error: 'Please enter your username.' })
     .min(2, 'Username must be at least 2 characters.')
     .max(30, 'Username must not be longer than 30 characters.'),
-  bio: z.string().max(160).min(4),
+  bio: z.string().max(160).min(4).optional().or(z.literal('')),
   profileImage: z.string().nullable().optional(),
   urls: z
     .array(
       z.object({
-        value: z.url('Please enter a valid URL.'),
+        value: z.string().url('Please enter a valid URL.'),
       }),
     )
     .optional(),
@@ -125,189 +125,190 @@ export function ProfilePage() {
   const profileImage = form.watch('profileImage')
 
   return (
-    <div className="min-h-screen">
-      {/* Ambient background effects */}
-
-      <div className="relative container mx-auto max-w-4xl px-6 py-6">
-        {/* Header */}
-        <div className="mb-6 space-y-3">
-          <h1 className="text-4xl font-bold tracking-tight text-white">Settings & Profile</h1>
-          <p className="text-lg text-slate-400">Manage your personal details and privacy preferences.</p>
+    <div className="animate-in fade-in mx-auto max-w-4xl pb-20 duration-500">
+      {/* Header */}
+      <div className="mb-8 flex items-center gap-3 border-b border-black/5 pb-6">
+        <div className="rounded-full bg-black/5 p-2">
+          <Settings className="text-foreground/70 size-6" />
         </div>
+        <div>
+          <h1 className="text-foreground/90 font-serif text-3xl font-bold">Settings & Profile</h1>
+          <p className="text-muted-foreground mt-1">Manage your personal details and public profile.</p>
+        </div>
+      </div>
 
-        {/* Profile Card */}
-        <div className="mb-8 rounded-2xl border border-slate-700/50 bg-slate-800/40 p-8 shadow-2xl backdrop-blur-xl">
-          <h2 className="mb-6 text-xl font-semibold text-white">Profile Details</h2>
+      <div className="">
+        {/* Sidebar Navigation (Mock) */}
 
-          {/* Avatar Section */}
-          <div className="mb-8 flex items-center gap-6 rounded-xl border border-slate-700/30 bg-slate-800/60 p-6">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleProfileImageChange}
-              className="hidden"
-            />
+        {/* Main Form Area */}
+        <div className="">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border border-black/5 bg-white p-8 shadow-sm"
+          >
+            {/* Avatar Section */}
+            <div className="mb-10 flex flex-col items-center gap-6 border-b border-dashed border-black/5 pb-8 sm:flex-row">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleProfileImageChange}
+                className="hidden"
+              />
 
-            <div className="group relative">
-              {profileImage ? (
-                <div className="relative h-24 w-24 overflow-hidden rounded-full ring-4 ring-slate-800/50">
-                  <ImageViewer_Basic thumbnailUrl={profileImage} imageUrl={profileImage} />
+              <div className="group relative shrink-0">
+                {profileImage ? (
+                  <div className="h-24 w-24 overflow-hidden rounded-full bg-gray-100 ring-4 ring-black/5">
+                    <ImageViewer_Basic thumbnailUrl={profileImage} imageUrl={profileImage} />
+                  </div>
+                ) : (
+                  <div className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-full bg-black/5 ring-4 ring-black/5 transition-all hover:bg-black/10">
+                    <User className="text-muted-foreground h-10 w-10" />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-foreground absolute right-0 bottom-0 rounded-full border border-black/10 bg-white p-1.5 shadow-sm hover:bg-gray-50"
+                >
+                  <Camera className="size-3.5" />
+                </button>
+              </div>
+
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="mb-1 font-serif text-lg font-bold">{userData?.username || 'Writer'}</h3>
+                <p className="text-muted-foreground mb-3 text-sm">
+                  Max file size is 5MB. Supported formats: .jpg, .png
+                </p>
+                <div className="flex justify-center gap-2 sm:justify-start">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-black/10 bg-white hover:bg-gray-50"
+                  >
+                    Upload New
+                  </Button>
+                  {profileImage && (
+                    <Button
+                      type="button"
+                      onClick={removeProfileImage}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                    >
+                      Remove
+                    </Button>
+                  )}
                 </div>
-              ) : (
-                <div className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-full bg-linear-to-br from-cyan-500 to-blue-600 ring-4 ring-slate-800/50 transition-all group-hover:from-cyan-600 group-hover:to-blue-700">
-                  <User className="h-12 w-12 text-white" />
-                </div>
-              )}
-              <div className="absolute -right-1 -bottom-1 flex h-7 w-7 items-center justify-center rounded-full border-4 border-slate-800 bg-cyan-500">
-                <div className="h-2.5 w-2.5 rounded-full bg-white" />
               </div>
             </div>
 
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white">{userData?.username || 'Loading...'}</h3>
-              <p className="text-sm text-slate-400">
-                Journaling since {userData?.createdAt ? new Date(userData.createdAt).getFullYear() : '2023'}
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <Button onClick={() => fileInputRef.current?.click()} type="button">
-                <Camera className="mr-2 h-4 w-4" />
-                {profileImage ? 'Change' : 'Upload'} Avatar
-              </Button>
-              {profileImage && (
-                <Button
-                  type="button"
-                  onClick={removeProfileImage}
-                  variant="outline"
-                  className="border-slate-600 text-slate-300 transition-all hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Remove
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {/* Username Field */}
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2 font-medium text-slate-200">
-                      <User className="h-4 w-4 text-cyan-400" />
-                      Username
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Username Field */}
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground/80 font-bold">Username</FormLabel>
+                      <FormControl>
                         <Input
-                          placeholder="shadcn"
+                          placeholder="johndoe"
                           {...field}
-                          className="h-12 border-slate-700 bg-slate-900/50 px-4 text-white transition-all placeholder:text-slate-500 focus:border-cyan-500 focus:ring-cyan-500/20"
+                          className="border-black/10 bg-white focus:border-black/20"
                         />
-                      </div>
-                    </FormControl>
-                    <FormDescription className="text-sm text-slate-400">
-                      This is your public display name. It can be your real name or a pseudonym.
-                    </FormDescription>
-                    <FormMessage className="text-red-400" />
-                  </FormItem>
-                )}
-              />
+                      </FormControl>
+                      <FormDescription>This is your public display name.</FormDescription>
+                      <FormMessage className="text-xs text-red-500" />
+                    </FormItem>
+                  )}
+                />
 
-              {/* Bio Field */}
-              <FormField
-                control={form.control}
-                name="bio"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2 font-medium text-slate-200">
-                      <FileText className="h-4 w-4 text-cyan-400" />
-                      Bio
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Tell us a little bit about yourself"
-                        className="min-h-[120px] resize-none border-slate-700 bg-slate-900/50 text-white transition-all placeholder:text-slate-500 focus:border-cyan-500 focus:ring-cyan-500/20"
-                        {...field}
+                {/* Bio Field */}
+                <FormField
+                  control={form.control}
+                  name="bio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-foreground/80 font-bold">Bio</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Tell us a little bit about yourself"
+                          className="min-h-[100px] resize-none border-black/10 bg-white focus:border-black/20"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Brief description for your profile. Max 160 characters.</FormDescription>
+                      <FormMessage className="text-xs text-red-500" />
+                    </FormItem>
+                  )}
+                />
+
+                {/* URLs Section */}
+                <div className="space-y-3 border-t border-dashed border-black/5 pt-4">
+                  <FormLabel className="text-foreground/80 flex items-center gap-2 font-bold">
+                    <LinkIcon className="size-4" />
+                    Social Links
+                  </FormLabel>
+
+                  <div className="space-y-3">
+                    {fields.map((field, index) => (
+                      <FormField
+                        control={form.control}
+                        key={field.id}
+                        name={`urls.${index}.value`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <div className="relative flex items-center gap-2">
+                                <Input
+                                  {...field}
+                                  className="border-black/10 bg-white focus:border-black/20"
+                                  placeholder="https://twitter.com/johndoe"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-muted-foreground shrink-0 hover:text-red-600"
+                                  onClick={() => remove(index)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </FormControl>
+                            <FormMessage className="text-xs text-red-500" />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormDescription className="text-sm text-slate-400">
-                      Brief description for your profile. Maximum 160 characters.
-                    </FormDescription>
-                    <FormMessage className="text-red-400" />
-                  </FormItem>
-                )}
-              />
+                    ))}
+                  </div>
 
-              {/* URLs Section */}
-              <div className="space-y-4">
-                <FormLabel className="flex items-center gap-2 font-medium text-slate-200">
-                  <LinkIcon className="h-4 w-4 text-cyan-400" />
-                  URLs
-                </FormLabel>
-                <FormDescription className="-mt-1 text-sm text-slate-400">
-                  Add links to your website, blog, or social media profiles.
-                </FormDescription>
-
-                <div className="space-y-3">
-                  {fields.map((field, index) => (
-                    <FormField
-                      control={form.control}
-                      key={field.id}
-                      name={`urls.${index}.value`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="relative flex items-center gap-2">
-                              <Input
-                                {...field}
-                                className="h-12 border-slate-700 bg-slate-900/50 pr-12 text-white transition-all placeholder:text-slate-500 focus:border-cyan-500 focus:ring-cyan-500/20"
-                                placeholder="https://example.com"
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="absolute right-2 h-8 w-8 text-slate-400 hover:bg-red-500/10 hover:text-red-400"
-                                onClick={() => remove(index)}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </FormControl>
-                          <FormMessage className="text-red-400" />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground mt-2 border-dashed border-black/20 text-xs"
+                    onClick={() => append({ value: '' })}
+                  >
+                    <Plus className="mr-1 h-3 w-3" />
+                    Add Link
+                  </Button>
                 </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-3 border-slate-600 text-slate-300 transition-all hover:border-cyan-500/50 hover:bg-slate-700/50 hover:text-white"
-                  onClick={() => append({ value: '' })}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add URL
-                </Button>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex items-center justify-between border-t border-slate-700/50 pt-6">
-                <p className="text-sm text-slate-400">Changes will be saved when you click update</p>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Updating...' : 'Update profile'}
-                </Button>
-              </div>
-            </form>
-          </Form>
+                {/* Submit Button */}
+                <div className="flex items-center justify-end border-t border-black/5 pt-6">
+                  <Button type="submit" disabled={loading} className="shadow-md transition-all hover:shadow-lg">
+                    {loading ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </motion.div>
         </div>
       </div>
     </div>
