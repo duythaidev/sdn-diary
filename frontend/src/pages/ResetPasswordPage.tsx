@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { motion } from 'motion/react'
+import { BookOpen, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { authService } from '@/services/api/authService'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import ShowPassword from '@/components/common/ShowPassword'
 import { getAxiosErrorMessage } from '@/lib/error'
 
 interface ResetPasswordForm {
@@ -51,137 +50,194 @@ export function ResetPasswordPage() {
     }
   }
 
-  if (!token) {
-    return (
-      <div className="bg-background flex min-h-screen items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <Card className="border-border bg-card/90 rounded-2xl border px-2 pt-2 pb-3 shadow-2xl backdrop-blur-md">
-            <CardContent className="space-y-5 px-8 py-8">
-              <div className="bg-destructive/10 border-destructive/20 rounded-lg border p-4 text-center">
-                <p className="text-foreground text-sm">Invalid or missing reset token.</p>
+  return (
+    <div className="relative flex min-h-screen overflow-hidden bg-[#f8f5f2]">
+      {/* Background Pattern */}
+      <div
+        className="pointer-events-none fixed inset-0 opacity-[0.03]"
+        style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+      />
+
+      {/* Left Column - Branding & Info */}
+      <div className="relative hidden w-1/2 flex-col justify-between p-16 lg:flex">
+        <Link to="/" className="group flex w-fit items-center gap-2">
+          <div className="-rotate-3 rounded-lg bg-black p-2 text-white shadow-md transition-transform duration-300 group-hover:rotate-0">
+            <BookOpen className="size-6" />
+          </div>
+          <h1 className="text-foreground font-serif text-2xl font-bold tracking-tight">
+            Journal<span className="text-foreground/40">Feed</span>
+          </h1>
+        </Link>
+
+        <div className="space-y-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <h2 className="text-foreground/85 font-serif text-5xl leading-tight font-bold">
+              Renew your
+              <br />
+              <span className="relative inline-block">
+                <span className="relative z-10">commitment.</span>
+                <span className="absolute right-0 bottom-1 left-0 -z-0 h-3 -rotate-1 bg-yellow-200/60" />
+              </span>
+            </h2>
+            <p className="text-muted-foreground mt-4 font-serif text-lg leading-relaxed">
+              Security is the foundation of self-reflection.
+              <br />
+              Update your password to keep your story private.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col gap-4"
+          >
+            {['Secure encrypted passwords', 'Quick and easy update', 'Stay logged into your journey'].map((item, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="bg-foreground/30 h-1.5 w-1.5 rounded-full" />
+                <span className="text-muted-foreground text-sm font-medium">{item}</span>
               </div>
-              <Button className="w-full" asChild>
-                <Link to="/forgot-password">Request New Reset Link</Link>
-              </Button>
-            </CardContent>
-          </Card>
+            ))}
+          </motion.div>
+        </div>
+
+        <div className="flex gap-3">
+          {[
+            { color: 'bg-[#fefce8]', rotate: '-rotate-2', label: 'Safety' },
+            { color: 'bg-[#f0f9ff]', rotate: 'rotate-1', label: 'Modern' },
+            { color: 'bg-[#fdf2f8]', rotate: '-rotate-1', label: 'Private' },
+          ].map((note, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 + i * 0.1 }}
+              className={`${note.color} ${note.rotate} flex h-28 w-28 items-end p-4 shadow-md`}
+              style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%)' }}
+            >
+              <span className="text-foreground/50 font-serif text-xs font-bold">{note.label}</span>
+            </motion.div>
+          ))}
         </div>
       </div>
-    )
-  }
 
-  return (
-    <div className="bg-background flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <Card className="border-border bg-card/90 rounded-2xl border px-2 pt-2 pb-3 shadow-2xl backdrop-blur-md">
-          {/* Header */}
-          <CardHeader className="space-y-4 pt-6 pb-5 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/95 shadow-lg">
-                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" className="text-[#0f1c24]">
-                  <path d="M8 4H20L24 8V28H8V4Z" fill="currentColor" />
-                </svg>
+      {/* Right Column - Form */}
+      <div className="relative flex w-full items-center justify-center p-8 lg:w-1/2">
+        <div className="absolute inset-0 border-l border-black/5 lg:bg-white/60 lg:backdrop-blur-sm" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 w-full max-w-md"
+        >
+          {/* Mobile Logo */}
+          <div className="mb-10 flex items-center gap-2 lg:hidden">
+            <div className="-rotate-3 rounded-lg bg-black p-2 text-white shadow-md">
+              <BookOpen className="size-5" />
+            </div>
+            <h1 className="font-serif text-xl font-bold tracking-tight">
+              Journal<span className="text-foreground/40">Feed</span>
+            </h1>
+          </div>
+
+          {!token ? (
+            <div className="text-center">
+              <div className="mb-6 flex justify-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-red-200 bg-red-100/50">
+                  <AlertCircle className="size-8 text-red-600" />
+                </div>
+              </div>
+              <h3 className="text-foreground/90 font-serif text-3xl font-bold">Invalid link</h3>
+              <p className="text-muted-foreground mt-3 leading-relaxed">
+                The password reset link is invalid or has expired. Please request a new one.
+              </p>
+              <div className="mt-8">
+                <Button
+                  className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
+                  asChild
+                >
+                  <Link to="/forgot-password">Request Reset Link</Link>
+                </Button>
               </div>
             </div>
-
-            <div className="space-y-1">
-              <h1 className="text-[22px] font-bold text-white">Reset Password</h1>
-              <p className="text-muted-foreground text-sm">Enter your new password below</p>
-            </div>
-          </CardHeader>
-
-          {/* Content */}
-          <CardContent className="space-y-5 px-8">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              {/* New Password */}
-              <div className="space-y-2">
-                <Label htmlFor="newPassword" className="text-foreground text-[13px]">
-                  New Password
-                </Label>
-
-                <div className="relative">
-                  <Input
-                    id="newPassword"
-                    type={showPassword ? 'text' : 'password'}
-                    className="border-border bg-muted text-foreground placeholder:text-muted-foreground h-11 rounded-lg border pr-10"
-                    placeholder="Enter new password"
-                    {...register('newPassword', {
-                      required: 'New password is required',
-                      minLength: {
-                        value: 6,
-                        message: 'Password must be at least 6 characters',
-                      },
-                    })}
-                  />
-
-                  <ShowPassword
-                    showPassword={showPassword}
-                    setShowPassword={setShowPassword}
-                    className="absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2"
-                  />
-                </div>
-
-                {errors.newPassword && <p className="text-destructive mt-1 text-sm">{errors.newPassword.message}</p>}
+          ) : (
+            <>
+              <div className="mb-8">
+                <h3 className="text-foreground/90 font-serif text-3xl font-bold">Reset password</h3>
+                <p className="text-muted-foreground mt-1 text-sm">Please enter and confirm your new password below.</p>
               </div>
 
-              {/* Confirm Password */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground text-[13px]">
-                  Confirm Password
-                </Label>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-3">
+                  <div className="relative">
+                    <Lock className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="New password"
+                      className="h-11 rounded-xl border-black/10 bg-white pr-10 pl-10 text-sm focus:border-black/25"
+                      {...register('newPassword', {
+                        required: 'New password is required',
+                        minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                      })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3.5 -translate-y-1/2 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                    {errors.newPassword && (
+                      <span className="ml-1 text-xs text-red-500">{errors.newPassword.message}</span>
+                    )}
+                  </div>
 
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    className="border-border bg-muted text-foreground placeholder:text-muted-foreground h-11 rounded-lg border pr-10"
-                    placeholder="Confirm new password"
-                    {...register('confirmPassword', {
-                      required: 'Please confirm your password',
-                      validate: (value) => value === newPassword || 'Passwords do not match',
-                    })}
-                  />
-
-                  <ShowPassword
-                    showPassword={showConfirmPassword}
-                    setShowPassword={setShowConfirmPassword}
-                    className="absolute top-1/2 right-1 h-10 w-10 -translate-y-1/2"
-                  />
+                  <div className="relative">
+                    <Lock className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                    <Input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="Confirm new password"
+                      className="h-11 rounded-xl border-black/10 bg-white pr-10 pl-10 text-sm focus:border-black/25"
+                      {...register('confirmPassword', {
+                        required: 'Please confirm your password',
+                        validate: (value) => value === newPassword || 'Passwords do not match',
+                      })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3.5 -translate-y-1/2 transition-colors"
+                    >
+                      {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                    {errors.confirmPassword && (
+                      <span className="ml-1 text-xs text-red-500">{errors.confirmPassword.message}</span>
+                    )}
+                  </div>
                 </div>
 
-                {errors.confirmPassword && (
-                  <p className="text-destructive mt-1 text-sm">{errors.confirmPassword.message}</p>
-                )}
-              </div>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
+                >
+                  {loading ? 'Resetting...' : 'Update Password'}
+                </Button>
+              </form>
 
-              {/* Submit Button */}
-              <Button className="w-full" type="submit" disabled={loading}>
-                {loading ? 'Resetting...' : 'Reset Password'}
-              </Button>
-
-              {/* Back to Login */}
-              <div className="text-center">
-                <Link to="/login" className="text-primary text-sm hover:underline">
-                  Back to Login
+              <p className="text-muted-foreground mt-8 text-center text-sm">
+                Already remember your password?{' '}
+                <Link
+                  to="/login"
+                  className="text-foreground hover:text-foreground/70 font-semibold underline underline-offset-4 transition-colors"
+                >
+                  Sign in
                 </Link>
-              </div>
-            </form>
-          </CardContent>
-
-          {/* Footer */}
-          <CardFooter className="justify-center pb-3 text-center">
-            <p className="text-muted-foreground text-center text-sm">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-primary hover:underline">
-                Create free account
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
-
-        <p className="text-muted-foreground mt-3 text-center text-[11px]">
-          © 2024 Personal Journal App. All rights reserved.
-        </p>
+              </p>
+            </>
+          )}
+        </motion.div>
       </div>
     </div>
   )

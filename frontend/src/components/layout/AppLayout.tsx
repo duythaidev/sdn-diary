@@ -1,13 +1,36 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
-import { BookOpen, PenSquare, Home, LayoutDashboard, Book } from 'lucide-react'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { BookOpen, PenSquare, Home, LayoutDashboard, Book, LogOut, User } from 'lucide-react'
 import { Button } from '../ui/button'
 import { cn } from '@/lib/utils'
+import { useProfile } from '@/hooks/useProfile'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default function AppLayout() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, isAuthenticated, logout } = useProfile()
 
-  const isActive = (path: string) => {
-    return location.pathname === path
+  const isActive = (path: string) => location.pathname === path
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  const handleLogout = async () => {
+    await logout()
   }
 
   return (
@@ -43,41 +66,88 @@ export default function AppLayout() {
                   Feed
                 </Button>
               </Link>
-              <Link to="/dashboard">
-                <Button
-                  variant={isActive('/dashboard') ? 'default' : 'ghost'}
-                  size="sm"
-                  className={cn('rounded-full px-4', isActive('/dashboard') ? 'shadow-md' : 'text-muted-foreground')}
-                >
-                  <LayoutDashboard className="mr-2 size-4" />
-                  Dashboard
-                </Button>
-              </Link>
-              <Link to="/diary">
-                <Button
-                  variant={isActive('/diary') ? 'default' : 'ghost'}
-                  size="sm"
-                  className={cn('rounded-full px-4', isActive('/diary') ? 'shadow-md' : 'text-muted-foreground')}
-                >
-                  <Book className="mr-2 size-4" />
-                  My Diaries
-                </Button>
-              </Link>
+
+              {isAuthenticated && (
+                <>
+                  <Link to="/dashboard">
+                    <Button
+                      variant={isActive('/dashboard') ? 'default' : 'ghost'}
+                      size="sm"
+                      className={cn('rounded-full px-4', isActive('/dashboard') ? 'shadow-md' : 'text-muted-foreground')}
+                    >
+                      <LayoutDashboard className="mr-2 size-4" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Link to="/diary">
+                    <Button
+                      variant={isActive('/diary') ? 'default' : 'ghost'}
+                      size="sm"
+                      className={cn('rounded-full px-4', isActive('/diary') ? 'shadow-md' : 'text-muted-foreground')}
+                    >
+                      <Book className="mr-2 size-4" />
+                      My Diaries
+                    </Button>
+                  </Link>
+                </>
+              )}
             </nav>
 
             <div className="flex items-center gap-4">
-              <Link to="/diary/create">
-                <Button className="rounded-full px-6 font-serif shadow-lg transition-all hover:shadow-xl">
-                  <PenSquare className="mr-2 size-4" />
-                  {isActive('/create') ? 'Writing' : 'Write'}
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/diary/create">
+                    <Button className="rounded-full px-6 font-serif shadow-lg transition-all hover:shadow-xl">
+                      <PenSquare className="mr-2 size-4" />
+                      {isActive('/diary/create') ? 'Writing' : 'Write'}
+                    </Button>
+                  </Link>
 
-              <Link to="/profile">
-                <div className="h-9 w-9 overflow-hidden rounded-full border border-black/10 bg-black/5 transition-all hover:ring-2 hover:ring-black/5">
-                  <img src="https://github.com/shadcn.png" alt="User" className="h-full w-full object-cover" />
-                </div>
-              </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                        <Avatar className="h-9 w-9 border border-black/10 transition-all hover:ring-2 hover:ring-black/10">
+                          <AvatarImage src={user?.profileImage ?? undefined} alt={user?.username} />
+                          <AvatarFallback className="bg-black/5 text-sm">
+                            {user ? getInitials(user.username) : 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuLabel>
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium">{user?.username}</p>
+                          <p className="text-muted-foreground text-xs">{user?.email}</p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/profile')}>
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button variant="ghost" className="rounded-full px-4">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button className="rounded-full px-6 font-serif shadow-lg transition-all hover:shadow-xl">
+                      Register
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

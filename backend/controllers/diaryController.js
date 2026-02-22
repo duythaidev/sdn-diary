@@ -189,8 +189,8 @@ export const getDiaryById = async (req, res) => {
   try {
     const { id } = req.params;
     const diary = await Diary.findById(id)
-      .populate("userId", "username email")
-      .populate("likes", "username");
+      .populate("userId", "username email bio profileImage")
+      .populate("likes", "username email bio profileImage");
 
     if (!diary) {
       return res.status(404).json({ message: "Diary not found" });

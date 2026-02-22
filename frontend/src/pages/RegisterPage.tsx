@@ -279,22 +279,10 @@ export function RegisterPage() {
               </div>
               {errors.confirm && <span className="ml-1 text-xs text-red-500">{errors.confirm.message}</span>}
 
-              <p className="text-muted-foreground px-0.5 text-[11px] leading-relaxed">
-                By creating an account, you agree to our{' '}
-                <button type="button" className="hover:text-foreground underline underline-offset-2 transition-colors">
-                  Terms of Service
-                </button>{' '}
-                and{' '}
-                <button type="button" className="hover:text-foreground underline underline-offset-2 transition-colors">
-                  Privacy Policy
-                </button>
-                .
-              </p>
-
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
+                className="h-11 w-full mt-2 rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
               >
                 {loading ? 'Creating account...' : 'Create Account'}
               </Button>
