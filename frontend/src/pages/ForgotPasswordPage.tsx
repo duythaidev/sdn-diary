@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'motion/react'
+import { BookOpen, Mail, ArrowLeft, CheckCircle2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { authService } from '@/services/api/authService'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { getAxiosErrorMessage } from '@/lib/error'
 
 interface ForgotPasswordForm {
@@ -37,99 +37,179 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <Card className="border-border bg-card/90 rounded-2xl border px-2 pt-2 pb-3 shadow-2xl backdrop-blur-md">
-          {/* Header */}
-          <CardHeader className="space-y-4 pt-6 pb-5 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/95 shadow-lg">
-                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" className="text-[#0f1c24]">
-                  <path d="M8 4H20L24 8V28H8V4Z" fill="currentColor" />
-                </svg>
+    <div className="relative flex min-h-screen overflow-hidden bg-[#f8f5f2]">
+      {/* Background Pattern */}
+      <div
+        className="pointer-events-none fixed inset-0 opacity-[0.03]"
+        style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+      />
+
+      {/* Left Column - Branding & Info */}
+      <div className="relative hidden w-1/2 flex-col justify-between p-16 lg:flex">
+        <Link to="/" className="group flex w-fit items-center gap-2">
+          <div className="-rotate-3 rounded-lg bg-black p-2 text-white shadow-md transition-transform duration-300 group-hover:rotate-0">
+            <BookOpen className="size-6" />
+          </div>
+          <h1 className="text-foreground font-serif text-2xl font-bold tracking-tight">
+            Journal<span className="text-foreground/40">Feed</span>
+          </h1>
+        </Link>
+
+        <div className="space-y-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <h2 className="text-foreground/85 font-serif text-5xl leading-tight font-bold">
+              Recover your
+              <br />
+              <span className="relative inline-block">
+                <span className="relative z-10">journey.</span>
+                <span className="absolute right-0 bottom-1 left-0 z-0 h-3 -rotate-1 bg-yellow-200/60" />
+              </span>
+            </h2>
+            <p className="text-muted-foreground mt-4 font-serif text-lg leading-relaxed">
+              Don't let a forgotten password stop your story.
+              <br />
+              We'll help you get back to your pages in no time.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col gap-4"
+          >
+            {['Secure password recovery', 'Back in minutes', 'Your privacy is our priority'].map((item, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="bg-foreground/30 h-1.5 w-1.5 rounded-full" />
+                <span className="text-muted-foreground text-sm font-medium">{item}</span>
               </div>
-            </div>
+            ))}
+          </motion.div>
+        </div>
 
-            <div className="space-y-1">
-              <h1 className="text-[22px] font-bold text-white">Forgot Password?</h1>
-              <p className="text-muted-foreground text-sm">
-                {emailSent
-                  ? 'Check your email for reset instructions'
-                  : 'Enter your email to receive a password reset link'}
-              </p>
-            </div>
-          </CardHeader>
+        <div className="flex gap-3">
+          {[
+            { color: 'bg-[#fefce8]', rotate: '-rotate-2', label: 'Security' },
+            { color: 'bg-[#f0f9ff]', rotate: 'rotate-1', label: 'Access' },
+            { color: 'bg-[#fdf2f8]', rotate: '-rotate-1', label: 'Privacy' },
+          ].map((note, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 + i * 0.1 }}
+              className={`${note.color} ${note.rotate} flex h-28 w-28 items-end p-4 shadow-md`}
+              style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%)' }}
+            >
+              <span className="text-foreground/50 font-serif text-xs font-bold">{note.label}</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
 
-          {/* Content */}
-          <CardContent className="space-y-5 px-8">
-            {emailSent ? (
-              <div className="space-y-4">
-                <div className="bg-primary/10 border-primary/20 rounded-lg border p-4 text-center">
-                  <p className="text-foreground text-sm">
-                    We've sent a password reset link to your email address. Please check your inbox and follow the
-                    instructions.
-                  </p>
-                  <p className="text-muted-foreground mt-2 text-xs">The link will expire in 15 minutes.</p>
+      {/* Right Column - Form */}
+      <div className="relative flex w-full items-center justify-center p-8 lg:w-1/2">
+        <div className="absolute inset-0 border-l border-black/5 lg:bg-white/60 lg:backdrop-blur-sm" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 w-full max-w-md"
+        >
+          {/* Mobile Logo */}
+          <div className="mb-10 flex items-center gap-2 lg:hidden">
+            <div className="-rotate-3 rounded-lg bg-black p-2 text-white shadow-md">
+              <BookOpen className="size-5" />
+            </div>
+            <h1 className="font-serif text-xl font-bold tracking-tight">
+              Journal<span className="text-foreground/40">Feed</span>
+            </h1>
+          </div>
+
+          {emailSent ? (
+            <div className="text-center">
+              <div className="mb-6 flex justify-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-green-200 bg-green-100/50">
+                  <CheckCircle2 className="size-8 text-green-600" />
                 </div>
-
-                <Button className="w-full" asChild>
+              </div>
+              <h3 className="text-foreground/90 font-serif text-3xl font-bold">Email sent!</h3>
+              <p className="text-muted-foreground mt-3 leading-relaxed">
+                We've sent a password reset link to your email address. Please check your inbox and spam folder.
+              </p>
+              <div className="mt-8">
+                <Button
+                  className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
+                  asChild
+                >
                   <Link to="/login">Back to Login</Link>
                 </Button>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground text-[13px]">
-                    Email Address
-                  </Label>
+              <p className="text-muted-foreground mt-6 text-sm">
+                Didn't receive the email?{' '}
+                <button
+                  onClick={() => setEmailSent(false)}
+                  className="text-foreground hover:text-foreground/70 font-semibold underline underline-offset-4 transition-colors"
+                >
+                  Try again
+                </button>
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-8">
+                <Link
+                  to="/login"
+                  className="text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1.5 text-sm font-medium transition-colors"
+                >
+                  <ArrowLeft className="size-4" />
+                  Back to login
+                </Link>
+                <h3 className="text-foreground/90 font-serif text-3xl font-bold">Forgot password?</h3>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  Enter your email address to receive a secure reset link.
+                </p>
+              </div>
 
-                  <Input
-                    id="email"
-                    type="email"
-                    className="border-border bg-muted text-foreground placeholder:text-muted-foreground h-11 rounded-lg border"
-                    placeholder="yourname@example.com"
-                    {...register('email', {
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^\S+@\S+\.\S+$/,
-                        message: 'Invalid email address',
-                      },
-                    })}
-                  />
-
-                  {errors.email && <p className="text-destructive mt-1 text-sm">{errors.email.message}</p>}
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-3">
+                  <div className="relative">
+                    <Mail className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                    <Input
+                      type="email"
+                      placeholder="Email address"
+                      className="h-11 rounded-xl border-black/10 bg-white pl-10 text-sm focus:border-black/25"
+                      {...register('email', {
+                        required: 'Email is required',
+                        pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' },
+                      })}
+                    />
+                    {errors.email && <span className="ml-1 text-xs text-red-500">{errors.email.message}</span>}
+                  </div>
                 </div>
 
-                {/* Submit Button */}
-                <Button className="w-full" type="submit" disabled={loading}>
-                  {loading ? 'Sending...' : 'Send Reset Link'}
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
+                >
+                  {loading ? 'Sending link...' : 'Send Reset Link'}
                 </Button>
-
-                {/* Back to Login */}
-                <div className="text-center">
-                  <Link to="/login" className="text-primary text-sm hover:underline">
-                    Back to Login
-                  </Link>
-                </div>
               </form>
-            )}
-          </CardContent>
 
-          {/* Footer */}
-          <CardFooter className="justify-center pb-3 text-center">
-            <p className="text-muted-foreground text-center text-sm">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-primary hover:underline">
-                Create free account
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
-
-        <p className="text-muted-foreground mt-3 text-center text-[11px]">
-          © 2024 Personal Journal App. All rights reserved.
-        </p>
+              <p className="text-muted-foreground mt-8 text-center text-sm">
+                Don't have an account?{' '}
+                <Link
+                  to="/register"
+                  className="text-foreground hover:text-foreground/70 font-semibold underline underline-offset-4 transition-colors"
+                >
+                  Create one
+                </Link>
+              </p>
+            </>
+          )}
+        </motion.div>
       </div>
     </div>
   )
