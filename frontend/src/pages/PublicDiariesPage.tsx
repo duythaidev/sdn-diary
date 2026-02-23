@@ -11,8 +11,10 @@ import { diaryService } from '@/services/api/diaryService'
 import useDebounce from '@/hooks/useDebounce'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useTranslation } from 'react-i18next'
 
 export const PublicDiariesPage = () => {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [publicDiaries, setPublicDiaries] = useState<Diary[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -44,13 +46,13 @@ export const PublicDiariesPage = () => {
 
         setHasMore(response.pagination.hasMore)
       } catch (error) {
-        toast.error(getAxiosErrorMessage(error, 'Failed to load public diaries'))
+        toast.error(getAxiosErrorMessage(error, t('common.tryAgain')))
       } finally {
         setLoading(false)
         setIsLoadingMore(false)
       }
     },
-    [isRecent, isMostLiked, debouncedSearchQuery],
+    [isRecent, isMostLiked, debouncedSearchQuery, t],
   )
 
   useEffect(() => {
@@ -72,20 +74,20 @@ export const PublicDiariesPage = () => {
         {/* Header */}
         <div className="mx-auto mb-12 max-w-2xl pt-8 text-center">
           <h2 className="text-foreground/80 mb-4 font-serif text-5xl font-bold">
-            Explore thoughts, <br />
+            {t('feed.title').split(',')[0]}, <br />
             <span className="relative inline-block">
-              <span className="relative z-10">memories & ideas</span>
-              <span className="absolute right-0 bottom-1 left-0 -z-0 h-3 -rotate-1 bg-yellow-200/60"></span>
+              <span className="relative z-10">{t('feed.title').split(',')[1]}</span>
+              <span className="absolute right-0 bottom-1 left-0 z-0 h-3 -rotate-1 bg-yellow-200/60"></span>
             </span>
           </h2>
 
           <div className="group relative mx-auto mt-8 max-w-lg">
-            <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 opacity-25 blur transition duration-1000 group-hover:opacity-50 group-hover:duration-200"></div>
+            <div className="absolute -inset-1 rounded-lg bg-linear-to-r from-pink-500 via-purple-500 to-blue-500 opacity-25 blur transition duration-1000 group-hover:opacity-50 group-hover:duration-200"></div>
             <div className="relative">
               <Search className="text-muted-foreground group-focus-within:text-foreground absolute top-1/2 left-4 size-5 -translate-y-1/2 transition-colors" />
               <Input
                 type="search"
-                placeholder="Search for stories..."
+                placeholder={t('feed.searchPlaceholder')}
                 className="h-14 rounded-xl border-2 border-black/5 bg-white pl-12 font-serif text-base shadow-sm focus:border-black/20"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -111,7 +113,7 @@ export const PublicDiariesPage = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom">
-                      <p>Most Liked</p>
+                      <p>{t('feed.mostLiked')}</p>
                     </TooltipContent>
                   </Tooltip>
                   {/* Recent */}
@@ -130,7 +132,7 @@ export const PublicDiariesPage = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom">
-                      <p>Newest Posts</p>
+                      <p>{t('feed.recent')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -178,7 +180,7 @@ export const PublicDiariesPage = () => {
                 <div className="flex justify-center py-8">
                   <div className="text-muted-foreground flex items-center gap-2">
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    <span className="text-sm">Loading more stories...</span>
+                    <span className="text-sm">{t('feed.loadingMore')}</span>
                   </div>
                 </div>
               )}
@@ -191,23 +193,23 @@ export const PublicDiariesPage = () => {
                     disabled={isLoadingMore}
                     className="h-12 rounded-full border-black/10 px-8 transition-all hover:bg-white hover:shadow-md"
                   >
-                    Load More Stories
+                    {t('feed.loadMoreStories')}
                   </Button>
                 </div>
               )}
 
               {!hasMore && publicDiaries.length > 0 && !isLoadingMore && (
                 <div className="flex justify-center py-12">
-                  <p className="text-muted-foreground font-serif text-sm">You've reached the end ✦</p>
+                  <p className="text-muted-foreground font-serif text-sm">{t('common.endOfList')}</p>
                 </div>
               )}
             </>
           ) : (
             <div className="rounded-3xl border-2 border-dashed border-black/5 bg-white/50 py-20 text-center">
-              <p className="text-muted-foreground font-serif text-xl">No public stories found.</p>
+              <p className="text-muted-foreground font-serif text-xl">{t('feed.noStoriesFound')}</p>
               {searchQuery && (
                 <Button variant="link" onClick={() => setSearchQuery('')} className="text-primary mt-2">
-                  Clear search
+                  {t('common.clearSearch')}
                 </Button>
               )}
             </div>

@@ -10,7 +10,6 @@ import {
   Image as ImageIcon,
   Tag,
   Hash,
-  Smile,
   AlignLeft,
   Bold,
   Italic,
@@ -26,8 +25,10 @@ import { diaryService } from '@/services/api/diaryService'
 import { toast } from 'sonner'
 import { getAxiosErrorMessage } from '@/lib/error'
 import type { DiaryFormData } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export function DiaryEditPage() {
+  const { t, i18n } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -53,14 +54,14 @@ export function DiaryEditPage() {
         setMood(d.selectedMood || 'neutral')
         setVisibility(d.isPublic ? 'public' : 'private')
       } catch (error) {
-        toast.error(getAxiosErrorMessage(error, 'Failed to load diary'))
+        toast.error(getAxiosErrorMessage(error, t('form.failedToLoad')))
         navigate('/diary')
       } finally {
         setFetchLoading(false)
       }
     }
     fetchDiary()
-  }, [id, navigate])
+  }, [id, navigate, t])
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && currentTag.trim()) {
@@ -89,7 +90,7 @@ export function DiaryEditPage() {
   const handleSubmit = async (isDraft: boolean) => {
     if (!id) return
     if (!title.trim() && !content.trim()) {
-      toast.error('Please enter a title or content')
+      toast.error(t('form.enterTitleContent'))
       return
     }
 
@@ -111,14 +112,14 @@ export function DiaryEditPage() {
       await diaryService.updateDiary(id, diaryData)
 
       if (isDraft) {
-        toast.success('Draft updated successfully!')
+        toast.success(t('diaries.draftSuccess'))
         navigate('/diary')
       } else {
-        toast.success('Diary entry updated successfully!')
+        toast.success(t('diaries.updateSuccess'))
         navigate('/dashboard')
       }
     } catch (error) {
-      toast.error(getAxiosErrorMessage(error, 'Failed to update diary'))
+      toast.error(getAxiosErrorMessage(error, t('form.failedToUpdate')))
     } finally {
       setLoading(false)
     }
@@ -139,7 +140,7 @@ export function DiaryEditPage() {
         <Link to="/diary">
           <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
             <ChevronLeft className="mr-2 size-4" />
-            Back to My Journal
+            {t('form.backToMyJournal')}
           </Button>
         </Link>
         <div className="flex items-center gap-3">
@@ -150,7 +151,7 @@ export function DiaryEditPage() {
             disabled={loading}
           >
             <Save className="mr-2 size-4" />
-            Save Draft
+            {t('form.saveDraft')}
           </Button>
           <Button
             className="shadow-lg transition-all hover:shadow-xl"
@@ -158,7 +159,7 @@ export function DiaryEditPage() {
             disabled={loading}
           >
             <Send className="mr-2 size-4" />
-            Update Entry
+            {t('form.updateEntry')}
           </Button>
         </div>
       </div>
@@ -168,7 +169,7 @@ export function DiaryEditPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2">
           <div className="relative flex min-h-[800px] flex-col overflow-hidden rounded-sm border border-black/5 bg-white shadow-xl">
             {/* Paper decoration */}
-            <div className="absolute top-0 left-0 h-2 w-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 opacity-50" />
+            <div className="absolute top-0 left-0 h-2 w-full bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 opacity-50" />
 
             {/* Toolbar */}
             <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-black/5 bg-[#fbfbfb] p-2">
@@ -206,7 +207,7 @@ export function DiaryEditPage() {
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  Plain
+                  {t('common.plain')}
                 </button>
                 <button
                   onClick={() => setPaperType('lined')}
@@ -217,7 +218,7 @@ export function DiaryEditPage() {
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  Lined
+                  {t('common.lined')}
                 </button>
                 <button
                   onClick={() => setPaperType('dotted')}
@@ -228,7 +229,7 @@ export function DiaryEditPage() {
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  Dotted
+                  {t('common.dotted')}
                 </button>
               </div>
             </div>
@@ -237,26 +238,30 @@ export function DiaryEditPage() {
             <div className="group relative flex-1 p-8 md:p-12">
               {/* Date Stamp */}
               <div className="pointer-events-none absolute top-6 right-8 rotate-3 rounded border-2 border-red-200 px-2 py-1 font-mono text-xs tracking-widest text-red-300 uppercase opacity-70 select-none">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {new Date().toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
               </div>
 
               <input
                 type="text"
-                placeholder="Untitled Entry"
+                placeholder={t('common.untitled')}
                 className="placeholder:text-muted-foreground/40 text-foreground/90 mb-6 block w-full border-none bg-transparent font-serif text-4xl font-bold outline-none"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
 
               <textarea
-                placeholder="Start writing your thoughts here..."
+                placeholder={t('common.startWriting')}
                 className={cn(
                   'text-foreground/80 block h-[600px] w-full resize-none border-none bg-transparent p-0 text-lg leading-8 outline-none focus:ring-0',
                   paperType === 'lined' &&
-                    'bg-[linear-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:100%_32px] font-serif leading-[32px]',
+                    'bg-[linear-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[100%_32px] font-serif leading-[32px]',
                   paperType === 'plain' && 'font-sans',
                   paperType === 'dotted' &&
-                    'bg-[radial-gradient(#d1d5db_1px,transparent_1px)] bg-[size:20px_20px] font-mono',
+                    'bg-[radial-gradient(#d1d5db_1px,transparent_1px)] bg-size-[20px_20px] font-mono',
                 )}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -274,13 +279,13 @@ export function DiaryEditPage() {
 
             <h3 className="mb-4 flex items-center gap-2 font-serif text-lg font-bold">
               <Tag className="size-4" />
-              Details
+              {t('common.details')}
             </h3>
 
             {/* Visibility Toggle */}
             <div className="mb-6">
               <label className="text-muted-foreground mb-2 block text-xs font-bold tracking-wider uppercase">
-                Visibility
+                {t('common.visibility')}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -293,7 +298,7 @@ export function DiaryEditPage() {
                   )}
                 >
                   <Lock className="size-3.5" />
-                  Private
+                  {t('common.private')}
                 </button>
                 <button
                   onClick={() => setVisibility('public')}
@@ -305,7 +310,7 @@ export function DiaryEditPage() {
                   )}
                 >
                   <Globe className="size-3.5" />
-                  Public
+                  {t('common.public')}
                 </button>
               </div>
             </div>
@@ -313,7 +318,7 @@ export function DiaryEditPage() {
             {/* Mood Selector */}
             <div className="mb-6">
               <label className="text-muted-foreground mb-2 block text-xs font-bold tracking-wider uppercase">
-                Mood
+                {t('common.mood')}
               </label>
               <div className="grid grid-cols-6 gap-1">
                 {moods.map((m) => (
@@ -337,7 +342,7 @@ export function DiaryEditPage() {
             {/* Tags Input */}
             <div className="mb-2">
               <label className="text-muted-foreground mb-2 block text-xs font-bold tracking-wider uppercase">
-                Tags
+                {t('common.tags')}
               </label>
               <div className="mb-2 flex min-h-[28px] flex-wrap gap-2">
                 {tags.map((tag) => (
@@ -359,14 +364,14 @@ export function DiaryEditPage() {
               <div className="relative">
                 <Hash className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
                 <Input
-                  placeholder="Add a tag..."
+                  placeholder={t('form.addTag')}
                   className="h-9 border-black/10 bg-white pl-8 text-sm focus:border-black/20"
                   value={currentTag}
                   onChange={(e) => setCurrentTag(e.target.value)}
                   onKeyDown={handleAddTag}
                 />
               </div>
-              <p className="text-muted-foreground mt-1.5 ml-1 text-[10px]">Press Enter to add tags</p>
+              <p className="text-muted-foreground mt-1.5 ml-1 text-[10px]">{t('form.pressEnterTags')}</p>
             </div>
           </div>
         </div>

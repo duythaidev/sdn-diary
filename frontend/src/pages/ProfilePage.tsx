@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { User, Link as LinkIcon, FileText, Plus, X, Camera, Trash2, Settings, UserCircle } from 'lucide-react'
+import { User, Link as LinkIcon, Plus, X, Camera, Settings } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import ImageViewer_Basic from '@/components/commerce-ui/image-viewer-basic'
 import { authService } from '@/services/api/authService'
@@ -13,6 +14,7 @@ import { getAxiosErrorMessage } from '@/lib/error'
 import { useProfile } from '@/hooks/useProfile'
 import type { User as UserType } from '@/types'
 import { motion } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -35,12 +37,14 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 export function ProfilePage() {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [userData, setUserData] = useState<UserType | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { setUser } = useProfile()
 
   const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: {
       username: '',
       bio: '',
@@ -72,7 +76,7 @@ export function ProfilePage() {
         urls: response.user.urls || [],
       })
     } catch (error) {
-      toast.error(getAxiosErrorMessage(error, 'Failed to load profile'))
+      toast.error(getAxiosErrorMessage(error, t('profile.failedToLoad')))
     }
   }
 
@@ -82,13 +86,13 @@ export function ProfilePage() {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast.error('Please upload an image file')
+        toast.error(t('profile.pleaseUploadImage'))
         return
       }
 
       // Validate file size (max 5MB)
       if (file.size > MAX_FILE_SIZE) {
-        toast.error('Image size should be less than 5MB')
+        toast.error(t('profile.imageTooLarge'))
         return
       }
 
@@ -113,10 +117,10 @@ export function ProfilePage() {
     setLoading(true)
     try {
       await authService.updateProfile(data)
-      toast.success('Profile updated successfully')
+      toast.success(t('profile.profileUpdated'))
       fetchUserProfile()
     } catch (error) {
-      toast.error(getAxiosErrorMessage(error, 'Failed to update profile'))
+      toast.error(getAxiosErrorMessage(error, t('profile.failedToUpdate')))
     } finally {
       setLoading(false)
     }
@@ -132,14 +136,12 @@ export function ProfilePage() {
           <Settings className="text-foreground/70 size-6" />
         </div>
         <div>
-          <h1 className="text-foreground/90 font-serif text-3xl font-bold">Settings & Profile</h1>
-          <p className="text-muted-foreground mt-1">Manage your personal details and public profile.</p>
+          <h1 className="text-foreground/90 font-serif text-3xl font-bold">{t('profile.settingsAndProfile')}</h1>
+          <p className="text-muted-foreground mt-1">{t('profile.settingsSubtitle')}</p>
         </div>
       </div>
 
       <div className="">
-        {/* Sidebar Navigation (Mock) */}
-
         {/* Main Form Area */}
         <div className="">
           <motion.div
@@ -178,9 +180,7 @@ export function ProfilePage() {
 
               <div className="flex-1 text-center sm:text-left">
                 <h3 className="mb-1 font-serif text-lg font-bold">{userData?.username || 'Writer'}</h3>
-                <p className="text-muted-foreground mb-3 text-sm">
-                  Max file size is 5MB. Supported formats: .jpg, .png
-                </p>
+                <p className="text-muted-foreground mb-3 text-sm">{t('profile.maxFileSize')}</p>
                 <div className="flex justify-center gap-2 sm:justify-start">
                   <Button
                     type="button"
@@ -189,7 +189,7 @@ export function ProfilePage() {
                     onClick={() => fileInputRef.current?.click()}
                     className="border-black/10 bg-white hover:bg-gray-50"
                   >
-                    Upload New
+                    {t('common.uploadNew')}
                   </Button>
                   {profileImage && (
                     <Button
@@ -199,7 +199,7 @@ export function ProfilePage() {
                       size="sm"
                       className="text-red-600 hover:bg-red-50 hover:text-red-700"
                     >
-                      Remove
+                      {t('common.remove')}
                     </Button>
                   )}
                 </div>
@@ -214,7 +214,7 @@ export function ProfilePage() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground/80 font-bold">Username</FormLabel>
+                      <FormLabel className="text-foreground/80 font-bold">{t('profile.username')}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="johndoe"
@@ -222,7 +222,7 @@ export function ProfilePage() {
                           className="border-black/10 bg-white focus:border-black/20"
                         />
                       </FormControl>
-                      <FormDescription>This is your public display name.</FormDescription>
+                      <FormDescription>{t('profile.usernameDescription')}</FormDescription>
                       <FormMessage className="text-xs text-red-500" />
                     </FormItem>
                   )}
@@ -234,15 +234,15 @@ export function ProfilePage() {
                   name="bio"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground/80 font-bold">Bio</FormLabel>
+                      <FormLabel className="text-foreground/80 font-bold">{t('profile.bio')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Tell us a little bit about yourself"
+                          placeholder={t('profile.bioPlaceholder')}
                           className="min-h-[100px] resize-none border-black/10 bg-white focus:border-black/20"
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>Brief description for your profile. Max 160 characters.</FormDescription>
+                      <FormDescription>{t('profile.bioDescription')}</FormDescription>
                       <FormMessage className="text-xs text-red-500" />
                     </FormItem>
                   )}
@@ -252,7 +252,7 @@ export function ProfilePage() {
                 <div className="space-y-3 border-t border-dashed border-black/5 pt-4">
                   <FormLabel className="text-foreground/80 flex items-center gap-2 font-bold">
                     <LinkIcon className="size-4" />
-                    Social Links
+                    {t('profile.socialLinks')}
                   </FormLabel>
 
                   <div className="space-y-3">
@@ -268,7 +268,7 @@ export function ProfilePage() {
                                 <Input
                                   {...field}
                                   className="border-black/10 bg-white focus:border-black/20"
-                                  placeholder="https://twitter.com/johndoe"
+                                  placeholder={t('profile.socialLinksPlaceholder')}
                                 />
                                 <Button
                                   type="button"
@@ -296,14 +296,14 @@ export function ProfilePage() {
                     onClick={() => append({ value: '' })}
                   >
                     <Plus className="mr-1 h-3 w-3" />
-                    Add Link
+                    {t('common.addLink')}
                   </Button>
                 </div>
 
                 {/* Submit Button */}
                 <div className="flex items-center justify-end border-t border-black/5 pt-6">
                   <Button type="submit" disabled={loading} className="shadow-md transition-all hover:shadow-lg">
-                    {loading ? 'Saving...' : 'Save Changes'}
+                    {loading ? t('common.saving') : t('common.saveChanges')}
                   </Button>
                 </div>
               </form>

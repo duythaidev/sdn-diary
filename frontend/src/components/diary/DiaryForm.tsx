@@ -11,6 +11,7 @@ import { MOODS } from '@/constants'
 import { Input } from '@/components/ui/input'
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 interface DiaryFormData {
   title: string
@@ -33,6 +34,7 @@ interface DiaryFormProps {
 }
 
 export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: DiaryFormProps) => {
+  const { t, i18n } = useTranslation()
   const {
     register,
     handleSubmit,
@@ -69,11 +71,11 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
     const file = e.target.files?.[0]
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file')
+      toast.error(t('profile.pleaseUploadImage'))
       return
     }
     if (file.size > MAX_FILE_SIZE) {
-      toast.error('Image size should be less than 5MB')
+      toast.error(t('profile.imageTooLarge'))
       return
     }
     const reader = new FileReader()
@@ -103,7 +105,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
 
   const handlePreview = () => {
     if (!title || !content) {
-      toast.error('Please add a title and content before previewing')
+      toast.error(t('form.previewError'))
       return
     }
     setIsPreviewOpen(true)
@@ -113,8 +115,8 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
     await onSubmit({ ...data, isDraft })
   }
 
-  const submitLabel = mode === 'create' ? 'Publish Entry' : 'Update Entry'
-  const loadingLabel = mode === 'create' ? 'Publishing...' : 'Updating...'
+  const submitLabel = mode === 'create' ? t('form.publishEntry') : t('form.updateEntry')
+  const loadingLabel = mode === 'create' ? t('form.publishing') : t('form.updating')
 
   return (
     <>
@@ -124,12 +126,12 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
           <Link to={mode === 'edit' ? '/diary' : '/dashboard'}>
             <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
               <ChevronLeft className="mr-2 size-4" />
-              {mode === 'edit' ? 'Back to Diary' : 'Back to Dashboard'}
+              {mode === 'edit' ? t('form.backToDiary') : t('form.backToDashboard')}
             </Button>
           </Link>
           <div className="flex items-center gap-3">
             <span className="text-muted-foreground mr-2 hidden text-sm sm:inline-block">
-              {loading ? 'Saving...' : 'Draft saved just now'}
+              {loading ? t('common.saving') : t('form.draftSavedNow')}
             </span>
             <Button
               variant="outline"
@@ -138,7 +140,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
               disabled={loading}
             >
               <Save className="mr-2 size-4" />
-              Save Draft
+              {t('form.saveDraft')}
             </Button>
             <Button
               variant="outline"
@@ -147,7 +149,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
               disabled={loading}
             >
               <Eye className="mr-1 size-4" />
-              View Draft
+              {t('form.viewDraft')}
             </Button>
             <Button
               className="shadow-lg transition-all hover:shadow-xl"
@@ -165,35 +167,33 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2">
             <div className="relative flex min-h-[800px] flex-col overflow-hidden rounded-sm border border-black/5 bg-white shadow-xl">
               {/* Top paper edge */}
-              <div className="absolute top-0 left-0 h-2 w-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 opacity-50" />
+              <div className="absolute top-0 left-0 h-2 w-full bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 opacity-50" />
 
               {/* Content Area */}
               <div className="relative flex-1 p-8 md:p-12">
                 {/* Date Stamp */}
                 <div className="pointer-events-none absolute top-6 right-8 rotate-3 rounded border-2 border-red-200 px-2 py-1 font-mono text-xs tracking-widest text-red-300 uppercase opacity-70 select-none">
-                  {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {new Date().toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
                 </div>
 
                 {/* Title */}
                 <input
                   type="text"
-                  placeholder="Untitled Entry"
+                  placeholder={t('common.untitled')}
                   className="text-foreground/90 placeholder:text-muted-foreground/40 mb-6 block w-full border-none bg-transparent font-serif text-4xl font-bold outline-none"
                   {...register('title', {
-                    required: 'Title is required',
-                    maxLength: { value: 200, message: 'Title cannot exceed 200 characters' },
+                    required: t('form.titleRequired'),
+                    maxLength: { value: 200, message: t('form.titleTooLong') },
                   })}
                 />
                 {errors.title && <p className="text-destructive mb-2 text-sm">{errors.title.message}</p>}
 
                 {/* Editor / Textarea */}
-                <div
-                  className={cn(
-                    'min-h-[500px]',
-                    // paperType === 'lined' && 'bg-[linear-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[100%_32px]',
-                    // paperType === 'dotted' && 'bg-[radial-gradient(#d1d5db_1px,transparent_1px)] bg-[size:20px_20px]',
-                  )}
-                >
+                <div className={cn('min-h-[500px]')}>
                   <Editor onChange={(val) => setValue('content', val)} content={content} />
                 </div>
                 {errors.content && <p className="text-destructive mt-2 text-sm">{errors.content.message}</p>}
@@ -229,7 +229,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                   className="text-muted-foreground border-muted bg-muted/30 hover:bg-muted/50 flex h-48 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors"
                 >
                   <ImageIcon className="size-8 opacity-50" />
-                  <span className="text-sm font-medium">Add Cover Image</span>
+                  <span className="text-sm font-medium">{t('form.addCoverImage')}</span>
                 </button>
               )}
             </div>
@@ -241,13 +241,13 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
 
               <h3 className="mb-4 flex items-center gap-2 font-serif text-lg font-bold">
                 <Tag className="size-4" />
-                Details
+                {t('common.details')}
               </h3>
 
               {/* Visibility Toggle */}
               <div className="mb-6">
                 <label className="text-muted-foreground mb-2 block text-xs font-bold tracking-wider uppercase">
-                  Visibility
+                  {t('common.visibility')}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -263,7 +263,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                     )}
                   >
                     <Lock className="size-3.5" />
-                    Private
+                    {t('common.private')}
                   </button>
                   <button
                     type="button"
@@ -278,16 +278,15 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                     )}
                   >
                     <Globe className="size-3.5" />
-                    Public
+                    {t('common.public')}
                   </button>
                 </div>
-                
               </div>
 
               {/* Mood Selector */}
               <div className="mb-6">
                 <label className="text-muted-foreground mb-2 block text-xs font-bold tracking-wider uppercase">
-                  Mood
+                  {t('common.mood')}
                 </label>
                 <div className="grid grid-cols-6 gap-1">
                   {MOODS.map((mood) => (
@@ -320,20 +319,20 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
               {/* Tags Input */}
               <div>
                 <label className="text-muted-foreground mb-2 block text-xs font-bold tracking-wider uppercase">
-                  Tags
+                  {t('common.tags')}
                 </label>
 
                 <div className="relative">
                   <Hash className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
                   <Input
-                    placeholder="Add a tag..."
+                    placeholder={t('form.addTag')}
                     className="h-9 border-black/10 bg-white pl-8 text-sm focus:border-black/20"
                     value={currentTag}
                     onChange={(e) => setCurrentTag(e.target.value)}
                     onKeyDown={handleAddTag}
                   />
                 </div>
-                <p className="text-muted-foreground mt-1.5 ml-1 text-[10px]">Press Enter to add tags</p>
+                <p className="text-muted-foreground mt-1.5 ml-1 text-[10px]">{t('form.pressEnterTags')}</p>
                 <div className="mb-2 flex min-h-[28px] flex-wrap gap-2">
                   {tags.map((tag) => (
                     <Badge
@@ -362,11 +361,8 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                   <Smile className="size-4" />
                 </div>
                 <div>
-                  <h4 className="mb-1 text-sm font-bold text-blue-900">Writer's Block?</h4>
-                  <p className="text-xs leading-relaxed text-blue-800/70">
-                    Try describing the most interesting person you saw today. What were they wearing? What were they
-                    doing?
-                  </p>
+                  <h4 className="mb-1 text-sm font-bold text-blue-900">{t('form.writersBlock')}</h4>
+                  <p className="text-xs leading-relaxed text-blue-800/70">{t('form.writersBlockDesc')}</p>
                 </div>
               </div>
             </div>
@@ -377,7 +373,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
       <DiaryPreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
-        title={title || 'Untitled'}
+        title={title || t('common.untitled')}
         content={content || ''}
         coverPhoto={coverPhoto}
         mood={selectedMoodData}

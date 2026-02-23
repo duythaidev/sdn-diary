@@ -12,8 +12,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '../LanguageSwitcher'
 
 export default function AppLayout() {
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useProfile()
@@ -63,7 +66,7 @@ export default function AppLayout() {
                   className={cn('rounded-full px-4', isActive('/') ? 'shadow-md' : 'text-muted-foreground')}
                 >
                   <Home className="mr-2 size-4" />
-                  Feed
+                  {t('sidebar.publicFeed')}
                 </Button>
               </Link>
 
@@ -73,10 +76,13 @@ export default function AppLayout() {
                     <Button
                       variant={isActive('/dashboard') ? 'default' : 'ghost'}
                       size="sm"
-                      className={cn('rounded-full px-4', isActive('/dashboard') ? 'shadow-md' : 'text-muted-foreground')}
+                      className={cn(
+                        'rounded-full px-4',
+                        isActive('/dashboard') ? 'shadow-md' : 'text-muted-foreground',
+                      )}
                     >
                       <LayoutDashboard className="mr-2 size-4" />
-                      Dashboard
+                      {t('sidebar.dashboard')}
                     </Button>
                   </Link>
                   <Link to="/diary">
@@ -86,20 +92,21 @@ export default function AppLayout() {
                       className={cn('rounded-full px-4', isActive('/diary') ? 'shadow-md' : 'text-muted-foreground')}
                     >
                       <Book className="mr-2 size-4" />
-                      My Diaries
+                      {t('sidebar.myDiaries')}
                     </Button>
                   </Link>
                 </>
               )}
             </nav>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
+              <LanguageSwitcher />
               {isAuthenticated ? (
                 <>
-                  <Link to="/diary/create">
+                  <Link to="/diary/create" className="hidden sm:block">
                     <Button className="rounded-full px-6 font-serif shadow-lg transition-all hover:shadow-xl">
                       <PenSquare className="mr-2 size-4" />
-                      {isActive('/diary/create') ? 'Writing' : 'Write'}
+                      {isActive('/diary/create') ? t('common.loading') : t('sidebar.createDiary')}
                     </Button>
                   </Link>
 
@@ -124,12 +131,12 @@ export default function AppLayout() {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => navigate('/profile')}>
                         <User className="mr-2 h-4 w-4" />
-                        Profile
+                        {t('sidebar.profile')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleLogout}>
                         <LogOut className="mr-2 h-4 w-4" />
-                        Logout
+                        {t('sidebar.logout')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -138,12 +145,12 @@ export default function AppLayout() {
                 <>
                   <Link to="/login">
                     <Button variant="ghost" className="rounded-full px-4">
-                      Login
+                      {t('common.signIn')}
                     </Button>
                   </Link>
                   <Link to="/register">
                     <Button className="rounded-full px-6 font-serif shadow-lg transition-all hover:shadow-xl">
-                      Register
+                      {t('common.signUp')}
                     </Button>
                   </Link>
                 </>

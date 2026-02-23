@@ -22,36 +22,37 @@ import { useProfile } from '@/hooks/useProfile'
 import { Separator } from './ui/separator'
 import { Button } from './ui/button'
 
-const data = {
-  navTabs: [
-    {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: Home,
-    },
-    {
-      title: 'My Diaries',
-      url: '/diary',
-      icon: FileText,
-    },
-    {
-      title: 'Public Diaries',
-      url: '/',
-      icon: Globe,
-    },
-    {
-      title: 'Profile',
-      url: '/profile',
-      icon: User,
-    },
-  ],
-}
+import { useTranslation } from 'react-i18next'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { t } = useTranslation()
   const location = useLocation()
   const { user } = useProfile()
   const navigate = useNavigate()
   const { state } = useSidebar()
+
+  const navTabs = [
+    {
+      title: t('sidebar.dashboard'),
+      url: '/dashboard',
+      icon: Home,
+    },
+    {
+      title: t('sidebar.myDiaries'),
+      url: '/diary',
+      icon: FileText,
+    },
+    {
+      title: t('sidebar.publicFeed'),
+      url: '/',
+      icon: Globe,
+    },
+    {
+      title: t('sidebar.profile'),
+      url: '/profile',
+      icon: User,
+    },
+  ]
 
   const isCollapsed = state === 'collapsed' // true khi thu sidebar
   return (
@@ -66,7 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.navTabs.map((item) => {
+              {navTabs.map((item) => {
                 const isActive = location.pathname === item.url
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -84,10 +85,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenuItem>
+        <SidebarMenuItem className="p-2">
           <Button onClick={() => navigate('/diary/create')} className="text-md w-full">
             <Edit className="h-4 w-4!" />
-            {!isCollapsed && <span>New Diary</span>}
+            {!isCollapsed && <span>{t('sidebar.createDiary')}</span>}
           </Button>
         </SidebarMenuItem>
       </SidebarFooter>

@@ -16,8 +16,10 @@ import { useProfile } from '@/hooks/useProfile'
 import { getAxiosErrorMessage } from '@/lib/error'
 import { MOODS } from '@/constants'
 import { motion } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 
 export const DiaryDetailPage = () => {
+  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user, isAuthenticated } = useProfile()
@@ -47,7 +49,7 @@ export const DiaryDetailPage = () => {
       const response = await commentService.createComment(id!, content)
       setComments([response.comment, ...comments])
       fetchDiary(id!)
-      toast.success('Comment added successfully')
+      toast.success(t('detail.commentSuccess'))
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))
       throw error
@@ -59,7 +61,7 @@ export const DiaryDetailPage = () => {
       await commentService.deleteComment(commentId)
       setComments(comments.filter((c) => c._id !== commentId))
       fetchDiary(id!)
-      toast.success('Comment deleted successfully')
+      toast.success(t('detail.commentDeleteSuccess'))
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))
     }
@@ -80,7 +82,7 @@ export const DiaryDetailPage = () => {
   const isOwner = user?._id === (diaryUser ? diaryUser._id : diary.userId)
   const selectedMoodData = diary.selectedMood ? MOODS.find((m) => m.value === diary.selectedMood) : undefined
   const displayDate = format(new Date(diary.createdAt), 'MMMM dd, yyyy')
-  const authorName = diaryUser?.username ?? 'Anonymous'
+  const authorName = diaryUser?.username ?? t('common.anonymous')
   const authorInitials = authorName
     .split(' ')
     .map((n) => n[0])
@@ -97,25 +99,19 @@ export const DiaryDetailPage = () => {
           className="text-muted-foreground hover:text-foreground pl-0 hover:bg-transparent"
         >
           <ArrowLeft className="mr-2 size-4" />
-          Back
+          {t('common.back')}
         </Button>
         <div className="flex gap-2">
           {isOwner && (
             <Link to={`/diary/${id}/edit`}>
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5" title="Edit">
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5" title={t('common.edit')}>
                 <Edit className="text-muted-foreground size-5" />
               </Button>
             </Link>
           )}
-          {/* <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5" title="Bookmark">
-            <Bookmark className="size-5 text-muted-foreground" />
-          </Button> */}
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5" title="Share">
+          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5" title={t('common.share')}>
             <Share2 className="text-muted-foreground size-5" />
           </Button>
-          {/* <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5" title="More">
-            <MoreHorizontal className="size-5 text-muted-foreground" />
-          </Button> */}
         </div>
       </div>
 
@@ -124,7 +120,7 @@ export const DiaryDetailPage = () => {
         <div className="mb-4 flex justify-center">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
             <FileText className="h-3 w-3" />
-            Draft – This is a draft
+            {t('detail.draftBadge')}
           </span>
         </div>
       ) : (
@@ -132,7 +128,7 @@ export const DiaryDetailPage = () => {
           <div className="mb-4 flex justify-center">
             <span className="text-muted-foreground inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-black/5 px-3 py-1 text-xs font-medium">
               <Lock className="h-3 w-3" />
-              Private – Only You Can See This
+              {t('detail.privateBadge')}
             </span>
           </div>
         )
@@ -155,7 +151,7 @@ export const DiaryDetailPage = () => {
             {diary.coverPhoto && (
               <div className="relative z-10 -mx-8 -mt-8 mb-8 md:-mx-12 md:-mt-12">
                 <img src={diary.coverPhoto} alt={diary.title} className="h-64 w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#fdfbf7]" />
+                <div className="absolute inset-0 bg-linear-to-b from-transparent to-[#fdfbf7]" />
               </div>
             )}
 
@@ -171,14 +167,16 @@ export const DiaryDetailPage = () => {
                     <span>•</span>
                     <div className="flex items-center gap-1.5" style={{ color: selectedMoodData.color }}>
                       <span>{selectedMoodData.icon}</span>
-                      Feeling {selectedMoodData.label}
+                      {t('common.feeling')} {selectedMoodData.label}
                     </div>
                   </>
                 )}
                 {diary.updatedAt !== diary.createdAt && (
                   <>
                     <span>•</span>
-                    <span>Updated {format(new Date(diary.updatedAt), 'MMM dd, yyyy')}</span>
+                    <span>
+                      {t('detail.updated')} {format(new Date(diary.updatedAt), 'MMM dd, yyyy')}
+                    </span>
                   </>
                 )}
               </div>
@@ -204,30 +202,17 @@ export const DiaryDetailPage = () => {
 
             {/* Body */}
             <div className="relative z-10">
-              {/* {paragraphs.length > 0 ? (
-                <div className="prose prose-lg prose-stone max-w-none font-serif leading-loose text-foreground/80">
-                  {paragraphs.map((paragraph, idx) => (
-                    <p
-                      key={idx}
-                      className="mb-6 first-letter:float-left first-letter:mr-3 first-letter:font-serif first-letter:text-5xl first-letter:font-bold"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              ) : ( */}
               <div
                 className="prose prose-lg prose-stone text-foreground/80 max-w-none font-serif leading-loose"
                 dangerouslySetInnerHTML={{ __html: diary.content }}
               />
-              {/* )} */}
             </div>
 
             {/* Footer: mood + author signature */}
             <div className="relative z-10 mt-12 flex items-center justify-between border-t border-black/10 pt-8">
               {selectedMoodData && (
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground font-serif text-sm font-bold italic">Mood:</span>
+                  <span className="text-muted-foreground font-serif text-sm font-bold italic">{t('common.mood')}:</span>
                   <span
                     className="flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium"
                     style={{
@@ -249,14 +234,14 @@ export const DiaryDetailPage = () => {
         <div className="space-y-6 lg:col-span-4">
           {/* Author Card */}
           <div className="relative overflow-hidden rounded-xl border border-black/5 bg-white p-6 text-center shadow-sm">
-            <div className="from-primary/10 absolute top-0 left-0 h-20 w-full bg-gradient-to-b to-transparent" />
+            <div className="from-primary/10 absolute top-0 left-0 h-20 w-full bg-linear-to-b to-transparent" />
             <div className="relative z-10 flex flex-col items-center">
               <Avatar className="mb-4 h-20 w-20 border-4 border-white shadow-md">
                 <AvatarImage src={diaryUser?.profileImage ?? undefined} alt={authorName} />
                 <AvatarFallback className="font-serif text-lg">{authorInitials}</AvatarFallback>
               </Avatar>
               <h3 className="font-serif text-lg font-bold">{authorName}</h3>
-              <p className="text-muted-foreground mb-3 text-xs tracking-widest uppercase">Author</p>
+              <p className="text-muted-foreground mb-3 text-xs tracking-widest uppercase">{t('common.author')}</p>
               {diaryUser?.bio && (
                 <p className="text-muted-foreground mb-6 px-4 text-sm leading-relaxed">{diaryUser.bio}</p>
               )}
@@ -268,7 +253,7 @@ export const DiaryDetailPage = () => {
             <div className="rounded-xl border border-black/5 bg-white p-6 shadow-sm">
               <h3 className="mb-4 flex items-center gap-2 font-serif font-bold">
                 <MessageCircle className="size-4" />
-                Discussion
+                {t('common.discussion')}
               </h3>
 
               {/* Like block */}
@@ -279,8 +264,8 @@ export const DiaryDetailPage = () => {
                       <Heart className={`size-5 ${diary.isLiked ? 'fill-rose-500 text-rose-500' : 'text-rose-400'}`} />
                     </div>
                     <div>
-                      <p className="font-bold text-rose-900">{diary.likesCount || 0} Likes</p>
-                      <p className="text-xs text-rose-700">People loved this entry</p>
+                      <p className="font-bold text-rose-900">{t('common.likes', { count: diary.likesCount || 0 })}</p>
+                      <p className="text-xs text-rose-700">{t('detail.peopleLoved')}</p>
                     </div>
                   </div>
                   <LikeButton

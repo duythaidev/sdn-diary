@@ -5,8 +5,10 @@ import { DiaryForm } from '@/components/diary/DiaryForm'
 import { toast } from 'sonner'
 import { getAxiosErrorMessage } from '@/lib/error'
 import type { DiaryFormData } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export const DiaryCreatePage = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
@@ -14,13 +16,13 @@ export const DiaryCreatePage = () => {
     setLoading(true)
     try {
       await diaryService.createDiary(data)
-      
+
       if (data.isDraft) {
-        toast.success('Draft saved successfully!')
+        toast.success(t('diaries.draftSuccess'))
       } else {
-        toast.success('Diary entry created successfully!')
+        toast.success(t('diaries.createSuccess'))
       }
-      
+
       navigate('/diary')
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))

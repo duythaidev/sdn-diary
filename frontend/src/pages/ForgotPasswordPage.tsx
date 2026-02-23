@@ -8,12 +8,14 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getAxiosErrorMessage } from '@/lib/error'
+import { useTranslation } from 'react-i18next'
 
 interface ForgotPasswordForm {
   email: string
 }
 
 export function ForgotPasswordPage() {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
 
@@ -28,9 +30,9 @@ export function ForgotPasswordPage() {
     try {
       await authService.forgotPassword(data.email)
       setEmailSent(true)
-      toast.success('Password reset email sent! Please check your inbox.')
+      toast.success(t('auth.resetEmailSent'))
     } catch (error) {
-      toast.error(getAxiosErrorMessage(error, 'Failed to send reset email'))
+      toast.error(getAxiosErrorMessage(error, t('auth.resetEmailFailed')))
     } finally {
       setLoading(false)
     }
@@ -58,17 +60,15 @@ export function ForgotPasswordPage() {
         <div className="space-y-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <h2 className="text-foreground/85 font-serif text-5xl leading-tight font-bold">
-              Recover your
+              {t('auth.recoverYourJourney').split(' ').slice(0, 2).join(' ')}
               <br />
               <span className="relative inline-block">
-                <span className="relative z-10">journey.</span>
+                <span className="relative z-10">{t('auth.recoverYourJourney').split(' ').slice(2).join(' ')}</span>
                 <span className="absolute right-0 bottom-1 left-0 z-0 h-3 -rotate-1 bg-yellow-200/60" />
               </span>
             </h2>
             <p className="text-muted-foreground mt-4 font-serif text-lg leading-relaxed">
-              Don't let a forgotten password stop your story.
-              <br />
-              We'll help you get back to your pages in no time.
+              {t('auth.dontLetPasswordStop')}
             </p>
           </motion.div>
 
@@ -78,7 +78,7 @@ export function ForgotPasswordPage() {
             transition={{ delay: 0.3 }}
             className="flex flex-col gap-4"
           >
-            {['Secure password recovery', 'Back in minutes', 'Your privacy is our priority'].map((item, i) => (
+            {[t('auth.secureRecovery'), t('auth.backInMinutes'), t('auth.privacyPriority')].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className="bg-foreground/30 h-1.5 w-1.5 rounded-full" />
                 <span className="text-muted-foreground text-sm font-medium">{item}</span>
@@ -89,9 +89,9 @@ export function ForgotPasswordPage() {
 
         <div className="flex gap-3">
           {[
-            { color: 'bg-[#fefce8]', rotate: '-rotate-2', label: 'Security' },
-            { color: 'bg-[#f0f9ff]', rotate: 'rotate-1', label: 'Access' },
-            { color: 'bg-[#fdf2f8]', rotate: '-rotate-1', label: 'Privacy' },
+            { color: 'bg-[#fefce8]', rotate: '-rotate-2', label: t('auth.security') },
+            { color: 'bg-[#f0f9ff]', rotate: 'rotate-1', label: t('auth.access') },
+            { color: 'bg-[#fdf2f8]', rotate: '-rotate-1', label: t('auth.privacy') },
           ].map((note, i) => (
             <motion.div
               key={i}
@@ -134,25 +134,23 @@ export function ForgotPasswordPage() {
                   <CheckCircle2 className="size-8 text-green-600" />
                 </div>
               </div>
-              <h3 className="text-foreground/90 font-serif text-3xl font-bold">Email sent!</h3>
-              <p className="text-muted-foreground mt-3 leading-relaxed">
-                We've sent a password reset link to your email address. Please check your inbox and spam folder.
-              </p>
+              <h3 className="text-foreground/90 font-serif text-3xl font-bold">{t('auth.emailSent')}</h3>
+              <p className="text-muted-foreground mt-3 leading-relaxed">{t('auth.checkInbox')}</p>
               <div className="mt-8">
                 <Button
                   className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
                   asChild
                 >
-                  <Link to="/login">Back to Login</Link>
+                  <Link to="/login">{t('common.backToLogin')}</Link>
                 </Button>
               </div>
               <p className="text-muted-foreground mt-6 text-sm">
-                Didn't receive the email?{' '}
+                {t('auth.didntReceiveEmail')}{' '}
                 <button
                   onClick={() => setEmailSent(false)}
                   className="text-foreground hover:text-foreground/70 font-semibold underline underline-offset-4 transition-colors"
                 >
-                  Try again
+                  {t('common.tryAgain')}
                 </button>
               </p>
             </div>
@@ -164,12 +162,10 @@ export function ForgotPasswordPage() {
                   className="text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1.5 text-sm font-medium transition-colors"
                 >
                   <ArrowLeft className="size-4" />
-                  Back to login
+                  {t('common.backToLogin')}
                 </Link>
-                <h3 className="text-foreground/90 font-serif text-3xl font-bold">Forgot password?</h3>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  Enter your email address to receive a secure reset link.
-                </p>
+                <h3 className="text-foreground/90 font-serif text-3xl font-bold">{t('auth.forgotPasswordTitle')}</h3>
+                <p className="text-muted-foreground mt-1 text-sm">{t('auth.forgotPasswordDesc')}</p>
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -178,11 +174,11 @@ export function ForgotPasswordPage() {
                     <Mail className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                     <Input
                       type="email"
-                      placeholder="Email address"
+                      placeholder={t('common.email')}
                       className="h-11 rounded-xl border-black/10 bg-white pl-10 text-sm focus:border-black/25"
                       {...register('email', {
-                        required: 'Email is required',
-                        pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' },
+                        required: t('auth.emailRequired'),
+                        pattern: { value: /^\S+@\S+\.\S+$/, message: t('auth.invalidEmail') },
                       })}
                     />
                     {errors.email && <span className="ml-1 text-xs text-red-500">{errors.email.message}</span>}
@@ -194,17 +190,17 @@ export function ForgotPasswordPage() {
                   disabled={loading}
                   className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
                 >
-                  {loading ? 'Sending link...' : 'Send Reset Link'}
+                  {loading ? t('common.loading') : t('common.send')}
                 </Button>
               </form>
 
               <p className="text-muted-foreground mt-8 text-center text-sm">
-                Don't have an account?{' '}
+                {t('common.dontHaveAccount')}{' '}
                 <Link
                   to="/register"
                   className="text-foreground hover:text-foreground/70 font-semibold underline underline-offset-4 transition-colors"
                 >
-                  Create one
+                  {t('common.createAccount')}
                 </Link>
               </p>
             </>

@@ -17,7 +17,10 @@ import type { User as Profile } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
 import { useNavigate } from 'react-router-dom'
 
+import { useTranslation } from 'react-i18next'
+
 export function NavUser({ user }: { user: Profile }) {
+  const { t } = useTranslation()
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
   const { logout } = useProfile()
@@ -69,7 +72,7 @@ export function NavUser({ user }: { user: Profile }) {
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => navigate('/profile')}>
                 <User />
-                Account
+                {t('sidebar.profile')}
               </DropdownMenuItem>
               {/* <DropdownMenuItem onClick={() => navigate('/notifications')}>
                 <Bell />
@@ -79,7 +82,7 @@ export function NavUser({ user }: { user: Profile }) {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Log out
+              {t('sidebar.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -5,19 +5,19 @@ import DiaryCardItem from '@/components/diary/DiaryCardItem'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Plus, BookOpen, PenLine, TrendingUp, Smile, Clock, PenSquare, Star, StickyNote } from 'lucide-react'
+import { Plus, BookOpen, PenLine, TrendingUp, Smile, Clock, PenSquare } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
 import { getAxiosErrorMessage } from '@/lib/error'
 import CreateDiaryButton from '@/components/common/CreateDiaryButton'
-import MoodBarChart from '@/components/dashboard/MoodBarChart'
-import DashboardCalendar from '@/components/dashboard/DashboardCalendar'
 import { motion } from 'motion/react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { format, subDays, isSameDay } from 'date-fns'
+import { useTranslation } from 'react-i18next'
 
 export const DashboardPage = () => {
+  const { t } = useTranslation()
   const [diaries, setDiaries] = useState<Diary[]>([])
   const { user } = useProfile()
   const [loading, setLoading] = useState(true)
@@ -75,10 +75,8 @@ export const DashboardPage = () => {
     entries: diaries.filter((d) => isSameDay(new Date(d.createdAt), day)).length,
   }))
 
-  // Recent drafts
   const recentDrafts = diaries.filter((d) => d.isDraft).slice(0, 3)
   const recentEntries = diaries.slice(0, 6)
-  const todayStr = format(new Date(), 'MMM d')
 
   return (
     <div className="animate-in fade-in space-y-8 duration-500">
@@ -86,12 +84,9 @@ export const DashboardPage = () => {
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h1 className="text-foreground/90 font-serif text-4xl font-bold">
-            Welcome back,{' '}
-            <span className="text-primary decoration-primary/30 underline decoration-wavy">
-              {user?.username ?? 'Friend'}
-            </span>
+            {t('dashboard.welcome', { name: user?.username ?? 'Friend' })}
           </h1>
-          <p className="text-muted-foreground mt-2 font-medium">Here's what's happening on your desk today.</p>
+          <p className="text-muted-foreground mt-2 font-medium">{t('dashboard.subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <Link to="/diary">
@@ -100,13 +95,13 @@ export const DashboardPage = () => {
               className="rounded-full border-2 border-dashed border-black/10 bg-white hover:border-black/30"
             >
               <Clock className="mr-2 size-4" />
-              History
+              {t('common.history')}
             </Button>
           </Link>
           <Link to="/diary/create">
             <Button className="rounded-full font-serif shadow-lg transition-all hover:shadow-xl">
               <PenSquare className="mr-2 size-4" />
-              New Entry
+              {t('common.newEntry')}
             </Button>
           </Link>
         </div>
@@ -129,7 +124,7 @@ export const DashboardPage = () => {
             <span className="font-mono text-xs font-bold text-yellow-700/50">#TOTAL</span>
           </div>
           <h3 className="text-foreground/80 font-serif text-4xl font-bold">{totalEntries}</h3>
-          <p className="mt-1 text-sm font-medium text-yellow-800/60">Journal Entries</p>
+          <p className="mt-1 text-sm font-medium text-yellow-800/60">{t('dashboard.stats.totalEntries')}</p>
         </motion.div>
 
         {/* Words Written - Pink Sticky */}
@@ -147,7 +142,7 @@ export const DashboardPage = () => {
             <span className="font-mono text-xs font-bold text-pink-700/50">#WORDS</span>
           </div>
           <h3 className="text-foreground/80 font-serif text-4xl font-bold">{wordDisplay}</h3>
-          <p className="mt-1 text-sm font-medium text-pink-800/60">Words Written</p>
+          <p className="mt-1 text-sm font-medium text-pink-800/60">{t('dashboard.stats.totalWords')}</p>
         </motion.div>
 
         {/* Streak - White card with tape */}
@@ -161,11 +156,11 @@ export const DashboardPage = () => {
               <TrendingUp className="size-5 text-blue-600" />
             </div>
             <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100">
-              {streak > 5 ? 'Top 10%' : 'Keep going!'}
+              {streak > 5 ? 'Top 10%' : t('dashboard.stats.topText')}
             </Badge>
           </div>
           <h3 className="text-foreground/80 font-serif text-4xl font-bold">{streak}</h3>
-          <p className="text-muted-foreground mt-1 text-sm font-medium">Day Streak 🔥</p>
+          <p className="text-muted-foreground mt-1 text-sm font-medium">{t('dashboard.stats.writingStreak')}</p>
         </motion.div>
 
         {/* Mood - White card with pin */}
@@ -183,7 +178,7 @@ export const DashboardPage = () => {
             <span className="text-muted-foreground font-mono text-xs font-bold">MOOD</span>
           </div>
           <h3 className="text-foreground/80 font-serif text-xl font-bold">{topMoodLabel}</h3>
-          <p className="text-muted-foreground mt-1 text-sm font-medium">Most frequent mood</p>
+          <p className="text-muted-foreground mt-1 text-sm font-medium">{t('dashboard.stats.mostFrequentMood')}</p>
         </motion.div>
       </div>
 
@@ -196,8 +191,8 @@ export const DashboardPage = () => {
             style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/graphy.png')" }}
           />
           <div className="mb-6 flex items-center justify-between">
-            <h3 className="font-serif text-xl font-bold">Writing Activity</h3>
-            <span className="text-muted-foreground font-mono text-xs">Last 7 days</span>
+            <h3 className="font-serif text-xl font-bold">{t('dashboard.writingActivity')}</h3>
+            <span className="text-muted-foreground font-mono text-xs">{t('dashboard.last7Days')}</span>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -246,10 +241,10 @@ export const DashboardPage = () => {
         {/* Recent Drafts */}
         <div className="relative rounded-xl border border-black/5 bg-white p-6 shadow-sm">
           <div className="mb-6 flex items-center justify-between">
-            <h3 className="font-serif text-xl font-bold">Recent Drafts</h3>
+            <h3 className="font-serif text-xl font-bold">{t('dashboard.recentDrafts')}</h3>
             <Link to="/diary">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                View All
+                {t('common.viewAll')}
               </Button>
             </Link>
           </div>
@@ -261,7 +256,7 @@ export const DashboardPage = () => {
                     <div className="group bg-muted/30 cursor-pointer rounded-lg border border-transparent p-4 transition-all hover:border-black/5 hover:bg-white hover:shadow-md">
                       <div className="mb-2 flex items-start justify-between">
                         <h4 className="group-hover:text-primary text-foreground/90 line-clamp-1 font-serif font-bold transition-colors">
-                          {diary.title || 'Untitled Entry'}
+                          {diary.title || t('common.untitled')}
                         </h4>
                         <span className="text-muted-foreground ml-2 shrink-0 rounded-full bg-black/5 px-2 py-0.5 font-mono text-[10px]">
                           {format(new Date(diary.createdAt), 'MMM d')}
@@ -279,7 +274,7 @@ export const DashboardPage = () => {
                     <div className="group bg-muted/30 cursor-pointer rounded-lg border border-transparent p-4 transition-all hover:border-black/5 hover:bg-white hover:shadow-md">
                       <div className="mb-2 flex items-start justify-between">
                         <h4 className="group-hover:text-primary text-foreground/90 line-clamp-1 font-serif font-bold transition-colors">
-                          {diary.title || 'Untitled Entry'}
+                          {diary.title || t('common.untitled')}
                         </h4>
                         <span className="text-muted-foreground ml-2 shrink-0 rounded-full bg-black/5 px-2 py-0.5 font-mono text-[10px]">
                           {format(new Date(diary.createdAt), 'MMM d')}
@@ -293,12 +288,16 @@ export const DashboardPage = () => {
                 ))}
 
             {recentDrafts.length === 0 && recentEntries.length === 0 && (
-              <p className="text-muted-foreground py-4 text-center font-serif text-sm italic">No entries yet.</p>
+              <p className="text-muted-foreground py-4 text-center font-serif text-sm italic">
+                {t('dashboard.noEntriesYet')}
+              </p>
             )}
           </div>
 
           <Link to="/diary/create">
-            <Button className="mt-6 w-full bg-black font-serif text-white hover:bg-black/90">Continue Writing</Button>
+            <Button className="mt-6 w-full bg-black font-serif text-white hover:bg-black/90">
+              {t('dashboard.continueWriting')}
+            </Button>
           </Link>
         </div>
       </div>
@@ -307,13 +306,13 @@ export const DashboardPage = () => {
       <div>
         <div className="mb-6 flex items-center justify-between border-b border-black/5 pb-4">
           <div>
-            <h2 className="text-foreground/90 font-serif text-2xl font-bold">Recent Entries</h2>
-            <p className="text-muted-foreground mt-1 text-sm">Your latest reflections and thoughts</p>
+            <h2 className="text-foreground/90 font-serif text-2xl font-bold">{t('dashboard.recentEntries')}</h2>
+            <p className="text-muted-foreground mt-1 text-sm">{t('dashboard.latestReflections')}</p>
           </div>
           <Link to="/diary/create">
             <Button className="rounded-full font-serif shadow-md">
               <Plus className="mr-2 h-4 w-4" />
-              New Entry
+              {t('common.newEntry')}
             </Button>
           </Link>
         </div>
@@ -341,7 +340,7 @@ export const DashboardPage = () => {
                     variant="outline"
                     className="h-12 rounded-full border-black/10 px-8 transition-all hover:bg-white hover:shadow-md"
                   >
-                    View All Entries
+                    {t('dashboard.viewAllEntries')}
                   </Button>
                 </Link>
               </div>
@@ -349,10 +348,10 @@ export const DashboardPage = () => {
           </>
         ) : (
           <div className="rounded-3xl border-2 border-dashed border-black/5 bg-white/50 py-20 text-center">
-            <p className="text-muted-foreground font-serif text-xl">No diary entries yet.</p>
+            <p className="text-muted-foreground font-serif text-xl">{t('dashboard.noEntriesYet')}</p>
             <Link to="/diary/create">
               <Button variant="link" className="text-primary mt-2">
-                Create your first entry
+                {t('dashboard.createFirstEntry')}
               </Button>
             </Link>
           </div>
