@@ -68,11 +68,9 @@ export function LoginPage() {
         <div className="space-y-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <h2 className="text-foreground/85 font-serif text-5xl leading-tight font-bold">
-              {t('auth.everyThoughtDeservesAPage').split('.')[0]}
-              <br />
               <span className="relative inline-block">
-                <span className="relative z-10">{t('auth.everyThoughtDeservesAPage').split('.')[1] || ''}.</span>
-                <span className="absolute right-0 bottom-1 left-0 -z-0 h-3 -rotate-1 bg-yellow-200/60" />
+                {t('auth.everyThoughtDeservesAPage')}
+                <span className="absolute inset-x-0 bottom-1 -z-0 h-3 -rotate-1 bg-yellow-200/60" />
               </span>
             </h2>
             <p className="text-muted-foreground mt-4 font-serif text-lg leading-relaxed">
