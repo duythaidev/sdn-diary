@@ -13,6 +13,8 @@ import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useTranslation } from 'react-i18next'
 
+const decorationPattern: ('clip' | 'pin' | 'tape' | 'none')[] = ['clip', 'pin', 'tape', 'tape', 'pin', 'clip']
+
 export const PublicDiariesPage = () => {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
@@ -161,15 +163,7 @@ export const PublicDiariesPage = () => {
                       rotation={index % 2 === 0 ? -1 : 1}
                       color={index % 3 === 0 ? 'bg-[#fefce8]' : index % 3 === 1 ? 'bg-[#fdf2f8]' : 'bg-white'}
                       texture={index % 2 === 0 ? 'plain' : 'dotted'}
-                      decoration={
-                        Math.floor(Math.random() * 4) + 1 === 1
-                          ? 'clip'
-                          : Math.floor(Math.random() * 4) + 1 === 2
-                            ? 'pin'
-                            : Math.floor(Math.random() * 4) + 1 === 3
-                              ? 'tape'
-                              : 'none'
-                      }
+                      decoration={decorationPattern[index % decorationPattern.length]}
                       delay={index % 10}
                     />
                   ))}
