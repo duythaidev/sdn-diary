@@ -4,7 +4,7 @@ import axiosInstance from './axios'
 const URL = '/diary'
 
 export const diaryService = {
-  getUserDiaries: async (
+   getUserDiaries: async (
     dateFilter?: string,
     moodFilter?: string,
     tagsFilter?: string,
@@ -12,6 +12,7 @@ export const diaryService = {
     page?: number,
     limit?: number,
     specificDate?: Date,
+    statusFilter?: string,
   ) => {
     const response = await axiosInstance.get(URL, {
       params: {
@@ -22,6 +23,7 @@ export const diaryService = {
         page,
         limit,
         date: specificDate ? specificDate.toISOString() : undefined,
+        statusFilter,
       },
     })
     return response.data
@@ -29,6 +31,11 @@ export const diaryService = {
 
   getUserRecentDiaries: async () => {
     const response = await axiosInstance.get(`${URL}/recent`)
+    return response.data
+  },
+
+  getDashboardData: async (range: 'last7' | 'lastmonth' | 'lastyear' = 'last7') => {
+    const response = await axiosInstance.get(`${URL}/dashboard`, { params: { range } })
     return response.data
   },
 

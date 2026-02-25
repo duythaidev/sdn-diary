@@ -1,5 +1,6 @@
 import Diary from "../models/Diary.js";
 import Comment from "../models/Comment.js";
+import { subDays, subMonths, subYears } from "../utils/date.js";
 
 const MAX_COVER_PHOTO_SIZE = 5 * 1024 * 1024;
 const MAX_USER_DIARIES_PER_PAGE = 10;
@@ -13,11 +14,11 @@ export const getUserDiaries = async (req, res) => {
       moodFilter,
       tagsFilter,
       queryFilter,
+      statusFilter, // 'all' | 'public' | 'private' | 'draft'
       page = 1,
       limit = MAX_USER_DIARIES_PER_PAGE,
     } = req.query;
 
-    // Parse pagination parameters
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
@@ -29,11 +30,7 @@ export const getUserDiaries = async (req, res) => {
       const date = new Date(req.query.date);
       const startOfDay = new Date(date.setHours(0, 0, 0, 0));
       const endOfDay = new Date(date.setHours(23, 59, 59, 999));
-
-      query.createdAt = {
-        $gte: startOfDay,
-        $lte: endOfDay,
-      };
+      query.createdAt = { $gte: startOfDay, $lte: endOfDay };
     }
 
     // Mood filter
@@ -46,6 +43,19 @@ export const getUserDiaries = async (req, res) => {
       query.tags = { $in: [tagsFilter] };
     }
 
+    // Status filter
+    if (statusFilter && statusFilter !== "all") {
+      if (statusFilter === "draft") {
+        query.isDraft = true;
+      } else if (statusFilter === "public") {
+        query.isDraft = false;
+        query.isPublic = true;
+      } else if (statusFilter === "private") {
+        query.isDraft = false;
+        query.isPublic = false;
+      }
+    }
+
     // Query filter
     if (queryFilter) {
       query.$or = [
@@ -54,10 +64,8 @@ export const getUserDiaries = async (req, res) => {
       ];
     }
 
-    // Get total count
     const totalCount = await Diary.countDocuments(query);
 
-    // Get paginated diaries
     const sortBy = dateFilter === "newest" ? -1 : 1;
     const diaries = await Diary.find(query)
       .sort({ createdAt: sortBy })
@@ -65,7 +73,6 @@ export const getUserDiaries = async (req, res) => {
       .limit(limitNum)
       .populate("userId", "username email");
 
-    // Calculate if there are more pages
     const hasMore = skip + diaries.length < totalCount;
 
     res.json({
@@ -569,6 +576,131 @@ export const getDiariesByTag = async (req, res) => {
       .populate("userId", "username email");
 
     res.json({ diaries, tag });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const getDashboardData = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { range = "last7" } = req.query;
+
+    // Determine date range for activity chart
+    const now = new Date();
+    let rangeStart;
+    let daysCount;
+    if (range === "lastmonth") {
+      rangeStart = subMonths(now, 1);
+      daysCount = 30;
+    } else if (range === "lastyear") {
+      rangeStart = subYears(now, 1);
+      daysCount = 365;
+    } else {
+      // default: last7
+      rangeStart = subDays(now, 6);
+      daysCount = 7;
+    }
+
+    // All user diaries (for stats)
+    const allDiaries = await Diary.find({ userId }).select(
+      "_id createdAt selectedMood isDraft isPublic",
+    );
+
+    const totalEntries = allDiaries.length;
+
+    // Total comments on user's diaries
+    const diaryIds = allDiaries.map((d) => d._id);
+    const totalComments = await Comment.countDocuments({
+      diaryId: { $in: diaryIds },
+    });
+
+    // Streak: consecutive days with at least one entry (from today backwards)
+    let streak = 0;
+    let checkDate = new Date();
+    const createdDates = allDiaries.map((d) => new Date(d.createdAt));
+    const isSameDay = (a, b) =>
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate();
+
+    while (true) {
+      const hasEntry = createdDates.some((d) => isSameDay(d, checkDate));
+      if (!hasEntry) break;
+      streak++;
+      checkDate = subDays(checkDate, 1);
+    }
+
+    // Most frequent mood
+    const moodCounts = {};
+    allDiaries.forEach((d) => {
+      if (d.selectedMood)
+        moodCounts[d.selectedMood] = (moodCounts[d.selectedMood] || 0) + 1;
+    });
+    const topMood =
+      Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
+    // Activity data for chart (group by day, week, or month depending on range)
+    let activityData = [];
+    if (range === "lastyear") {
+      // Group by month (12 buckets)
+      activityData = Array.from({ length: 12 }, (_, i) => {
+        const date = subMonths(now, 11 - i);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const entries = allDiaries.filter((d) => {
+          const cd = new Date(d.createdAt);
+          return cd.getFullYear() === year && cd.getMonth() === month;
+        }).length;
+        return {
+          name: date.toLocaleString("default", { month: "short" }),
+          entries,
+        };
+      });
+    } else {
+      // Group by day
+      activityData = Array.from({ length: daysCount }, (_, i) => {
+        const day = subDays(now, daysCount - 1 - i);
+        const entries = allDiaries.filter((d) =>
+          isSameDay(new Date(d.createdAt), day),
+        ).length;
+        const name =
+          daysCount <= 7
+            ? day.toLocaleString("default", { weekday: "short" })
+            : `${day.getMonth() + 1}/${day.getDate()}`;
+        return { name, entries };
+      });
+    }
+
+    // Recent drafts (latest 3)
+    const recentDrafts = await Diary.find({ userId, isDraft: true })
+      .sort({ updatedAt: -1 })
+      .limit(3)
+      .select("_id title content createdAt updatedAt isDraft");
+
+    // Recent public entries (latest 3)
+    const recentPublic = await Diary.find({
+      userId,
+      isPublic: true,
+      isDraft: false,
+    })
+      .sort({ updatedAt: -1 })
+      .limit(3)
+      .select(
+        "_id title content createdAt updatedAt isPublic selectedMood tags",
+      );
+
+    res.json({
+      stats: {
+        totalEntries,
+        totalComments,
+        streak,
+        topMood,
+      },
+      activityData,
+      recentDrafts,
+      recentPublic,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

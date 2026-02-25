@@ -12,6 +12,7 @@ export const useGetUserDiaries = () => {
   const [dateFilter, setDateFilter] = useState<string>('newest')
   const [moodFilter, setMoodFilter] = useState<string>('all')
   const [tagsFilter, setTagsFilter] = useState<string>('all')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -34,6 +35,8 @@ export const useGetUserDiaries = () => {
           debouncedSearchQuery,
           pageNum,
           12,
+          undefined,
+          statusFilter,
         )
 
         if (isInitial) {
@@ -50,7 +53,7 @@ export const useGetUserDiaries = () => {
         setLoadingMore(false)
       }
     },
-    [dateFilter, moodFilter, tagsFilter, debouncedSearchQuery],
+    [dateFilter, moodFilter, tagsFilter, debouncedSearchQuery, statusFilter],
   )
 
   // Reset and fetch when filters change
@@ -58,7 +61,7 @@ export const useGetUserDiaries = () => {
     setPage(1)
     setDiaries([])
     fetchDiaries(1, true)
-  }, [dateFilter, moodFilter, tagsFilter, debouncedSearchQuery, fetchDiaries])
+  }, [dateFilter, moodFilter, tagsFilter, debouncedSearchQuery, statusFilter, fetchDiaries])
 
   // Load more handler
   const loadMore = useCallback(() => {
@@ -77,9 +80,11 @@ export const useGetUserDiaries = () => {
     dateFilter,
     moodFilter,
     tagsFilter,
+    statusFilter,
     setDateFilter,
     setMoodFilter,
     setTagsFilter,
+    setStatusFilter,
     searchQuery,
     setSearchQuery,
     loadMore,

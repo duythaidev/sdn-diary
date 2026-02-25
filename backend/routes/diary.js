@@ -15,6 +15,7 @@ import {
   toggleLike,
   likeDiary,
   unlikeDiary,
+  getDashboardData,
 } from '../controllers/diaryController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -61,12 +62,14 @@ router.get('/drafts', verifyAccessToken, getUserDrafts);
 // Protected routes
 router.get('/', verifyAccessToken, getUserDiaries);
 router.get('/recent', verifyAccessToken, getUserRecentDiaries);
+router.get('/dashboard', verifyAccessToken, getDashboardData);
 router.get('/mood/:mood', verifyAccessToken, getDiariesByMood);
-router.get('/:id', verifyAccessToken, getDiaryById);
 router.post('/', verifyAccessToken, diaryValidation, validate, createDiary);
+router.get('/:id', verifyAccessToken, getDiaryById);
 router.put('/:id', verifyAccessToken, updateDiaryValidation, validate, updateDiary);
 router.delete('/:id', verifyAccessToken, deleteDiary);
-router.patch('/:id/publish', verifyAccessToken, publishDraft);
+router.patch('/:id/publish', verifyAccessToken, publishDraft);  
+
 
 router.post('/:id/like', verifyAccessToken, toggleLike);
 router.post('/:id/like/add', verifyAccessToken, likeDiary);

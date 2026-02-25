@@ -106,7 +106,7 @@ export default function AppLayout() {
                   <Link to="/diary/create" className="hidden sm:block">
                     <Button className="rounded-full px-6 font-serif shadow-lg transition-all hover:shadow-xl">
                       <PenSquare className="mr-2 size-4" />
-                      {isActive('/diary/create') ? t('common.loading') : t('sidebar.createDiary')}
+                      {isActive('/diary/create') ? t('sidebar.createDiary') : t('sidebar.createDiary')}
                     </Button>
                   </Link>
 
