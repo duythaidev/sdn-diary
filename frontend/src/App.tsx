@@ -7,6 +7,7 @@ import { RegisterPage } from './pages/RegisterPage'
 import NotFound from './pages/NotFound'
 import { Toaster } from './components/ui/sonner'
 import AppLayout from './components/layout/AppLayout'
+import { RouteChangeTracker } from './components/common/RouteChangeTracker'
 
 const ProtectedRoute = lazy(() =>
   import('./components/layout/ProtectedRoute').then((module) => ({ default: module.ProtectedRoute })),
@@ -134,6 +135,7 @@ function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
+        <RouteChangeTracker />
         <AppContent />
       </BrowserRouter>
     </Provider>

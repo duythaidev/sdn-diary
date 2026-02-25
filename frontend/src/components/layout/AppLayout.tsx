@@ -48,7 +48,7 @@ export default function AppLayout() {
       <header className="sticky top-0 z-40 border-b border-black/5 bg-[#f8f5f2]/80 backdrop-blur-md">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <Link to="/" className="group flex items-center gap-2">
+            <Link to="/" className="group flex items-center gap-2 flex-1">
               <div className="-rotate-3 rounded-lg bg-black p-2 text-white shadow-md transition-transform duration-300 group-hover:rotate-0">
                 <BookOpen className="size-6" />
               </div>
@@ -99,7 +99,7 @@ export default function AppLayout() {
               )}
             </nav>
 
-            <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
               <LanguageSwitcher />
               {isAuthenticated ? (
                 <>
