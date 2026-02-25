@@ -139,7 +139,7 @@ const vi = {
   sidebar: {
     dashboard: 'Tổng quan',
     myDiaries: 'Nhật ký',
-    publicFeed: 'Dòng thời gian công khai',
+    publicFeed: 'Dòng thời gian',
     createDiary: 'Viết bài mới',
     profile: 'Hồ sơ',
     logout: 'Đăng xuất',

@@ -165,6 +165,7 @@ export const PublicDiariesPage = () => {
                       texture={index % 2 === 0 ? 'plain' : 'dotted'}
                       decoration={decorationPattern[index % decorationPattern.length]}
                       delay={index % 10}
+                      shouldShowPrivacy={false}
                     />
                   ))}
                 </Masonry>

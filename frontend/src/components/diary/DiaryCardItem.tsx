@@ -17,16 +17,12 @@ interface DiaryCardItemProps {
   showActions?: boolean
   onLikeUpdate?: (diaryId: string, likesCount: number, isLiked: boolean) => void
   className?: string
-  /** Visual rotation for the paper card effect */
   rotation?: number
-  /** Paper color variant */
   color?: string
-  /** Paper texture: plain, lined, or dotted */
   texture?: 'plain' | 'lined' | 'dotted'
-  /** Decoration on top of the card */
   decoration?: 'tape' | 'pin' | 'clip' | 'none'
-  /** Stagger animation delay index */
   delay?: number
+  shouldShowPrivacy?: boolean
 }
 
 const textureStyles = {
@@ -51,6 +47,7 @@ const DiaryCardItem = ({
   texture = 'plain',
   decoration = 'none',
   delay = 0,
+  shouldShowPrivacy = true,
 }: DiaryCardItemProps) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -128,21 +125,23 @@ const DiaryCardItem = ({
 
               <div className="flex items-center gap-2">
                 {/* Privacy / Draft badge */}
-                {diary.isDraft ? (
+                {diary.isDraft && shouldShowPrivacy ? (
                   <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
                     <FileText className="size-3" />
                     {t('common.draft')}
                   </span>
-                ) : diary.isPublic ? (
+                ) : diary.isPublic && shouldShowPrivacy ? (
                   <span className="inline-flex items-center gap-1 rounded-full border border-sky-400/30 bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-600">
                     <Globe className="size-3" />
                     {t('common.public')}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-100 px-2.5 py-1 text-xs font-semibold text-zinc-500">
-                    <Lock className="size-3" />
-                    {t('common.private')}
-                  </span>
+                  shouldShowPrivacy && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-100 px-2.5 py-1 text-xs font-semibold text-zinc-500">
+                      <Lock className="size-3" />
+                      {t('common.private')}
+                    </span>
+                  )
                 )}
 
                 {/* Actions menu */}
