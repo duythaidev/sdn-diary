@@ -256,6 +256,9 @@ const en = {
     enterTitleContent: 'Please enter a title or content',
     failedToLoad: 'Failed to load diary',
     failedToUpdate: 'Failed to update diary',
+    autosaving: 'Autosaving…',
+    autosaved: 'Saved',
+    autosaveError: 'Autosave failed',
   },
   preview: {
     backToEditor: 'Back to Editor',

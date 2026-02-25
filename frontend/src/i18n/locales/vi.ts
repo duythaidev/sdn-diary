@@ -253,6 +253,9 @@ const vi = {
     enterTitleContent: 'Nhập tiêu đề hoặc nội dung đi bạn ơi',
     failedToLoad: 'Không mở được bài viết',
     failedToUpdate: 'Cập nhật bài bị lỗi',
+    autosaving: "Đang tự lưu…",
+    autosaved: "Đã lưu",
+    autosaveError: "Tự lưu thất bại"
   },
   preview: {
     backToEditor: 'Quay lại viết',
