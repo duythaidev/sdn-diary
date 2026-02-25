@@ -27,6 +27,7 @@ import type { Diary, User as UserType } from '@/types'
 import { toast } from 'sonner'
 import { getAxiosErrorMessage } from '@/lib/error'
 import useDebounce from '@/hooks/useDebounce'
+import { LanguageSwitcher } from '../LanguageSwitcher'
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useProfile()
@@ -108,7 +109,8 @@ export const Navbar = () => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <LanguageSwitcher />
               {isAuthenticated ? (
                 <>
                   <Link to="/dashboard">

@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getAxiosErrorMessage } from '@/lib/error'
+import { useTranslation } from 'react-i18next'
 
 interface ResetPasswordForm {
   newPassword: string
@@ -15,6 +16,7 @@ interface ResetPasswordForm {
 }
 
 export function ResetPasswordPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
@@ -34,17 +36,17 @@ export function ResetPasswordPage() {
 
   const onSubmit = async (data: ResetPasswordForm) => {
     if (!token) {
-      toast.error('Invalid reset link')
+      toast.error(t('auth.invalidLink'))
       return
     }
 
     setLoading(true)
     try {
       await authService.resetPassword(token, data.newPassword)
-      toast.success('Password reset successful! You can now login.')
+      toast.success(t('auth.resetSuccess'))
       navigate('/login')
     } catch (error) {
-      toast.error(getAxiosErrorMessage(error, 'Failed to reset password'))
+      toast.error(getAxiosErrorMessage(error, t('auth.resetFailed')))
     } finally {
       setLoading(false)
     }
@@ -72,17 +74,15 @@ export function ResetPasswordPage() {
         <div className="space-y-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <h2 className="text-foreground/85 font-serif text-5xl leading-tight font-bold">
-              Renew your
+              {t('auth.renewCommitment').split(' ').slice(0, 2).join(' ')}
               <br />
               <span className="relative inline-block">
-                <span className="relative z-10">commitment.</span>
-                <span className="absolute right-0 bottom-1 left-0 -z-0 h-3 -rotate-1 bg-yellow-200/60" />
+                <span className="relative z-10">{t('auth.renewCommitment').split(' ').slice(2).join(' ')}</span>
+                <span className="absolute right-0 bottom-1 left-0 z-0 h-3 -rotate-1 bg-yellow-200/60" />
               </span>
             </h2>
             <p className="text-muted-foreground mt-4 font-serif text-lg leading-relaxed">
-              Security is the foundation of self-reflection.
-              <br />
-              Update your password to keep your story private.
+              {t('auth.securityFoundation')}
             </p>
           </motion.div>
 
@@ -92,7 +92,7 @@ export function ResetPasswordPage() {
             transition={{ delay: 0.3 }}
             className="flex flex-col gap-4"
           >
-            {['Secure encrypted passwords', 'Quick and easy update', 'Stay logged into your journey'].map((item, i) => (
+            {[t('auth.secureEncrypted'), t('auth.quickEasyUpdate'), t('auth.stayLogged')].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className="bg-foreground/30 h-1.5 w-1.5 rounded-full" />
                 <span className="text-muted-foreground text-sm font-medium">{item}</span>
@@ -103,9 +103,9 @@ export function ResetPasswordPage() {
 
         <div className="flex gap-3">
           {[
-            { color: 'bg-[#fefce8]', rotate: '-rotate-2', label: 'Safety' },
-            { color: 'bg-[#f0f9ff]', rotate: 'rotate-1', label: 'Modern' },
-            { color: 'bg-[#fdf2f8]', rotate: '-rotate-1', label: 'Private' },
+            { color: 'bg-[#fefce8]', rotate: '-rotate-2', label: t('auth.safety') },
+            { color: 'bg-[#f0f9ff]', rotate: 'rotate-1', label: t('auth.modern') },
+            { color: 'bg-[#fdf2f8]', rotate: '-rotate-1', label: t('auth.private') },
           ].map((note, i) => (
             <motion.div
               key={i}
@@ -148,24 +148,22 @@ export function ResetPasswordPage() {
                   <AlertCircle className="size-8 text-red-600" />
                 </div>
               </div>
-              <h3 className="text-foreground/90 font-serif text-3xl font-bold">Invalid link</h3>
-              <p className="text-muted-foreground mt-3 leading-relaxed">
-                The password reset link is invalid or has expired. Please request a new one.
-              </p>
+              <h3 className="text-foreground/90 font-serif text-3xl font-bold">{t('auth.invalidLink')}</h3>
+              <p className="text-muted-foreground mt-3 leading-relaxed">{t('auth.invalidLinkDesc')}</p>
               <div className="mt-8">
                 <Button
                   className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
                   asChild
                 >
-                  <Link to="/forgot-password">Request Reset Link</Link>
+                  <Link to="/forgot-password">{t('common.send')}</Link>
                 </Button>
               </div>
             </div>
           ) : (
             <>
               <div className="mb-8">
-                <h3 className="text-foreground/90 font-serif text-3xl font-bold">Reset password</h3>
-                <p className="text-muted-foreground mt-1 text-sm">Please enter and confirm your new password below.</p>
+                <h3 className="text-foreground/90 font-serif text-3xl font-bold">{t('auth.resetPasswordTitle')}</h3>
+                <p className="text-muted-foreground mt-1 text-sm">{t('auth.resetPasswordDesc')}</p>
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -174,11 +172,11 @@ export function ResetPasswordPage() {
                     <Lock className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="New password"
+                      placeholder={t('auth.newPassword')}
                       className="h-11 rounded-xl border-black/10 bg-white pr-10 pl-10 text-sm focus:border-black/25"
                       {...register('newPassword', {
-                        required: 'New password is required',
-                        minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                        required: t('auth.passwordRequired'),
+                        minLength: { value: 6, message: t('auth.passwordMinLength') },
                       })}
                     />
                     <button
@@ -197,11 +195,11 @@ export function ResetPasswordPage() {
                     <Lock className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                     <Input
                       type={showConfirmPassword ? 'text' : 'password'}
-                      placeholder="Confirm new password"
+                      placeholder={t('auth.confirmNewPassword')}
                       className="h-11 rounded-xl border-black/10 bg-white pr-10 pl-10 text-sm focus:border-black/25"
                       {...register('confirmPassword', {
-                        required: 'Please confirm your password',
-                        validate: (value) => value === newPassword || 'Passwords do not match',
+                        required: t('auth.confirmPasswordRequired'),
+                        validate: (value) => value === newPassword || t('auth.passwordsMustMatch'),
                       })}
                     />
                     <button
@@ -222,17 +220,17 @@ export function ResetPasswordPage() {
                   disabled={loading}
                   className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
                 >
-                  {loading ? 'Resetting...' : 'Update Password'}
+                  {loading ? t('common.loading') : t('auth.updatePassword')}
                 </Button>
               </form>
 
               <p className="text-muted-foreground mt-8 text-center text-sm">
-                Already remember your password?{' '}
+                {t('common.alreadyHaveAccount')}{' '}
                 <Link
                   to="/login"
                   className="text-foreground hover:text-foreground/70 font-semibold underline underline-offset-4 transition-colors"
                 >
-                  Sign in
+                  {t('common.signIn')}
                 </Link>
               </p>
             </>

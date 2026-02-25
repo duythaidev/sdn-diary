@@ -9,6 +9,7 @@ import { authService } from '@/services/api/authService'
 import { useProfile } from '@/hooks/useProfile'
 import { toast } from 'sonner'
 import { getAxiosErrorMessage } from '@/lib/error'
+import { useTranslation } from 'react-i18next'
 
 interface RegisterForm {
   name: string
@@ -18,6 +19,7 @@ interface RegisterForm {
 }
 
 export function RegisterPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { setUser } = useProfile()
   const [showPassword, setShowPassword] = useState(false)
@@ -43,7 +45,13 @@ export function RegisterPage() {
     return s
   })()
 
-  const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'][strength]
+  const strengthLabel = [
+    '',
+    t('auth.strength.weak'),
+    t('auth.strength.fair'),
+    t('auth.strength.good'),
+    t('auth.strength.strong'),
+  ][strength]
   const strengthColor = ['', 'bg-red-400', 'bg-yellow-400', 'bg-blue-400', 'bg-green-500'][strength]
 
   const onSubmit = async (data: RegisterForm) => {
@@ -51,10 +59,10 @@ export function RegisterPage() {
     try {
       const response = await authService.register(data.name, data.email, data.password)
       setUser(response.user)
-      toast.success('Registration successful!')
+      toast.success(t('auth.registerSuccess'))
       navigate('/dashboard')
     } catch (error) {
-      toast.error(getAxiosErrorMessage(error, 'Registration failed'))
+      toast.error(getAxiosErrorMessage(error, t('auth.registerFailed')))
     } finally {
       setLoading(false)
     }
@@ -85,16 +93,14 @@ export function RegisterPage() {
         <div className="space-y-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <h2 className="text-foreground/85 font-serif text-5xl leading-tight font-bold">
-              Start your
+              {t('auth.startStoryToday').split(' ').slice(0, 2).join(' ')}
               <br />
               <span className="relative inline-block">
-                <span className="relative z-10">story today.</span>
+                <span className="relative z-10">{t('auth.startStoryToday').split(' ').slice(2).join(' ')}</span>
                 <span className="absolute right-0 bottom-1 left-0 -z-0 h-3 -rotate-1 bg-yellow-200/60" />
               </span>
             </h2>
-            <p className="text-muted-foreground mt-4 font-serif text-lg leading-relaxed">
-              Join thousands of writers sharing their inner world — one entry at a time.
-            </p>
+            <p className="text-muted-foreground mt-4 font-serif text-lg leading-relaxed">{t('auth.joinThousands')}</p>
           </motion.div>
 
           <motion.div
@@ -104,10 +110,10 @@ export function RegisterPage() {
             className="grid grid-cols-2 gap-4"
           >
             {[
-              { value: '12k+', label: 'Writers' },
-              { value: '84k+', label: 'Entries' },
-              { value: 'Free', label: 'Always' },
-              { value: 'Private', label: 'By default' },
+              { value: '12k+', label: t('auth.writers') },
+              { value: '84k+', label: t('auth.entries') },
+              { value: t('auth.free'), label: t('auth.always') },
+              { value: t('auth.private'), label: t('auth.byDefault') },
             ].map((stat, i) => (
               <div key={i} className="rounded-xl border border-black/5 bg-white/60 p-4 backdrop-blur-sm">
                 <div className="text-foreground/85 font-serif text-2xl font-bold">{stat.value}</div>
@@ -123,10 +129,8 @@ export function RegisterPage() {
           transition={{ delay: 0.5 }}
           className="rounded-2xl border border-black/5 bg-white/70 p-5 backdrop-blur-sm"
         >
-          <p className="text-foreground/70 font-serif text-sm leading-relaxed italic">
-            "Writing is the painting of the voice."
-          </p>
-          <p className="text-muted-foreground mt-2 text-xs font-medium">— Voltaire</p>
+          <p className="text-foreground/70 font-serif text-sm leading-relaxed italic">{t('auth.quote')}</p>
+          <p className="text-muted-foreground mt-2 text-xs font-medium">— {t('auth.author')}</p>
         </motion.div>
       </div>
 
@@ -149,8 +153,8 @@ export function RegisterPage() {
           </div>
 
           <div className="mb-8">
-            <h3 className="text-foreground/90 font-serif text-3xl font-bold">Create account</h3>
-            <p className="text-muted-foreground mt-1 text-sm">Your journal awaits. It only takes a moment.</p>
+            <h3 className="text-foreground/90 font-serif text-3xl font-bold">{t('common.createAccount')}</h3>
+            <p className="text-muted-foreground mt-1 text-sm">{t('auth.createAccountDesc')}</p>
           </div>
 
           <div className="space-y-4">
@@ -177,12 +181,12 @@ export function RegisterPage() {
                   fill="#EA4335"
                 />
               </svg>
-              Sign up with Google
+              {t('auth.signUpWithGoogle')}
             </button>
 
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-black/8" />
-              <span className="text-muted-foreground text-xs font-medium">or register with email</span>
+              <span className="text-muted-foreground text-xs font-medium">{t('auth.orRegisterWithEmail')}</span>
               <div className="h-px flex-1 bg-black/8" />
             </div>
 
@@ -191,11 +195,11 @@ export function RegisterPage() {
                 <User className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                 <Input
                   type="text"
-                  placeholder="Full name"
+                  placeholder={t('common.fullName')}
                   className="h-11 rounded-xl border-black/10 bg-white pl-10 text-sm focus:border-black/25"
                   {...register('name', {
-                    required: 'Full name is required',
-                    minLength: { value: 3, message: 'Name must be at least 3 characters' },
+                    required: t('auth.nameRequired'),
+                    minLength: { value: 3, message: t('auth.nameMinLength') },
                   })}
                 />
                 {errors.name && <span className="ml-1 text-xs text-red-500">{errors.name.message}</span>}
@@ -205,11 +209,11 @@ export function RegisterPage() {
                 <Mail className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                 <Input
                   type="email"
-                  placeholder="Email address"
+                  placeholder={t('common.email')}
                   className="h-11 rounded-xl border-black/10 bg-white pl-10 text-sm focus:border-black/25"
                   {...register('email', {
-                    required: 'Email is required',
-                    pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' },
+                    required: t('auth.emailRequired'),
+                    pattern: { value: /^\S+@\S+\.\S+$/, message: t('auth.invalidEmail') },
                   })}
                 />
                 {errors.email && <span className="ml-1 text-xs text-red-500">{errors.email.message}</span>}
@@ -220,11 +224,11 @@ export function RegisterPage() {
                   <Lock className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Password"
+                    placeholder={t('common.password')}
                     className="h-11 rounded-xl border-black/10 bg-white pr-10 pl-10 text-sm focus:border-black/25"
                     {...register('password', {
-                      required: 'Password is required',
-                      minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                      required: t('auth.passwordRequired'),
+                      minLength: { value: 6, message: t('auth.passwordMinLength') },
                     })}
                   />
                   <button
@@ -252,7 +256,8 @@ export function RegisterPage() {
                       ))}
                     </div>
                     <p className="text-muted-foreground text-[11px]">
-                      Password strength: <span className="text-foreground/70 font-semibold">{strengthLabel}</span>
+                      {t('auth.passwordStrength')}:{' '}
+                      <span className="text-foreground/70 font-semibold">{strengthLabel}</span>
                     </p>
                   </motion.div>
                 )}
@@ -262,11 +267,11 @@ export function RegisterPage() {
                 <Lock className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                 <Input
                   type={showConfirm ? 'text' : 'password'}
-                  placeholder="Confirm password"
+                  placeholder={t('common.confirmPassword')}
                   className="h-11 rounded-xl border-black/10 bg-white pr-10 pl-10 text-sm focus:border-black/25"
                   {...register('confirm', {
-                    required: 'Please confirm your password',
-                    validate: (value) => value === password || 'Passwords do not match',
+                    required: t('auth.confirmPasswordRequired'),
+                    validate: (value) => value === password || t('auth.passwordsMustMatch'),
                   })}
                 />
                 <button
@@ -282,20 +287,20 @@ export function RegisterPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-11 w-full mt-2 rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
+                className="mt-2 h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
               >
-                {loading ? 'Creating account...' : 'Create Account'}
+                {loading ? t('common.loading') : t('common.createAccount')}
               </Button>
             </form>
           </div>
 
           <p className="text-muted-foreground mt-6 text-center text-sm">
-            Already have an account?{' '}
+            {t('common.alreadyHaveAccount')}{' '}
             <Link
               to="/login"
               className="text-foreground hover:text-foreground/70 font-semibold underline underline-offset-4 transition-colors"
             >
-              Sign in
+              {t('common.signIn')}
             </Link>
           </p>
         </motion.div>

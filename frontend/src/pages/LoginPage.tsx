@@ -9,6 +9,7 @@ import { authService } from '@/services/api/authService'
 import { useProfile } from '@/hooks/useProfile'
 import { toast } from 'sonner'
 import { getAxiosErrorMessage } from '@/lib/error'
+import { useTranslation } from 'react-i18next'
 
 interface LoginForm {
   email: string
@@ -16,6 +17,7 @@ interface LoginForm {
 }
 
 export function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { setUser } = useProfile()
   const [showPassword, setShowPassword] = useState(false)
@@ -32,10 +34,10 @@ export function LoginPage() {
     try {
       const response = await authService.login(data.email, data.password)
       setUser(response.user)
-      toast.success('Login successful!')
+      toast.success(t('auth.loginSuccess'))
       navigate('/dashboard')
     } catch (error) {
-      toast.error(getAxiosErrorMessage(error, 'Login failed'))
+      toast.error(getAxiosErrorMessage(error, t('auth.loginFailed')))
     } finally {
       setLoading(false)
     }
@@ -66,15 +68,13 @@ export function LoginPage() {
         <div className="space-y-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <h2 className="text-foreground/85 font-serif text-5xl leading-tight font-bold">
-              Every thought
-              <br />
               <span className="relative inline-block">
-                <span className="relative z-10">deserves a page.</span>
-                <span className="absolute right-0 bottom-1 left-0 -z-0 h-3 -rotate-1 bg-yellow-200/60" />
+                {t('auth.everyThoughtDeservesAPage')}
+                <span className="absolute inset-x-0 bottom-1 -z-0 h-3 -rotate-1 bg-yellow-200/60" />
               </span>
             </h2>
             <p className="text-muted-foreground mt-4 font-serif text-lg leading-relaxed">
-              Your private space to write, reflect, and share stories with the world.
+              {t('auth.yourPrivateSpace')}
             </p>
           </motion.div>
 
@@ -84,20 +84,22 @@ export function LoginPage() {
             transition={{ delay: 0.3 }}
             className="flex flex-col gap-4"
           >
-            {['Keep a daily streak', 'Share entries publicly', "Discover others' stories"].map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="bg-foreground/30 h-1.5 w-1.5 rounded-full" />
-                <span className="text-muted-foreground text-sm font-medium">{item}</span>
-              </div>
-            ))}
+            {[t('auth.keepDailyStreak'), t('auth.shareEntriesPublicly'), t('auth.discoverOthersStories')].map(
+              (item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="bg-foreground/30 h-1.5 w-1.5 rounded-full" />
+                  <span className="text-muted-foreground text-sm font-medium">{item}</span>
+                </div>
+              ),
+            )}
           </motion.div>
         </div>
 
         <div className="flex gap-3">
           {[
-            { color: 'bg-[#fefce8]', rotate: '-rotate-2', label: 'Gratitude' },
-            { color: 'bg-[#f0f9ff]', rotate: 'rotate-1', label: 'Dreams' },
-            { color: 'bg-[#fdf2f8]', rotate: '-rotate-1', label: 'Ideas' },
+            { color: 'bg-[#fefce8]', rotate: '-rotate-2', label: t('auth.gratitude') },
+            { color: 'bg-[#f0f9ff]', rotate: 'rotate-1', label: t('auth.dreams') },
+            { color: 'bg-[#fdf2f8]', rotate: '-rotate-1', label: t('auth.ideas') },
           ].map((note, i) => (
             <motion.div
               key={i}
@@ -132,8 +134,8 @@ export function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h3 className="text-foreground/90 font-serif text-3xl font-bold">Welcome back</h3>
-            <p className="text-muted-foreground mt-1 text-sm">Sign in to continue your journaling journey.</p>
+            <h3 className="text-foreground/90 font-serif text-3xl font-bold">{t('auth.welcomeBack')}</h3>
+            <p className="text-muted-foreground mt-1 text-sm">{t('auth.signInToContinue')}</p>
           </div>
 
           <div className="space-y-4">
@@ -160,12 +162,12 @@ export function LoginPage() {
                   fill="#EA4335"
                 />
               </svg>
-              Continue with Google
+              {t('auth.continueWithGoogle')}
             </button>
 
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-black/8" />
-              <span className="text-muted-foreground text-xs font-medium">or continue with email</span>
+              <span className="text-muted-foreground text-xs font-medium">{t('auth.orContinueWithEmail')}</span>
               <div className="h-px flex-1 bg-black/8" />
             </div>
 
@@ -175,9 +177,9 @@ export function LoginPage() {
                   <Mail className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                   <Input
                     type="email"
-                    placeholder="Email address"
+                    placeholder={t('common.email')}
                     className="h-11 rounded-xl border-black/10 bg-white pl-10 text-sm focus:border-black/25"
-                    {...register('email', { required: 'Email is required' })}
+                    {...register('email', { required: t('auth.emailRequired') })}
                   />
                   {errors.email && <span className="ml-1 text-xs text-red-500">{errors.email.message}</span>}
                 </div>
@@ -186,9 +188,9 @@ export function LoginPage() {
                   <Lock className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Password"
+                    placeholder={t('common.password')}
                     className="h-11 rounded-xl border-black/10 bg-white pr-10 pl-10 text-sm focus:border-black/25"
-                    {...register('password', { required: 'Password is required' })}
+                    {...register('password', { required: t('auth.passwordRequired') })}
                   />
                   <button
                     type="button"
@@ -207,7 +209,7 @@ export function LoginPage() {
                     type="button"
                     className="text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
                   >
-                    Forgot password?
+                    {t('common.forgotPassword')}
                   </button>
                 </Link>
               </div>
@@ -217,18 +219,18 @@ export function LoginPage() {
                 disabled={loading}
                 className="h-11 w-full rounded-xl font-serif text-base shadow-md transition-all hover:shadow-lg"
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? t('common.loading') : t('common.signIn')}
               </Button>
             </form>
           </div>
 
           <p className="text-muted-foreground mt-6 text-center text-sm">
-            Don't have an account?{' '}
+            {t('common.dontHaveAccount')}{' '}
             <Link
               to="/register"
               className="text-foreground hover:text-foreground/70 font-semibold underline underline-offset-4 transition-colors"
             >
-              Create one
+              {t('common.createAccount')}
             </Link>
           </p>
         </motion.div>

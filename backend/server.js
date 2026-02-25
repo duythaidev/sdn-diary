@@ -39,7 +39,9 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(morgan('combined'));
+const customFormat = ':method :url :status :res[content-length] - :response-time ms';
+
+app.use(morgan(customFormat));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/diary', diaryRoutes);

@@ -65,6 +65,7 @@ import { createPortal } from 'react-dom'
 import { defaultTheme } from './theme'
 import './styles.css'
 import { cn, getHTMLFromEditor, setHTMLToEditor, toBase64 } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 type TableConfig = {
   rows?: number
@@ -144,6 +145,7 @@ function EditorContent({
   onChange?: (content: string) => void
   content?: string
 }) {
+  const {t} = useTranslation()
   const { commands, hasExtension, activeStates, editor } = useEditor()
 
   useEffect(() => {
@@ -182,7 +184,7 @@ function EditorContent({
         <div className="flex flex-1 flex-col">
           <RichTextPlugin
             contentEditable={<ContentEditable className="lexkit-content-editable" />}
-            placeholder={<div className="lexkit-placeholder">Start typing...</div>}
+            placeholder={<div className="lexkit-placeholder">{t('editor.placeholder')}</div>}
             ErrorBoundary={ErrorBoundary}
           />
           <FloatingToolbarRenderer />

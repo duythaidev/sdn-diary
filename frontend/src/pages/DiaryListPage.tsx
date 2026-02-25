@@ -14,6 +14,10 @@ import {
   List as ListIcon,
   PlusCircle,
   Loader2,
+  Globe,
+  Lock,
+  FileText,
+  Eye,
 } from 'lucide-react'
 import DiaryCardItem from '@/components/diary/DiaryCardItem'
 import { MOODS } from '@/constants'
@@ -23,8 +27,19 @@ import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import CreateDiaryButton from '@/components/common/CreateDiaryButton'
 import { format } from 'date-fns'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
+import { useTranslation } from 'react-i18next'
+
+type StatusFilter = 'all' | 'public' | 'private' | 'draft'
+
+const STATUS_OPTIONS: { value: StatusFilter; labelKey: string; icon: React.ReactNode }[] = [
+  { value: 'all', labelKey: 'diaries.statusAll', icon: <Eye className="size-4" /> },
+  { value: 'public', labelKey: 'diaries.statusPublic', icon: <Globe className="size-4" /> },
+  { value: 'private', labelKey: 'diaries.statusPrivate', icon: <Lock className="size-4" /> },
+  { value: 'draft', labelKey: 'diaries.statusDraft', icon: <FileText className="size-4" /> },
+]
 
 export const DiaryListPage = () => {
+  const { t } = useTranslation()
   const {
     diaries,
     loading,
@@ -33,17 +48,20 @@ export const DiaryListPage = () => {
     setDateFilter,
     setMoodFilter,
     setTagsFilter,
+    setStatusFilter,
     searchQuery,
     setSearchQuery,
     dateFilter,
     moodFilter,
     tagsFilter,
+    statusFilter,
     loadMore,
   } = useGetUserDiaries()
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const activeMood = MOODS.find((option) => option.value === moodFilter)
+  const activeStatus = STATUS_OPTIONS.find((o) => o.value === statusFilter)
 
   const sentinelRef = useInfiniteScroll({
     loading: loadingMore,
@@ -52,25 +70,27 @@ export const DiaryListPage = () => {
     rootMargin: '200px',
   })
 
+  const activeFilterCount = [moodFilter !== 'all', tagsFilter !== 'all', statusFilter !== 'all'].filter(Boolean).length
+
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 border-b border-black/5 pb-6 md:flex-row md:items-center">
         <div>
           <h1 className="text-foreground/90 flex items-center gap-3 font-serif text-3xl font-bold">
-            My Entries
+            {t('diaries.title')}
             <span className="text-muted-foreground rounded-full bg-black/5 px-2 py-1 font-sans text-sm font-normal">
-              {diaries.length} Entries
+              {t('common.entries', { count: diaries.length })}
             </span>
           </h1>
-          <p className="text-muted-foreground mt-1">Your private collection of thoughts and memories.</p>
+          <p className="text-muted-foreground mt-1">{t('diaries.subtitle')}</p>
         </div>
 
         <div className="flex w-full gap-2 md:w-auto">
           <div className="relative flex-1 md:w-64">
             <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
-              placeholder="Search entries..."
+              placeholder={t('diaries.searchPlaceholder')}
               className="bg-white pl-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -79,7 +99,7 @@ export const DiaryListPage = () => {
           <Link to="/diary/create">
             <Button className="font-serif shadow-md">
               <PlusCircle className="mr-2 size-4" />
-              New Entry
+              {t('common.newEntry')}
             </Button>
           </Link>
         </div>
@@ -97,7 +117,7 @@ export const DiaryListPage = () => {
                 className="h-8 border-dashed border-black/20 bg-transparent hover:bg-black/5"
               >
                 <Calendar className="mr-2 size-3.5" />
-                {dateFilter === 'newest' ? 'Newest First' : 'Oldest First'}
+                {dateFilter === 'newest' ? t('diaries.newestFirst') : t('diaries.oldestFirst')}
                 <ChevronDown className="ml-1 size-3 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
@@ -107,14 +127,14 @@ export const DiaryListPage = () => {
                 onClick={() => setDateFilter('newest')}
               >
                 <Calendar className="mr-2 h-4 w-4" />
-                Newest First
+                {t('diaries.newestFirst')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={cn('cursor-pointer', dateFilter === 'oldest' && 'font-semibold')}
                 onClick={() => setDateFilter('oldest')}
               >
                 <Calendar className="mr-2 h-4 w-4" />
-                Oldest First
+                {t('diaries.oldestFirst')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -134,7 +154,7 @@ export const DiaryListPage = () => {
                     {activeMood.label}
                   </>
                 ) : (
-                  'All Moods'
+                  t('diaries.allMoods')
                 )}
                 <ChevronDown className="ml-1 size-3 opacity-50" />
               </Button>
@@ -144,7 +164,7 @@ export const DiaryListPage = () => {
                 className={cn('cursor-pointer', moodFilter === 'all' && 'font-semibold')}
                 onClick={() => setMoodFilter('all')}
               >
-                All Moods
+                {t('diaries.allMoods')}
               </DropdownMenuItem>
               <div className="my-1 h-px bg-black/5" />
               {MOODS.map((mood) => (
@@ -160,23 +180,52 @@ export const DiaryListPage = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Status Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  'h-8 border-dashed border-black/20 bg-transparent hover:bg-black/5',
+                  statusFilter !== 'all' && 'border-primary/40 bg-primary/5 text-primary',
+                )}
+              >
+                <span className="mr-2 flex items-center">{activeStatus?.icon}</span>
+                {t(activeStatus?.labelKey ?? 'diaries.statusAll')}
+                <ChevronDown className="ml-1 size-3 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="min-w-[180px]">
+              {STATUS_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  className={cn('cursor-pointer gap-2', statusFilter === option.value && 'font-semibold')}
+                  onClick={() => setStatusFilter(option.value)}
+                >
+                  {option.icon}
+                  {t(option.labelKey)}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Tags Filter */}
           <div className="relative">
             <Tag className="absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-
             <Input
-              placeholder="Filter by tag..."
-              className="h-8 border-dashed border-black/20 bg-transparent pl-9 hover:bg-black/5 transition-all"
+              placeholder={t('diaries.filterByTag')}
+              className="h-8 border-dashed border-black/20 bg-transparent pl-9 transition-all hover:bg-black/5"
               value={tagsFilter === 'all' ? '' : tagsFilter}
               onChange={(e) => setTagsFilter(e.target.value.trim())}
             />
           </div>
 
           {/* Active Filters indicator */}
-          {(moodFilter !== 'all' || tagsFilter !== 'all') && (
+          {activeFilterCount > 0 && (
             <span className="text-primary border-primary/20 bg-primary/5 flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
               <span className="bg-primary h-1.5 w-1.5 animate-pulse rounded-full" />
-              {[moodFilter !== 'all' && 'mood', tagsFilter !== 'all' && 'tag'].filter(Boolean).length} Public
+              {activeFilterCount} {t('common.active')}
             </span>
           )}
         </div>
@@ -246,7 +295,23 @@ export const DiaryListPage = () => {
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <h3 className="mb-2 truncate font-serif text-xl font-bold">{diary.title}</h3>
+                      <div className="mb-2 flex items-center gap-2">
+                        <h3 className="truncate font-serif text-xl font-bold">{diary.title}</h3>
+                        {/* Status badge */}
+                        {diary.isDraft ? (
+                          <span className="text-muted-foreground shrink-0 rounded bg-black/5 px-2 py-0.5 font-mono text-[10px]">
+                            draft
+                          </span>
+                        ) : diary.isPublic ? (
+                          <span className="shrink-0 rounded bg-green-50 px-2 py-0.5 font-mono text-[10px] text-green-700">
+                            public
+                          </span>
+                        ) : (
+                          <span className="shrink-0 rounded bg-orange-50 px-2 py-0.5 font-mono text-[10px] text-orange-700">
+                            private
+                          </span>
+                        )}
+                      </div>
                       <p className="text-muted-foreground mb-3 line-clamp-2 text-sm">
                         {diary.content.replace(/<[^>]*>/g, '').substring(0, 150)}
                       </p>
@@ -273,7 +338,7 @@ export const DiaryListPage = () => {
               <div className="mt-8 flex justify-center">
                 <div className="text-muted-foreground flex items-center gap-2">
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  <span className="text-sm">Loading more entries...</span>
+                  <span className="text-sm">{t('diaries.loadingMore')}</span>
                 </div>
               </div>
             )}
@@ -284,7 +349,7 @@ export const DiaryListPage = () => {
             {/* End of results */}
             {!hasMore && diaries.length > 0 && (
               <div className="mt-12 flex justify-center">
-                <p className="text-muted-foreground font-serif text-sm">You've reached the end ✦</p>
+                <p className="text-muted-foreground font-serif text-sm">{t('common.endOfList')}</p>
               </div>
             )}
           </>
@@ -293,8 +358,8 @@ export const DiaryListPage = () => {
             <div className="bg-muted mb-4 inline-flex h-20 w-20 animate-bounce items-center justify-center rounded-full">
               <Search className="text-muted-foreground size-10" />
             </div>
-            <p className="text-muted-foreground font-serif text-xl">No entries found.</p>
-            {searchQuery || moodFilter !== 'all' || tagsFilter !== 'all' ? (
+            <p className="text-muted-foreground font-serif text-xl">{t('diaries.noEntriesFound')}</p>
+            {searchQuery || moodFilter !== 'all' || tagsFilter !== 'all' || statusFilter !== 'all' ? (
               <Button
                 variant="link"
                 className="text-primary mt-2"
@@ -302,14 +367,15 @@ export const DiaryListPage = () => {
                   setSearchQuery('')
                   setMoodFilter('all')
                   setTagsFilter('all')
+                  setStatusFilter('all')
                 }}
               >
-                Clear filters
+                {t('common.clearFilters')}
               </Button>
             ) : (
               <Link to="/diary/create">
                 <Button variant="link" className="text-primary mt-2">
-                  Create your first entry
+                  {t('diaries.createFirstEntry')}
                 </Button>
               </Link>
             )}

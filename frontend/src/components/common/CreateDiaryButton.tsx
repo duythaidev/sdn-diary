@@ -2,8 +2,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Edit } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const CreateDiaryButton = () => {
+    const { t } = useTranslation();
     return (
         <TooltipProvider delayDuration={100}>
           <Tooltip>
@@ -16,7 +18,7 @@ const CreateDiaryButton = () => {
             </TooltipTrigger>
 
             <TooltipContent side="left" className="text-sm">
-              Create new diary
+              {t('sidebar.createDiary')}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
