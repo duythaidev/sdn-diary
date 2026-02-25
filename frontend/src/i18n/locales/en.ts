@@ -275,6 +275,9 @@ const en = {
       backToHome: 'Back to home page',
     },
   },
+  editor: {
+    placeholder: 'Write something…',
+  },
 }
 
 export default en

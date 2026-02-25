@@ -23,7 +23,7 @@ const vi = {
     history: 'Lịch sử',
     newEntry: 'Bài mới',
     viewAll: 'Xem hết',
-    untitled: 'Chưa đặt tên',
+    untitled: 'Tiêu đề',
     search: 'Tìm kiếm...',
     loadMore: 'Xem thêm',
     endOfList: 'Đã hết rồi nè ✦',
@@ -271,6 +271,9 @@ const vi = {
       description: 'Trang bạn tìm không tồn tại. Về trang chủ thử xem sao nhé?',
       backToHome: 'Về trang chủ',
     },
+  },
+  editor: {
+    placeholder: 'Viết gì đó…',
   },
 }
 

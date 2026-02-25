@@ -2,16 +2,17 @@ import { useForm, useWatch } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Editor } from '../editor/Editor'
-import { Save, Send, ChevronLeft, Lock, Globe, Tag, Hash, Smile, Image as ImageIcon, X, Eye } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { Save, Send, ChevronLeft, Lock, Globe, Tag, Hash, Smile, Image as ImageIcon, X, Eye, CheckCheck, Loader2, CloudOff, Clock } from 'lucide-react'
+import { useRef, useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { DiaryPreviewModal } from './DiaryPreviewModal'
 import { MOODS } from '@/constants'
 import { Input } from '@/components/ui/input'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import type { AutosaveStatus } from '@/hooks/useAutosave'
 
 interface DiaryFormData {
   title: string
@@ -31,15 +32,71 @@ interface DiaryFormProps {
   initialData?: DiaryFormData
   onSubmit: (data: DiaryFormData) => Promise<void>
   loading?: boolean
+  // Autosave props — only used in create mode
+  autosaveStatus?: AutosaveStatus
+  onFieldChange?: (data: DiaryFormData) => void
 }
 
-export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: DiaryFormProps) => {
+// ─── Autosave status indicator ───────────────────────────────────────────────
+const AutosaveIndicator = ({ status }: { status: AutosaveStatus }) => {
+  const { t } = useTranslation()
+
+  const config = {
+    idle: {
+      icon: <Clock className="size-3.5" />,
+      label: t('form.draftSavedNow'),
+      className: 'text-muted-foreground',
+    },
+    saving: {
+      icon: <Loader2 className="size-3.5 animate-spin" />,
+      label: t('form.autosaving'),
+      className: 'text-muted-foreground',
+    },
+    saved: {
+      icon: <CheckCheck className="size-3.5 text-green-500" />,
+      label: t('form.autosaved'),
+      className: 'text-green-600',
+    },
+    error: {
+      icon: <CloudOff className="size-3.5 text-red-400" />,
+      label: t('form.autosaveError'),
+      className: 'text-red-500',
+    },
+  }[status]
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.span
+        key={status}
+        initial={{ opacity: 0, y: -4 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 4 }}
+        transition={{ duration: 0.15 }}
+        className={cn('hidden items-center gap-1.5 font-mono text-xs sm:flex', config.className)}
+      >
+        {config.icon}
+        {config.label}
+      </motion.span>
+    </AnimatePresence>
+  )
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+export const DiaryForm = ({
+  mode,
+  initialData,
+  onSubmit,
+  loading = false,
+  autosaveStatus = 'idle',
+  onFieldChange,
+}: DiaryFormProps) => {
   const { t, i18n } = useTranslation()
   const {
     register,
     handleSubmit,
     setValue,
     control,
+    getValues,
     formState: { errors },
   } = useForm<DiaryFormData>({
     defaultValues: initialData || {
@@ -67,6 +124,14 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
 
   const selectedMoodData = MOODS.find((m) => m.value === selectedMood)
 
+  // Notify parent of field changes for autosave scheduling
+  const notifyChange = () => {
+    if (onFieldChange) {
+      // Small timeout so form values are settled
+      setTimeout(() => onFieldChange(getValues()), 0)
+    }
+  }
+
   const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -79,29 +144,38 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
       return
     }
     const reader = new FileReader()
-    reader.onloadend = () => setValue('coverPhoto', reader.result as string)
+    reader.onloadend = () => {
+      setValue('coverPhoto', reader.result as string)
+      notifyChange()
+    }
     reader.readAsDataURL(file)
   }
 
   const removeCoverPhoto = () => {
     setValue('coverPhoto', null)
     if (fileInputRef.current) fileInputRef.current.value = ''
+    notifyChange()
   }
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && currentTag.trim()) {
       e.preventDefault()
       const trimmed = currentTag.trim().toLowerCase()
-      if (!tags.includes(trimmed)) setValue('tags', [...tags, trimmed])
+      if (!tags.includes(trimmed)) {
+        setValue('tags', [...tags, trimmed])
+        notifyChange()
+      }
       setCurrentTag('')
     }
   }
 
-  const removeTag = (tag: string) =>
+  const removeTag = (tag: string) => {
     setValue(
       'tags',
       tags.filter((t) => t !== tag),
     )
+    notifyChange()
+  }
 
   const handlePreview = () => {
     if (!title || !content) {
@@ -130,9 +204,14 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
             </Button>
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground mr-2 hidden text-sm sm:inline-block">
-              {loading ? t('common.saving') : t('form.draftSavedNow')}
-            </span>
+            {/* Autosave status — only in create mode */}
+            {mode === 'create' && <AutosaveIndicator status={autosaveStatus} />}
+            {/* In edit mode, keep the old static label */}
+            {mode === 'edit' && (
+              <span className="text-muted-foreground hidden text-sm sm:inline-block">
+                {loading ? t('common.saving') : t('form.draftSavedNow')}
+              </span>
+            )}
             <Button
               variant="outline"
               className="border-black/10 bg-white hover:bg-black/5"
@@ -163,13 +242,11 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* Main Writing Area — The "Paper" */}
+          {/* Main Writing Area */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2">
             <div className="relative flex min-h-[800px] flex-col overflow-hidden rounded-sm border border-black/5 bg-white shadow-xl">
-              {/* Top paper edge */}
               <div className="absolute top-0 left-0 h-2 w-full bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 opacity-50" />
 
-              {/* Content Area */}
               <div className="relative flex-1 p-8 md:p-12">
                 {/* Date Stamp */}
                 <div className="pointer-events-none absolute top-6 right-8 rotate-3 rounded border-2 border-red-200 px-2 py-1 font-mono text-xs tracking-widest text-red-300 uppercase opacity-70 select-none">
@@ -188,30 +265,31 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                   {...register('title', {
                     required: t('form.titleRequired'),
                     maxLength: { value: 200, message: t('form.titleTooLong') },
+                    onChange: notifyChange,
                   })}
                 />
                 {errors.title && <p className="text-destructive mb-2 text-sm">{errors.title.message}</p>}
 
-                {/* Editor / Textarea */}
+                {/* Editor */}
                 <div className={cn('min-h-[500px]')}>
-                  <Editor onChange={(val) => setValue('content', val)} content={content} />
+                  <Editor
+                    onChange={(val) => {
+                      setValue('content', val)
+                      notifyChange()
+                    }}
+                    content={content}
+                  />
                 </div>
                 {errors.content && <p className="text-destructive mt-2 text-sm">{errors.content.message}</p>}
               </div>
             </div>
           </motion.div>
 
-          {/* Sidebar — "Desk Accessories" */}
+          {/* Sidebar */}
           <div className="space-y-6">
             {/* Cover Image Card */}
             <div className="rounded-xl border border-black/5 bg-white p-1 shadow-sm">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleCoverPhotoChange}
-              />
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleCoverPhotoChange} />
               {coverPhoto ? (
                 <div className="relative h-48 overflow-hidden rounded-lg">
                   <img src={coverPhoto} alt="Cover" className="h-full w-full object-cover" />
@@ -236,7 +314,6 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
 
             {/* Metadata Card */}
             <div className="relative overflow-hidden rounded-xl border border-black/5 bg-[#fdfbf7] p-6 shadow-sm">
-              {/* Washi tape decoration */}
               <div className="absolute top-0 left-1/2 h-4 w-32 -translate-x-1/2 -rotate-1 bg-rose-200/50 opacity-80" />
 
               <h3 className="mb-4 flex items-center gap-2 font-serif text-lg font-bold">
@@ -252,9 +329,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      setValue('isPublic', false)
-                    }}
+                    onClick={() => { setValue('isPublic', false); notifyChange() }}
                     className={cn(
                       'flex items-center justify-center gap-2 rounded-lg border p-2 text-sm transition-all',
                       !isPublic
@@ -267,9 +342,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      setValue('isPublic', true)
-                    }}
+                    onClick={() => { setValue('isPublic', true); notifyChange() }}
                     className={cn(
                       'flex items-center justify-center gap-2 rounded-lg border p-2 text-sm transition-all',
                       isPublic
@@ -293,7 +366,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                     <button
                       key={mood.value}
                       type="button"
-                      onClick={() => setValue('selectedMood', mood.value)}
+                      onClick={() => { setValue('selectedMood', mood.value); notifyChange() }}
                       title={mood.label}
                       className={cn(
                         'relative flex aspect-square items-center justify-center rounded-lg text-2xl transition-all hover:bg-black/5',
@@ -307,10 +380,7 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                   ))}
                 </div>
                 {selectedMoodData && (
-                  <p
-                    className="mt-2 text-center font-mono text-xs font-medium"
-                    style={{ color: selectedMoodData.color }}
-                  >
+                  <p className="mt-2 text-center font-mono text-xs font-medium" style={{ color: selectedMoodData.color }}>
                     {selectedMoodData.label}
                   </p>
                 )}
@@ -321,7 +391,6 @@ export const DiaryForm = ({ mode, initialData, onSubmit, loading = false }: Diar
                 <label className="text-muted-foreground mb-2 block text-xs font-bold tracking-wider uppercase">
                   {t('common.tags')}
                 </label>
-
                 <div className="relative">
                   <Hash className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
                   <Input
