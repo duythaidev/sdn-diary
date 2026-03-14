@@ -140,7 +140,7 @@ export const DiaryDetailPage = () => {
               </Button>
             </Link>
           )}
-          {diary.isPublic && (
+          {(diary.isPublic && !diary.isDraft) && (
             <Button
               onClick={handleShare}
               variant="ghost"
@@ -242,8 +242,8 @@ export const DiaryDetailPage = () => {
                     <span>
                       {t('detail.updated')}{' '}
                       {new Date(diary.updatedAt).toLocaleDateString('vi-VN', {
-                        month: 'short',
                         day: 'numeric',
+                        month: 'numeric',
                         year: 'numeric',
                       })}
                     </span>

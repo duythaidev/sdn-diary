@@ -11,6 +11,7 @@ interface LikeButtonProps {
   onLike: (diaryId: string) => Promise<{ likesCount: number; isLiked: boolean }>
   variant?: 'default' | 'compact' | 'detail'
   className?: string
+  disabled?: boolean
 }
 
 export const LikeButton = ({
@@ -20,6 +21,7 @@ export const LikeButton = ({
   onLike,
   variant = 'default',
   className,
+  disabled = false,
 }: LikeButtonProps) => {
   const [isLiked, setIsLiked] = useState(initialIsLiked)
   const [likesCount, setLikesCount] = useState(initialLikesCount)
@@ -30,7 +32,7 @@ export const LikeButton = ({
     e.preventDefault()
     e.stopPropagation()
 
-    if (isLoading) return
+    if (isLoading || disabled) return
 
     setIsLoading(true)
     setIsAnimating(true)
@@ -60,7 +62,7 @@ export const LikeButton = ({
     return (
       <button
         onClick={handleLike}
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         className={cn(
           'group flex items-center gap-1.5 transition-all',
           'hover:scale-105',

@@ -196,7 +196,10 @@ export const Navbar = () => {
                       </div>
                       {diary.content && (
                         <p className="text-muted-foreground line-clamp-1 text-sm">
-                          {diary.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                          {diary.content
+                            .replace(/<figcaption[^>]*>.*?<\/figcaption>/gis, '')
+                            .replace(/<[^>]*>/g, '')
+                            .substring(0, 100)}...
                         </p>
                       )}
                     </div>

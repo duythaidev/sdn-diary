@@ -243,10 +243,10 @@ function useImageHandlers(commands: EditorCommands, _editor: LexicalEditor | nul
   const handlers = useMemo(
     () => ({
       insertFromUrl: () => {
-        const src = prompt('Enter image URL:')
+        const src = prompt('Nhập URL ảnh:')
         if (!src) return
-        const alt = prompt('Enter alt text:') || ''
-        const caption = prompt('Enter caption (optional):') || undefined
+        const alt = prompt('Nhập alt text:') || ''
+        const caption = prompt('Nhập caption (optional):') || undefined
         commands.insertImage({ src, alt, caption })
       },
       insertFromFile: () => fileInputRef.current?.click(),
@@ -664,7 +664,7 @@ function Toolbar({
                 }}
                 type='button'
               >
-                <Link size={16} /> From URL
+                <Link size={16} /> Nhập URL
               </button>
               <button
                 className="lexkit-dropdown-item"
@@ -674,10 +674,10 @@ function Toolbar({
                 }}
                 type='button'
               >
-                <Upload size={16} /> Upload File
+                <Upload size={16} /> Tải File lên
               </button>
             </Dropdown>
-            {activeStates.imageSelected && (
+            {/* {activeStates.imageSelected && (
               <Dropdown
                 trigger={
                   <button className="lexkit-toolbar-button" title="Align Image">
@@ -724,7 +724,7 @@ function Toolbar({
                   <Type size={16} /> Set Caption
                 </button>
               </Dropdown>
-            )}
+            )} */}
             <input
               ref={fileInputRef}
               type="file"

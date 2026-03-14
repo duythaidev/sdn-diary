@@ -251,7 +251,10 @@ export const DashboardPage = () => {
                       </span>
                     </div>
                     <p className="text-muted-foreground line-clamp-2 text-xs">
-                      {diary.content.replace(/<[^>]*>/g, '').substring(0, 120)}...
+                      {diary.content
+                        .replace(/<figcaption[^>]*>.*?<\/figcaption>/gis, '')
+                        .replace(/<[^>]*>/g, '')
+                        .substring(0, 120)}...
                     </p>
                   </div>
                 </Link>

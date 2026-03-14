@@ -179,7 +179,11 @@ const DiaryCardItem = ({
 
             {/* Content preview */}
             <p className="text-muted-foreground mb-5 line-clamp-4 font-serif text-sm leading-relaxed">
-              {diary.content.replace(/<[^>]*>/g, '').substring(0, 200)}...
+              {diary.content
+                .replace(/<figcaption[^>]*>.*?<\/figcaption>/gis, '')
+                .replace(/<[^>]*>/g, '')
+                .substring(0, 200)}
+              ...
             </p>
 
             {/* Tags */}
@@ -221,6 +225,7 @@ const DiaryCardItem = ({
                     initialIsLiked={diary.isLiked || false}
                     onLike={handleLike}
                     variant="compact"
+                    disabled={!shouldShowPrivacy}
                   />
                   {diary.allowComments && (
                     <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium transition-colors hover:text-blue-500">

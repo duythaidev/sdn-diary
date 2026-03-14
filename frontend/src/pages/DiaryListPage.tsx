@@ -274,13 +274,13 @@ export const DiaryListPage = () => {
 
                     <div className="flex min-w-[60px] flex-col items-center justify-center border-r border-dashed border-black/10 py-2 pr-6 text-center">
                       <span className="text-foreground/80 font-serif text-2xl font-bold">
-                        {format(new Date(diary.createdAt), 'dd')}
+                        {new Date(diary.createdAt).toLocaleDateString('vi-VN', { day: '2-digit' })}
                       </span>
                       <span className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
-                        {format(new Date(diary.createdAt), 'MMM')}
+                        {new Date(diary.createdAt).toLocaleDateString('vi-VN', { month: 'short' }).toUpperCase()}
                       </span>
                       <span className="text-muted-foreground mt-1 text-xs">
-                        {format(new Date(diary.createdAt), 'yyyy')}
+                        {new Date(diary.createdAt).toLocaleDateString('vi-VN', { year: 'numeric' })}
                       </span>
                     </div>
 
@@ -303,7 +303,10 @@ export const DiaryListPage = () => {
                         )}
                       </div>
                       <p className="text-muted-foreground mb-3 line-clamp-2 text-sm">
-                        {diary.content.replace(/<[^>]*>/g, '').substring(0, 150)}
+                        {diary.content
+                          .replace(/<figcaption[^>]*>.*?<\/figcaption>/gis, '')
+                          .replace(/<[^>]*>/g, '')
+                          .substring(0, 150)}
                       </p>
                       {diary.tags && diary.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">

@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -19,13 +19,13 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
   try {
     const transporter = createTransporter();
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
     const mailOptions = {
-      from: `"Personal Journal App" <${process.env.EMAIL_USER}>`,
+      from: `"Nhật Ký Cá Nhân" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'Password Reset Request',
+      subject: "Yêu cầu đặt lại mật khẩu",
       html: `
         <!DOCTYPE html>
         <html>
@@ -74,21 +74,21 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
           <body>
             <div class="container">
               <div class="header">
-                <h1>Password Reset Request</h1>
+                <h1>Yêu cầu đặt lại mật khẩu</h1>
               </div>
               <div class="content">
-                <p>Hello,</p>
-                <p>We received a request to reset your password for your Personal Journal App account.</p>
-                <p>Click the button below to reset your password. This link will expire in <strong>15 minutes</strong>.</p>
+                <p>Xin chào,</p>
+                <p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản Nhật Ký Cá Nhân của bạn.</p>
+                <p>Hãy nhấn vào nút bên dưới để đặt lại mật khẩu. Liên kết này sẽ hết hạn sau <strong>15 phút</strong>.</p>
                 <div style="text-align: center;">
-                  <a href="${resetUrl}" class="button">Reset Password</a>
+                  <a href="${resetUrl}" class="button">Đặt lại mật khẩu</a>
                 </div>
-                <p>Or copy and paste this link into your browser:</p>
+                <p>Hoặc bạn có thể sao chép và dán đường dẫn này vào trình duyệt:</p>
                 <p style="word-break: break-all; color: #0066cc;">${resetUrl}</p>
-                <p>If you didn't request a password reset, please ignore this email. Your password will remain unchanged.</p>
+                <p>Nếu bạn không yêu cầu đặt lại mật khẩu, hãy bỏ qua email này. Mật khẩu của bạn sẽ không thay đổi.</p>
                 <div class="footer">
-                  <p>This is an automated email. Please do not reply to this message.</p>
-                  <p>© 2024 Personal Journal App. All rights reserved.</p>
+                  <p>Đây là email tự động, vui lòng không trả lời email này.</p>
+                  <p>© 2026 Nhật Ký Cá Nhân. Bảo lưu mọi quyền.</p>
                 </div>
               </div>
             </div>
@@ -96,26 +96,26 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
         </html>
       `,
       text: `
-        Password Reset Request
+        Yêu cầu đặt lại mật khẩu
         
-        Hello,
+        Xin chào,
         
-        We received a request to reset your password for your Personal Journal App account.
+        Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản Nhật Ký Cá Nhân của bạn.
         
-        Click the link below to reset your password. This link will expire in 15 minutes.
+        Nhấn vào liên kết dưới đây để đặt lại mật khẩu. Liên kết sẽ hết hạn sau 15 phút.
         
         ${resetUrl}
         
-        If you didn't request a password reset, please ignore this email. Your password will remain unchanged.
+        Nếu bạn không yêu cầu đặt lại mật khẩu, hãy bỏ qua email này. Mật khẩu của bạn sẽ không thay đổi.
         
-        © 2024 Personal Journal App. All rights reserved.
+        © 2026 Nhật Ký Cá Nhân. Bảo lưu mọi quyền.
       `,
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`Password reset email sent to ${email}`);
+    console.log(`Đã gửi email đặt lại mật khẩu tới ${email}`);
   } catch (error) {
-    console.error('Error sending password reset email:', error);
-    throw new Error('Failed to send password reset email');
+    console.error("Lỗi khi gửi email đặt lại mật khẩu:", error);
+    throw new Error("Không thể gửi email đặt lại mật khẩu");
   }
 };

@@ -196,14 +196,14 @@ export const DiaryForm = ({
     <>
       <div className="mx-auto max-w-6xl pb-20">
         {/* Top Navigation / Action Bar */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between flex-wrap">
           <Link to={mode === 'edit' ? '/diary' : '/dashboard'}>
             <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
               <ChevronLeft className="mr-2 size-4" />
               {mode === 'edit' ? t('form.backToDiary') : t('form.backToDashboard')}
             </Button>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             {/* Autosave status — only in create mode */}
             {mode === 'create' && <AutosaveIndicator status={autosaveStatus} />}
             {/* In edit mode, keep the old static label */}
@@ -244,7 +244,7 @@ export const DiaryForm = ({
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Writing Area */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2">
-            <div className="relative flex min-h-[800px] flex-col overflow-hidden rounded-sm border border-black/5 bg-white shadow-xl">
+            <div className="relative flex min-h-[800px] flex-col rounded-sm border border-black/5 bg-white shadow-xl">
               <div className="absolute top-0 left-0 h-2 w-full bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 opacity-50" />
 
               <div className="relative flex-1 p-8 md:p-12">
@@ -277,6 +277,7 @@ export const DiaryForm = ({
                       setValue('content', val)
                       notifyChange()
                     }}
+                    className="overflow-visible"
                     content={content}
                   />
                 </div>
