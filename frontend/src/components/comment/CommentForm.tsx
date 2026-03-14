@@ -57,7 +57,7 @@ export const CommentForm = ({ onSubmit }: CommentFormProps) => {
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Share your thoughts..."
+            placeholder="Chia sẻ suy nghĩ của bạn..."
             disabled={submitting}
             maxLength={500}
             rows={3}
@@ -67,7 +67,7 @@ export const CommentForm = ({ onSubmit }: CommentFormProps) => {
 
         <div className="mt-4 flex justify-end">
           <Button type="submit" disabled={!content.trim() || submitting}>
-            {submitting ? 'Posting...' : 'Post Comment'}
+            {submitting ? 'Đang gửi...' : 'Gửi bình luận'}
           </Button>
         </div>
       </form>

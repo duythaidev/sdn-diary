@@ -85,7 +85,7 @@ export const DashboardPage = () => {
           <Link to="/diary/create">
             <Button className="rounded-full font-serif shadow-lg transition-all hover:shadow-xl">
               <PenSquare className="mr-2 size-4" />
-              {t('common.newEntry')}
+              {t('diaries.newEntry')}
             </Button>
           </Link>
         </div>
@@ -215,7 +215,7 @@ export const DashboardPage = () => {
                 />
                 <Area
                   type="monotone"
-                  dataKey="entries"
+                  dataKey="Bài viết"
                   stroke="#000"
                   strokeWidth={2}
                   fillOpacity={1}

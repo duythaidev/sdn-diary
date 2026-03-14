@@ -70,8 +70,6 @@ export const DiaryListPage = () => {
     rootMargin: '200px',
   })
 
-  const activeFilterCount = [moodFilter !== 'all', tagsFilter !== 'all', statusFilter !== 'all'].filter(Boolean).length
-
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
       {/* Header */}
@@ -99,7 +97,7 @@ export const DiaryListPage = () => {
           <Link to="/diary/create">
             <Button className="font-serif shadow-md">
               <PlusCircle className="mr-2 size-4" />
-              {t('common.newEntry')}
+              {t('diaries.newEntry')}
             </Button>
           </Link>
         </div>
@@ -220,7 +218,6 @@ export const DiaryListPage = () => {
               onChange={(e) => setTagsFilter(e.target.value.trim())}
             />
           </div>
-
         </div>
 
         {/* View Toggle */}

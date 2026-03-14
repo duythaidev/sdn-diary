@@ -629,8 +629,8 @@ export const getDashboardData = async (req, res) => {
           return cd.getFullYear() === year && cd.getMonth() === month;
         }).length;
         return {
-          name: date.toLocaleString("default", { month: "short" }),
-          entries,
+          name: date.toLocaleString("vi-VN", { month: "long" }),
+          "Bài viết": entries,
         };
       });
     } else {
@@ -642,9 +642,9 @@ export const getDashboardData = async (req, res) => {
         ).length;
         const name =
           daysCount <= 7
-            ? day.toLocaleString("default", { weekday: "short" })
+            ? day.toLocaleString("vi-VN", { weekday: "long" })
             : `${day.getMonth() + 1}/${day.getDate()}`;
-        return { name, entries };
+        return { name, "Bài viết": entries };
       });
     }
 

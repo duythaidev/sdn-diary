@@ -58,6 +58,7 @@ const vi = {
     lined: 'Có kẻ',
     dotted: 'Chấm chấm',
     startWriting: 'Viết gì đó đi… tâm sự, kể lể, than thở, gì cũng được…',
+    deleting: 'Đang xóa...',
   },
   auth: {
     welcomeBack: 'Chào bạn trở lại',
@@ -231,6 +232,10 @@ const vi = {
     commentSuccess: 'Đã thêm bình luận',
     commentDeleteSuccess: 'Đã xóa bình luận',
   },
+  diary: {
+    deleteTitle: 'Xóa nhật ký?',
+    deleteDescription: 'Hành động này không thể hoàn tác. Nhật ký và toàn bộ bình luận sẽ bị xóa vĩnh viễn.',
+  },
   form: {
     backToDiary: 'Quay lại nhật ký',
     backToDashboard: 'Về tổng quan',
@@ -253,9 +258,9 @@ const vi = {
     enterTitleContent: 'Nhập tiêu đề hoặc nội dung đi bạn ơi',
     failedToLoad: 'Không mở được bài viết',
     failedToUpdate: 'Cập nhật bài bị lỗi',
-    autosaving: "Đang tự lưu…",
-    autosaved: "Đã lưu",
-    autosaveError: "Tự lưu thất bại"
+    autosaving: 'Đang tự lưu…',
+    autosaved: 'Đã lưu',
+    autosaveError: 'Tự lưu thất bại',
   },
   preview: {
     backToEditor: 'Quay lại viết',

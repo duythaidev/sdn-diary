@@ -84,7 +84,10 @@ const CommentItem = ({ comment, username, initials, avatarColor, canDelete, onDe
   const timeAgo = formatDistanceToNow(new Date(comment.createdAt as string), {
     addSuffix: true,
     locale: vi,
-  }).replace('khoảng', '')
+  })
+    .replace('khoảng', '')
+    .replace('dưới', '')
+    .replace('trên', '')
 
   const commentUser = typeof comment.userId === 'object' ? (comment.userId as User) : null
 

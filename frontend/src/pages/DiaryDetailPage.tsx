@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
-import { Edit, ArrowLeft, Lock, Share2, FileText, Calendar, Heart, MessageCircle } from 'lucide-react'
+import { Edit, ArrowLeft, Lock, Share2, FileText, Calendar, Heart, MessageCircle, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Diary, Comment } from '@/types'
 import { useProfile } from '@/hooks/useProfile'
@@ -17,6 +17,17 @@ import { getAxiosErrorMessage } from '@/lib/error'
 import { MOODS } from '@/constants'
 import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 
 export const DiaryDetailPage = () => {
   const { t } = useTranslation()
@@ -81,13 +92,27 @@ export const DiaryDetailPage = () => {
     toast.success('Copy đường dẫn thành công')
   }
 
+  const handleDelete = async () => {
+    try {
+      await diaryService.deleteDiary(id!)
+      toast.success(t('diaries.deleteSuccess'))
+      navigate('/diary')
+    } catch (error) {
+      toast.error(getAxiosErrorMessage(error))
+    }
+  }
+
   if (loading) return <LoadingSpinner />
   if (!diary) return null
 
   const diaryUser = typeof diary.userId === 'object' ? diary.userId : null
   const isOwner = user?._id === (diaryUser ? diaryUser._id : diary.userId)
   const selectedMoodData = diary.selectedMood ? MOODS.find((m) => m.value === diary.selectedMood) : undefined
-  const displayDate = format(new Date(diary.createdAt), 'MMMM dd, yyyy')
+  const displayDate = new Date(diary.createdAt).toLocaleDateString('vi-VN', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
   const authorName = diaryUser?.username ?? t('common.anonymous')
   const authorInitials = authorName
     .split(' ')
@@ -115,15 +140,43 @@ export const DiaryDetailPage = () => {
               </Button>
             </Link>
           )}
-          <Button
-            onClick={handleShare}
-            variant="ghost"
-            size="icon"
-            className="rounded-full hover:bg-black/5"
-            title={t('common.share')}
-          >
-            <Share2 className="text-muted-foreground size-5" />
-          </Button>
+          {diary.isPublic && (
+            <Button
+              onClick={handleShare}
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-black/5"
+              title={t('common.share')}
+            >
+              <Share2 className="text-muted-foreground size-5" />
+            </Button>
+          )}
+          {isOwner && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full hover:bg-black/5"
+                  title={t('common.delete')}
+                >
+                  <Trash className="size-5 text-red-500" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t('diary.deleteTitle')}</AlertDialogTitle>
+                  <AlertDialogDescription>{t('diary.deleteDescription')}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                  <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={handleDelete}>
+                    {t('common.delete')}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
 
@@ -187,7 +240,12 @@ export const DiaryDetailPage = () => {
                   <>
                     <span>•</span>
                     <span>
-                      {t('detail.updated')} {format(new Date(diary.updatedAt), 'MMM dd, yyyy')}
+                      {t('detail.updated')}{' '}
+                      {new Date(diary.updatedAt).toLocaleDateString('vi-VN', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
                     </span>
                   </>
                 )}
