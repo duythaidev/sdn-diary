@@ -44,12 +44,17 @@ export const DiaryDetailPage = () => {
 
   const fetchDiary = async (id: string) => {
     try {
-      const response = await diaryService.getDiaryById(id)
+      let response
+      if (isAuthenticated) {
+        response = await diaryService.getDiaryById(id)
+      } else {
+        response = await diaryService.getPublicDiaryById(id)
+      }
       setDiary(response.diary)
       setComments(response.comments || [])
     } catch (error) {
       toast.error(getAxiosErrorMessage(error))
-      navigate('/diary')
+      navigate('/')
     } finally {
       setLoading(false)
     }
@@ -140,7 +145,7 @@ export const DiaryDetailPage = () => {
               </Button>
             </Link>
           )}
-          {(diary.isPublic && !diary.isDraft) && (
+          {diary.isPublic && !diary.isDraft && (
             <Button
               onClick={handleShare}
               variant="ghost"

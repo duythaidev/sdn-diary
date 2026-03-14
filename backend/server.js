@@ -43,6 +43,7 @@ const customFormat = ':method :url :status :res[content-length] - :response-time
 
 app.use(morgan(customFormat));
 // Routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/diary', diaryRoutes);
 app.use('/api/comment', commentRoutes);

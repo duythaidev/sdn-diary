@@ -16,6 +16,7 @@ import {
   likeDiary,
   unlikeDiary,
   getDashboardData,
+  getPublicDiaryById,
 } from '../controllers/diaryController.js';
 import { verifyAccessToken } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
@@ -57,6 +58,7 @@ const updateDiaryValidation = [
 ];
 // Routes
 router.get('/public', getPublicDiaries);
+router.get('/public/:id', getPublicDiaryById);
 router.get('/tag/:tag', getDiariesByTag);
 router.get('/drafts', verifyAccessToken, getUserDrafts);
 // Protected routes

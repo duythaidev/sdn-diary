@@ -4,7 +4,7 @@ import axiosInstance from './axios'
 const URL = '/diary'
 
 export const diaryService = {
-   getUserDiaries: async (
+  getUserDiaries: async (
     dateFilter?: string,
     moodFilter?: string,
     tagsFilter?: string,
@@ -90,6 +90,10 @@ export const diaryService = {
 
   unlikeDiary: async (id: string) => {
     const response = await axiosInstance.delete(`${URL}/${id}/like`)
+    return response.data
+  },
+  getPublicDiaryById: async (id: string) => {
+    const response = await axiosInstance.get(`${URL}/public/${id}`)
     return response.data
   },
 }

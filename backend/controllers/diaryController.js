@@ -681,3 +681,41 @@ export const getDashboardData = async (req, res) => {
     res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
+
+// diaryController.js
+export const getPublicDiaryById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const diary = await Diary.findById(id)
+      .populate("userId", "username email bio profileImage")
+      .populate("likes", "_id");
+
+    if (!diary) {
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
+    }
+
+    // Chỉ cho phép xem diary public, không phải draft
+    if (!diary.isPublic || diary.isDraft) {
+      return res.status(403).json({ message: "Không có quyền truy cập" });
+    }
+
+    // isLiked dựa vào optional auth header nếu có
+    const isLiked = req.user?.userId
+      ? diary.likes.some((like) => like._id.toString() === req.user.userId)
+      : false;
+
+    let comments = [];
+    if (diary.allowComments) {
+      comments = await Comment.find({ diaryId: id })
+        .sort({ createdAt: -1 })
+        .populate("userId", "username email profileImage");
+    }
+
+    res.json({
+      diary: { ...diary.toObject(), isLiked },
+      comments,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+  }
+};
