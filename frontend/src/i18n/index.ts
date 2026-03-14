@@ -1,7 +1,7 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
-import enTranslations from './locales/en'
+// import enTranslations from './locales/en'
 import viTranslations from './locales/vi'
 
 i18n
@@ -9,10 +9,10 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { translation: enTranslations },
       vi: { translation: viTranslations },
+      // en: { translation: enTranslations },
     },
-    fallbackLng: 'en',
+    fallbackLng: 'vi',
     interpolation: {
       escapeValue: false,
     },
