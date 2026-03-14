@@ -34,5 +34,6 @@ export const useGetProfile = () => {
     isAuthenticated,
     loading,
     error,
+    logout
   }
 }

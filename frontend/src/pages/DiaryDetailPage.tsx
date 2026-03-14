@@ -75,6 +75,12 @@ export const DiaryDetailPage = () => {
     return result
   }
 
+  const handleShare = () => {
+    const shareUrl = `${window.location.origin}/diary/${id}`
+    navigator.clipboard.writeText(shareUrl)
+    toast.success('Copy đường dẫn thành công')
+  }
+
   if (loading) return <LoadingSpinner />
   if (!diary) return null
 
@@ -109,7 +115,13 @@ export const DiaryDetailPage = () => {
               </Button>
             </Link>
           )}
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5" title={t('common.share')}>
+          <Button
+            onClick={handleShare}
+            variant="ghost"
+            size="icon"
+            className="rounded-full hover:bg-black/5"
+            title={t('common.share')}
+          >
             <Share2 className="text-muted-foreground size-5" />
           </Button>
         </div>
@@ -240,8 +252,8 @@ export const DiaryDetailPage = () => {
                 <AvatarImage src={diaryUser?.profileImage ?? undefined} alt={authorName} />
                 <AvatarFallback className="font-serif text-lg">{authorInitials}</AvatarFallback>
               </Avatar>
-              <h3 className="font-serif text-lg font-bold">{authorName}</h3>
               <p className="text-muted-foreground mb-3 text-xs tracking-widest uppercase">{t('common.author')}</p>
+              <h3 className="font-serif text-lg">{authorName}</h3>
               {diaryUser?.bio && (
                 <p className="text-muted-foreground mb-6 px-4 text-sm leading-relaxed">{diaryUser.bio}</p>
               )}
@@ -254,6 +266,9 @@ export const DiaryDetailPage = () => {
               <h3 className="mb-4 flex items-center gap-2 font-serif font-bold">
                 <MessageCircle className="size-4" />
                 {t('common.discussion')}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-700 text-sm font-medium text-gray-300">
+                  {comments.length}
+                </span>
               </h3>
 
               {/* Like block */}

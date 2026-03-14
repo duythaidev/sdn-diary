@@ -1,4 +1,4 @@
-import { X, ArrowLeft, Share2, MoreHorizontal, Calendar, MessageCircle, Heart } from 'lucide-react'
+import { X, ArrowLeft, Calendar, MessageCircle, Heart } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
@@ -54,7 +54,7 @@ export const DiaryPreviewModal = ({
 
   if (!isOpen) return null
 
-  const displayDate = format(new Date(), 'MMMM dd, yyyy', {
+  const displayDate = format(new Date(), 'dd/MM/yyyy', {
     locale: i18n.language === 'vi' ? vi : enUS,
   })
 
@@ -74,12 +74,6 @@ export const DiaryPreviewModal = ({
           <span className="text-muted-foreground mr-2 font-mono text-xs tracking-wider uppercase">
             {t('preview.preview')}
           </span>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5">
-            <Share2 className="text-muted-foreground size-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5">
-            <MoreHorizontal className="text-muted-foreground size-5" />
-          </Button>
           <Button variant="ghost" size="icon" className="rounded-full hover:bg-black/5" onClick={onClose}>
             <X className="text-muted-foreground size-5" />
           </Button>

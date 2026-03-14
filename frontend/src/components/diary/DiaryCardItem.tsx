@@ -120,7 +120,13 @@ const DiaryCardItem = ({
             <div className="mb-4 flex items-start justify-between">
               <div className="text-muted-foreground flex items-center gap-2 text-xs">
                 <Calendar className="size-3" />
-                <time className="font-mono">{format(new Date(diary.createdAt), 'MMM dd, yyyy')}</time>
+                <time className="font-mono">
+                  {new Date(diary.createdAt).toLocaleDateString('vi-VN', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </time>
               </div>
 
               <div className="flex items-center gap-2">
@@ -227,7 +233,7 @@ const DiaryCardItem = ({
 
               {/* Read time */}
               <span className="text-muted-foreground font-mono text-xs">
-                {t('common.minRead', { count: Math.ceil(diary.content.replace(/<[^>]*>/g, '').length / 1000) })}
+                {t('common.minRead', { count: Math.ceil(diary.content.replace(/<[^>]*>/g, '').length / 200) })}
               </span>
             </div>
           </div>

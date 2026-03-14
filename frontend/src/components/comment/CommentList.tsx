@@ -3,7 +3,7 @@ import type { Comment, User } from '@/types'
 import { MessageCircle, Trash } from 'lucide-react'
 import { useProfile } from '@/hooks/useProfile'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-
+import { vi } from 'date-fns/locale'
 interface CommentListProps {
   comments: Comment[]
   diaryOwnerId: string
@@ -81,9 +81,10 @@ interface CommentItemProps {
 }
 
 const CommentItem = ({ comment, username, initials, avatarColor, canDelete, onDelete, loading }: CommentItemProps) => {
-  const timeAgo = formatDistanceToNow(new Date(comment.createdAt as string), { addSuffix: true })
-    .replace('about ', '')
-    .replace('less than a minute ago', 'just now')
+  const timeAgo = formatDistanceToNow(new Date(comment.createdAt as string), {
+    addSuffix: true,
+    locale: vi,
+  }).replace('khoảng', '')
 
   const commentUser = typeof comment.userId === 'object' ? (comment.userId as User) : null
 

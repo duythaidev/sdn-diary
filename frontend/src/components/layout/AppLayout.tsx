@@ -100,7 +100,7 @@ export default function AppLayout() {
             </nav>
 
             <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
-              <LanguageSwitcher />
+              {/* <LanguageSwitcher /> */}
               {isAuthenticated ? (
                 <>
                   <Link to="/diary/create" className="hidden sm:block">

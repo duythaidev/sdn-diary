@@ -221,13 +221,6 @@ export const DiaryListPage = () => {
             />
           </div>
 
-          {/* Active Filters indicator */}
-          {activeFilterCount > 0 && (
-            <span className="text-primary border-primary/20 bg-primary/5 flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
-              <span className="bg-primary h-1.5 w-1.5 animate-pulse rounded-full" />
-              {activeFilterCount} {t('common.active')}
-            </span>
-          )}
         </div>
 
         {/* View Toggle */}

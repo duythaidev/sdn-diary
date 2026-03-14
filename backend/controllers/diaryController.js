@@ -86,7 +86,7 @@ export const getUserDiaries = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -98,7 +98,7 @@ export const getUserRecentDiaries = async (req, res) => {
       .populate("userId", "username email");
     res.json({ diaries });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -112,7 +112,7 @@ export const getUserPublishedDiaries = async (req, res) => {
       .populate("userId", "username email");
     res.json({ diaries });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -126,7 +126,7 @@ export const getUserDrafts = async (req, res) => {
       .populate("userId", "username email");
     res.json({ diaries });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -138,12 +138,10 @@ export const getPublicDiaries = async (req, res) => {
     limit = MAX_PUBLIC_DIARIES_PER_PAGE,
   } = req.query;
 
-  // Parse pagination parameters
   const pageNum = parseInt(page);
   const limitNum = parseInt(limit);
   const skip = (pageNum - 1) * limitNum;
 
-  // Query filter
   const query = {};
   if (queryFilter) {
     query.$or = [
@@ -164,17 +162,14 @@ export const getPublicDiaries = async (req, res) => {
       ...query,
     };
 
-    // Get total count for pagination
     const totalCount = await Diary.countDocuments(baseQuery);
 
-    // Get paginated diaries
     const diaries = await Diary.find(baseQuery)
       .sort(sortQuery)
       .skip(skip)
       .limit(limitNum)
       .populate("userId", "username email");
 
-    // Calculate if there are more pages
     const hasMore = skip + diaries.length < totalCount;
 
     res.json({
@@ -188,7 +183,7 @@ export const getPublicDiaries = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -200,14 +195,14 @@ export const getDiaryById = async (req, res) => {
       .populate("likes", "username email bio profileImage");
 
     if (!diary) {
-      return res.status(404).json({ message: "Diary not found" });
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
     }
 
     if (
       (!diary.isPublic || diary.isDraft) &&
       diary.userId._id.toString() !== req.user?.userId
     ) {
-      return res.status(403).json({ message: "Access denied" });
+      return res.status(403).json({ message: "Không có quyền truy cập" });
     }
 
     const isLiked = req.user?.userId
@@ -229,7 +224,7 @@ export const getDiaryById = async (req, res) => {
       comments,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -249,7 +244,7 @@ export const createDiary = async (req, res) => {
     if (coverPhoto && coverPhoto.length > MAX_COVER_PHOTO_SIZE) {
       return res
         .status(400)
-        .json({ message: "Cover photo is too large. Maximum size is 5MB." });
+        .json({ message: "Ảnh bìa quá lớn. Dung lượng tối đa là 5MB." });
     }
 
     const diary = new Diary({
@@ -270,19 +265,17 @@ export const createDiary = async (req, res) => {
     await diary.populate("userId", "username email");
 
     res.status(201).json({
-      message: isDraft
-        ? "Draft saved successfully"
-        : "Diary created successfully",
+      message: isDraft ? "Đã lưu nháp thành công" : "Tạo nhật ký thành công",
       diary,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
       return res.status(400).json({
-        message: "Validation error",
+        message: "Lỗi xác thực dữ liệu",
         error: error.message,
       });
     }
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -303,21 +296,21 @@ export const updateDiary = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: "Diary not found" });
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
     }
 
     if (diary.userId.toString() !== req.user.userId) {
       return res
         .status(403)
-        .json({ message: "Not authorized to update this diary" });
+        .json({ message: "Không có quyền chỉnh sửa nhật ký này" });
     }
+
     if (coverPhoto && coverPhoto.length > MAX_COVER_PHOTO_SIZE) {
       return res
         .status(400)
-        .json({ message: "Cover photo is too large. Maximum size is 5MB." });
+        .json({ message: "Ảnh bìa quá lớn. Dung lượng tối đa là 5MB." });
     }
 
-    // Update fields
     if (title !== undefined) diary.title = title;
     if (content !== undefined) diary.content = content;
     if (isPublic !== undefined) diary.isPublic = isPublic;
@@ -334,50 +327,45 @@ export const updateDiary = async (req, res) => {
 
     res.json({
       message: isDraft
-        ? "Draft saved successfully"
-        : "Diary updated successfully",
+        ? "Đã lưu nháp thành công"
+        : "Cập nhật nhật ký thành công",
       diary,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
       return res.status(400).json({
-        message: "Validation error",
+        message: "Lỗi xác thực dữ liệu",
         error: error.message,
       });
     }
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
-// Delete diary
 export const deleteDiary = async (req, res) => {
   try {
     const { id } = req.params;
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: "Diary not found" });
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
     }
 
-    // Check if user is the owner
     if (diary.userId.toString() !== req.user.userId) {
       return res
         .status(403)
-        .json({ message: "Not authorized to delete this diary" });
+        .json({ message: "Không có quyền xóa nhật ký này" });
     }
 
     await diary.deleteOne();
-
-    // Optionally delete all comments associated with this diary
     await Comment.deleteMany({ diaryId: id });
 
-    res.json({ message: "Diary deleted successfully" });
+    res.json({ message: "Xóa nhật ký thành công" });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
-// Like a diary
 export const likeDiary = async (req, res) => {
   try {
     const { id } = req.params;
@@ -386,41 +374,35 @@ export const likeDiary = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: "Diary not found" });
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
     }
 
-    // Check if diary is public and not a draft
     if (!diary.isPublic || diary.isDraft) {
       return res
         .status(403)
-        .json({ message: "Cannot like private or draft diaries" });
+        .json({ message: "Không thể thích nhật ký riêng tư hoặc nháp" });
     }
 
-    // Check if user already liked this diary
     const alreadyLiked = diary.likes.includes(userId);
 
     if (alreadyLiked) {
-      return res
-        .status(400)
-        .json({ message: "You have already liked this diary" });
+      return res.status(400).json({ message: "Bạn đã thích nhật ký này rồi" });
     }
 
-    // Add user to likes array
     diary.likes.push(userId);
     diary.likesCount = diary.likes.length;
     await diary.save();
 
     res.json({
-      message: "Diary liked successfully",
+      message: "Thích nhật ký thành công",
       likesCount: diary.likesCount,
       isLiked: true,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
-// Unlike a diary
 export const unlikeDiary = async (req, res) => {
   try {
     const { id } = req.params;
@@ -429,32 +411,29 @@ export const unlikeDiary = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: "Diary not found" });
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
     }
 
-    // Check if user has liked this diary
     const likeIndex = diary.likes.indexOf(userId);
 
     if (likeIndex === -1) {
-      return res.status(400).json({ message: "You have not liked this diary" });
+      return res.status(400).json({ message: "Bạn chưa thích nhật ký này" });
     }
 
-    // Remove user from likes array
     diary.likes.splice(likeIndex, 1);
     diary.likesCount = diary.likes.length;
     await diary.save();
 
     res.json({
-      message: "Diary unliked successfully",
+      message: "Bỏ thích nhật ký thành công",
       likesCount: diary.likesCount,
       isLiked: false,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
-// Toggle like (like or unlike in one endpoint)
 export const toggleLike = async (req, res) => {
   try {
     const { id } = req.params;
@@ -463,27 +442,23 @@ export const toggleLike = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: "Diary not found" });
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
     }
 
-    // Check if diary is public and not a draft
     if (!diary.isPublic || diary.isDraft) {
       return res
         .status(403)
-        .json({ message: "Cannot like private or draft diaries" });
+        .json({ message: "Không thể thích nhật ký riêng tư hoặc nháp" });
     }
 
-    // Check if user already liked this diary
     const likeIndex = diary.likes.indexOf(userId);
     let isLiked;
 
     if (likeIndex > -1) {
-      // Unlike
       diary.likes.splice(likeIndex, 1);
       diary.likesCount = diary.likes.length;
       isLiked = false;
     } else {
-      // Like
       diary.likes.push(userId);
       diary.likesCount = diary.likes.length;
       isLiked = true;
@@ -493,13 +468,13 @@ export const toggleLike = async (req, res) => {
 
     res.json({
       message: isLiked
-        ? "Diary liked successfully"
-        : "Diary unliked successfully",
+        ? "Thích nhật ký thành công"
+        : "Bỏ thích nhật ký thành công",
       likesCount: diary.likesCount,
       isLiked,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -509,19 +484,19 @@ export const publishDraft = async (req, res) => {
     const diary = await Diary.findById(id);
 
     if (!diary) {
-      return res.status(404).json({ message: "Diary not found" });
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
     }
 
     if (diary.userId.toString() !== req.user.userId) {
       return res
         .status(403)
-        .json({ message: "Not authorized to publish this diary" });
+        .json({ message: "Không có quyền đăng nhật ký này" });
     }
 
     if (!diary.isDraft) {
       return res
         .status(400)
-        .json({ message: "This diary is already published" });
+        .json({ message: "Nhật ký này đã được đăng công khai" });
     }
 
     diary.isDraft = false;
@@ -531,11 +506,11 @@ export const publishDraft = async (req, res) => {
     await diary.populate("userId", "username email");
 
     res.json({
-      message: "Diary published successfully",
+      message: "Đăng nhật ký thành công",
       diary,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -543,10 +518,11 @@ export const getDiariesByMood = async (req, res) => {
   try {
     const { mood } = req.params;
 
-    // Validate mood
     const validMoods = ["stressed", "okay", "calm", "happy", "great"];
     if (!validMoods.includes(mood)) {
-      return res.status(400).json({ message: "Invalid mood value" });
+      return res
+        .status(400)
+        .json({ message: "Giá trị tâm trạng không hợp lệ" });
     }
 
     const diaries = await Diary.find({
@@ -558,11 +534,11 @@ export const getDiariesByMood = async (req, res) => {
 
     res.json({ diaries, mood });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
-// Get diaries by tag (exclude drafts)
+// Lấy nhật ký theo tag (loại trừ nháp)
 export const getDiariesByTag = async (req, res) => {
   try {
     const { tag } = req.params;
@@ -577,7 +553,7 @@ export const getDiariesByTag = async (req, res) => {
 
     res.json({ diaries, tag });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
 
@@ -586,7 +562,7 @@ export const getDashboardData = async (req, res) => {
     const userId = req.user.userId;
     const { range = "last7" } = req.query;
 
-    // Determine date range for activity chart
+    // Xác định khoảng thời gian cho biểu đồ hoạt động
     const now = new Date();
     let rangeStart;
     let daysCount;
@@ -597,25 +573,25 @@ export const getDashboardData = async (req, res) => {
       rangeStart = subYears(now, 1);
       daysCount = 365;
     } else {
-      // default: last7
+      // mặc định: last7
       rangeStart = subDays(now, 6);
       daysCount = 7;
     }
 
-    // All user diaries (for stats)
+    // Tất cả nhật ký của người dùng (dùng để tính thống kê)
     const allDiaries = await Diary.find({ userId }).select(
       "_id createdAt selectedMood isDraft isPublic",
     );
 
     const totalEntries = allDiaries.length;
 
-    // Total comments on user's diaries
+    // Tổng số bình luận trên nhật ký của người dùng
     const diaryIds = allDiaries.map((d) => d._id);
     const totalComments = await Comment.countDocuments({
       diaryId: { $in: diaryIds },
     });
 
-    // Streak: consecutive days with at least one entry (from today backwards)
+    // Chuỗi streak: số ngày liên tiếp có ít nhất 1 bài viết (tính ngược từ hôm nay)
     let streak = 0;
     let checkDate = new Date();
     const createdDates = allDiaries.map((d) => new Date(d.createdAt));
@@ -631,7 +607,7 @@ export const getDashboardData = async (req, res) => {
       checkDate = subDays(checkDate, 1);
     }
 
-    // Most frequent mood
+    // Tâm trạng xuất hiện nhiều nhất
     const moodCounts = {};
     allDiaries.forEach((d) => {
       if (d.selectedMood)
@@ -640,10 +616,10 @@ export const getDashboardData = async (req, res) => {
     const topMood =
       Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
-    // Activity data for chart (group by day, week, or month depending on range)
+    // Dữ liệu hoạt động cho biểu đồ (nhóm theo ngày/tuần/tháng tùy range)
     let activityData = [];
     if (range === "lastyear") {
-      // Group by month (12 buckets)
+      // Nhóm theo tháng (12 khoảng)
       activityData = Array.from({ length: 12 }, (_, i) => {
         const date = subMonths(now, 11 - i);
         const year = date.getFullYear();
@@ -658,7 +634,7 @@ export const getDashboardData = async (req, res) => {
         };
       });
     } else {
-      // Group by day
+      // Nhóm theo ngày
       activityData = Array.from({ length: daysCount }, (_, i) => {
         const day = subDays(now, daysCount - 1 - i);
         const entries = allDiaries.filter((d) =>
@@ -672,13 +648,13 @@ export const getDashboardData = async (req, res) => {
       });
     }
 
-    // Recent drafts (latest 3)
+    // Nháp gần đây (mới nhất 3)
     const recentDrafts = await Diary.find({ userId, isDraft: true })
       .sort({ updatedAt: -1 })
       .limit(3)
       .select("_id title content createdAt updatedAt isDraft");
 
-    // Recent public entries (latest 3)
+    // Bài viết công khai gần đây (mới nhất 3)
     const recentPublic = await Diary.find({
       userId,
       isPublic: true,
@@ -702,6 +678,6 @@ export const getDashboardData = async (req, res) => {
       recentPublic,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };

@@ -71,12 +71,6 @@ export const DashboardPage = () => {
 
   const topMoodLabel = stats.topMood ? stats.topMood.charAt(0).toUpperCase() + stats.topMood.slice(1) : '—'
 
-  const rangeLabelMap: Record<Range, string> = {
-    last7: t('dashboard.last7Days'),
-    lastmonth: t('dashboard.lastMonth'),
-    lastyear: t('dashboard.lastYear'),
-  }
-
   return (
     <div className="animate-in fade-in space-y-8 duration-500">
       {/* Welcome Section */}
@@ -145,9 +139,7 @@ export const DashboardPage = () => {
             <div className="rounded-full bg-blue-50 p-2">
               <TrendingUp className="size-5 text-blue-600" />
             </div>
-            <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100">
-              {stats.streak > 5 ? 'Top 10%' : t('dashboard.stats.topText')}
-            </Badge>
+            <span className="font-mono text-xs font-bold text-blue-600">#STREAK</span>
           </div>
           <h3 className="text-foreground/80 font-serif text-4xl font-bold">{stats.streak}</h3>
           <p className="text-muted-foreground mt-1 text-sm font-medium">{t('dashboard.stats.writingStreak')}</p>
@@ -165,7 +157,7 @@ export const DashboardPage = () => {
             <div className="rounded-full bg-green-50 p-2">
               <Smile className="size-5 text-green-600" />
             </div>
-            <span className="text-muted-foreground font-mono text-xs font-bold">MOOD</span>
+            <span className="text-muted-foreground font-mono text-xs font-bold">#MOOD</span>
           </div>
           <h3 className="text-foreground/80 font-serif text-xl font-bold">{topMoodLabel}</h3>
           <p className="text-muted-foreground mt-1 text-sm font-medium">{t('dashboard.stats.mostFrequentMood')}</p>
@@ -176,10 +168,6 @@ export const DashboardPage = () => {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Activity Chart */}
         <div className="relative overflow-hidden rounded-xl border border-black/5 bg-white p-6 shadow-sm lg:col-span-2">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.03]"
-            style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/graphy.png')" }}
-          />
           <div className="mb-6 flex items-center justify-between">
             <h3 className="font-serif text-xl font-bold">{t('dashboard.writingActivity')}</h3>
             <Select value={range} onValueChange={(v) => setRange(v as Range)}>
@@ -259,7 +247,7 @@ export const DashboardPage = () => {
                         {diary.title || t('common.untitled')}
                       </h4>
                       <span className="text-muted-foreground ml-2 shrink-0 rounded-full bg-black/5 px-2 py-0.5 font-mono text-[10px]">
-                        {format(new Date(diary.createdAt), 'MMM d')}
+                        {new Date(diary.createdAt).toLocaleDateString('vi-VN')}
                       </span>
                     </div>
                     <p className="text-muted-foreground line-clamp-2 text-xs">

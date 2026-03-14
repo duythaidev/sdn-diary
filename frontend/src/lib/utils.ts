@@ -62,19 +62,6 @@ export const checkIsOwner = (user: User | null, diary: Diary) => {
   return isOwner
 }
 
-/**
- * "/" : Public diaries
- * "/dashboard" : Dashboard
- * "/diary" : Diary list
- * "/diary/create" : Create diary
- * "/diary/:id" : Diary detail
- * "/diary/:id/edit" : Edit diary
- * "/profile" : Profile
- * "/login" : Login
- * "/register" : Register
- * "/404" : 404 Not Found
- */
-
 export const getRouteName = (path: string) => {
   const routes = {
     '/': 'Public diaries',

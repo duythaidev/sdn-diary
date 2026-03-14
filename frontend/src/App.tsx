@@ -1,13 +1,14 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
-import { store } from './redux/store'
+import { persistor, store } from './redux/store'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import NotFound from './pages/NotFound'
 import { Toaster } from './components/ui/sonner'
 import AppLayout from './components/layout/AppLayout'
 import { RouteChangeTracker } from './components/common/RouteChangeTracker'
+import { PersistGate } from 'redux-persist/integration/react'
 
 const ProtectedRoute = lazy(() =>
   import('./components/layout/ProtectedRoute').then((module) => ({ default: module.ProtectedRoute })),
@@ -134,10 +135,12 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <RouteChangeTracker />
-        <AppContent />
-      </BrowserRouter>
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter>
+          <RouteChangeTracker />
+          <AppContent />
+        </BrowserRouter>
+      </PersistGate>
     </Provider>
   )
 }

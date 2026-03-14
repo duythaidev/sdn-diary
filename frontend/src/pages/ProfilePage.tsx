@@ -20,15 +20,15 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
 const profileFormSchema = z.object({
   username: z
-    .string({ error: 'Please enter your username.' })
-    .min(2, 'Username must be at least 2 characters.')
-    .max(30, 'Username must not be longer than 30 characters.'),
+    .string({ error: 'Vui lòng nhập tên người dùng.' })
+    .min(2, 'Tên người dùng phải có ít nhất 2 ký tự.')
+    .max(30, 'Tên người dùng không được vượt quá 30 ký tự.'),
   bio: z.string().max(160).min(4).optional().or(z.literal('')),
   profileImage: z.string().nullable().optional(),
   urls: z
     .array(
       z.object({
-        value: z.string().url('Please enter a valid URL.'),
+        value: z.string().url('Hãy nhập đường dẫn hợp lệ.'),
       }),
     )
     .optional(),

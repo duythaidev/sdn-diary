@@ -195,7 +195,7 @@ const vi = {
     newestFirst: 'Mới nhất trước',
     oldestFirst: 'Cũ nhất trước',
     loadingMore: 'Đang tải thêm bài...',
-    noEntriesFound: 'Chưa có bài nào khớp...',
+    noEntriesFound: 'Chưa có bài nào khớp hãy thử thay đổi bộ lọc...',
     createFirstEntry: 'Viết bài đầu tiên thôi nào',
     createSuccess: 'Đã lưu bài mới thành công!',
     updateSuccess: 'Đã cập nhật bài viết xong!',

@@ -43,13 +43,6 @@ export const CommentsSection = ({
 
   return (
     <>
-      <div className="mb-8 flex items-center gap-3">
-        <h2 className="text-xl text-3xl text-primary">Comments</h2>
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-700 text-sm font-medium text-gray-300">
-          {comments.length}
-        </span>
-      </div>
-
       {isAuthenticated && (
         <div className="mb-10">
           <CommentForm onSubmit={handleAddComment} />
@@ -59,11 +52,11 @@ export const CommentsSection = ({
       {!isAuthenticated && (
         <div className="mb-10 rounded-lg border bg-gray-50 py-4">
           <p className="text-center text-gray-400">
-            Please{' '}
+            Vui lòng{' '}
             <Link to="/login" className="text-primary hover:text-primary/80">
-              sign in
+              đăng nhập
             </Link>{' '}
-            to leave a comment
+            để bình luận
           </p>
         </div>
       )}

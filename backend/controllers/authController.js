@@ -21,10 +21,11 @@ export const register = async (req, res, next) => {
       return res.status(400).json({
         message:
           existingUser.email === email
-            ? "Email already registered"
-            : "Username already taken",
+            ? "Email này đã được đăng ký"
+            : "Tên người dùng đã được sử dụng",
       });
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -36,8 +37,9 @@ export const register = async (req, res, next) => {
 
     res.cookie("accessToken", accessToken, accessTokenCookieOptions);
     res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
+
     res.status(201).json({
-      message: "User registered successfully",
+      message: "Đăng ký tài khoản thành công",
       user: {
         _id: user._id,
         username: user.username,
@@ -55,12 +57,12 @@ export const login = async (req, res, next) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Thông tin đăng nhập không đúng" });
     }
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Thông tin đăng nhập không đúng" });
     }
 
     const accessToken = generateAccessToken(user._id);
@@ -68,8 +70,9 @@ export const login = async (req, res, next) => {
 
     res.cookie("accessToken", accessToken, accessTokenCookieOptions);
     res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
+
     res.json({
-      message: "Login successful",
+      message: "Đăng nhập thành công",
       user: {
         _id: user._id,
         username: user.username,
@@ -85,7 +88,7 @@ export const refresh = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ message: "Refresh token not found" });
+      return res.status(401).json({ message: "Không tìm thấy refresh token" });
     }
 
     const decoded = verifyRefreshToken(refreshToken);
@@ -93,7 +96,7 @@ export const refresh = async (req, res, next) => {
     const accessToken = generateAccessToken(decoded.userId);
 
     res.cookie("accessToken", accessToken, accessTokenCookieOptions);
-    res.json({ message: "Token refreshed successfully" });
+    res.json({ message: "Làm mới token thành công" });
   } catch (error) {
     next(error);
   }
@@ -103,7 +106,7 @@ export const logout = async (req, res, next) => {
   try {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
-    res.json({ message: "Logout successful" });
+    res.json({ message: "Đăng xuất thành công" });
   } catch (error) {
     next(error);
   }
@@ -113,7 +116,7 @@ export const getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId).select("-password");
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
     }
     res.json({
       user: {
@@ -142,7 +145,7 @@ export const updateProfile = async (req, res, next) => {
         _id: { $ne: userId },
       });
       if (existingUser) {
-        return res.status(400).json({ message: "Username already taken" });
+        return res.status(400).json({ message: "Tên người dùng đã được sử dụng" });
       }
     }
 
@@ -158,11 +161,11 @@ export const updateProfile = async (req, res, next) => {
     ).select("-password");
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
     }
 
     res.json({
-      message: "Profile updated successfully",
+      message: "Cập nhật hồ sơ thành công",
       user: {
         _id: user._id,
         username: user.username,
@@ -213,8 +216,7 @@ export const forgotPassword = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({
-        message:
-          "Email not found",
+        message: "Không tìm thấy email này",
       });
     }
 
@@ -233,7 +235,7 @@ export const forgotPassword = async (req, res, next) => {
 
     res.json({
       message:
-        "If an account with that email exists, a password reset link has been sent.",
+        "Nếu email này tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu cho bạn.",
     });
   } catch (error) {
     next(error);
@@ -253,7 +255,7 @@ export const resetPassword = async (req, res, next) => {
 
     if (!user) {
       return res.status(400).json({
-        message: "Invalid or expired reset token",
+        message: "Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn",
       });
     }
 
@@ -267,7 +269,7 @@ export const resetPassword = async (req, res, next) => {
 
     res.json({
       message:
-        "Password reset successful. You can now login with your new password.",
+        "Đặt lại mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới.",
     });
   } catch (error) {
     next(error);
