@@ -4,31 +4,28 @@ import bcrypt from 'bcrypt';
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: [true, 'Username is required'],
-    unique: true,
+    required: [true, 'Tên người dùng là bắt buộc'],
     trim: true,
-    minlength: [3, 'Username must be at least 3 characters'],
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: [true, 'Email là bắt buộc'],
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
+    match: [/^\S+@\S+\.\S+$/, 'Vui lòng cung cấp email hợp lệ'],
   },
   password: {
     type: String,
     required: function () {
-      // Password is only required for local authentication
       return this.provider === 'local';
     },
-    minlength: [6, 'Password must be at least 6 characters'],
+    minlength: [6, 'Mật khẩu phải có ít nhất 6 ký tự'],
   },
   googleId: {
     type: String,
     unique: true,
-    sparse: true, // Allows multiple null values
+    sparse: true,
   },
   provider: {
     type: String,
@@ -37,17 +34,17 @@ const userSchema = new mongoose.Schema({
   },
   bio: {
     type: String,
-    maxlength: [160, 'Bio must not exceed 160 characters'],
+    maxlength: [160, 'Tiểu sử không được vượt quá 160 ký tự'],
     default: '',
   },
   profileImage: {
-    type: String, // Base64 string or URL
+    type: String,
     default: null,
   },
   urls: [{
     value: {
       type: String,
-      match: [/^https?:\/\/.+/, 'Please provide a valid URL'],
+      match: [/^https?:\/\/.+/, 'Vui lòng cung cấp URL hợp lệ'],
     }
   }],
   resetPasswordToken: {
@@ -59,13 +56,13 @@ const userSchema = new mongoose.Schema({
     default: null,
   },
 }, { timestamps: true });
-// Method to compare password
+
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  // If user doesn't have a password (OAuth user), return false
   if (!this.password) {
     return false;
   }
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
 const User = mongoose.model('User', userSchema);
 export default User;

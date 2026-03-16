@@ -3,13 +3,13 @@ import mongoose from 'mongoose';
 const diarySchema = new mongoose.Schema({
   title: {
     type: String,
-    required: [true, 'Title is required'],
+    required: [true, 'Tiêu đề là bắt buộc'],
     trim: true,
-    maxlength: [200, 'Title cannot exceed 200 characters'],
+    maxlength: [200, 'Tiêu đề không được vượt quá 200 ký tự'],
   },
   content: {
     type: String,
-    required: [true, 'Content is required'],
+    required: [true, 'Nội dung là bắt buộc'],
   },
   isPublic: {
     type: Boolean,
@@ -31,11 +31,11 @@ const diarySchema = new mongoose.Schema({
       validator: function (tags) {
         return tags.length <= 20;
       },
-      message: 'Cannot have more than 20 tags'
+      message: 'Không được có quá 20 thẻ (tags)'
     }
   },
   coverPhoto: {
-    type: String, // Base64 string or URL
+    type: String,
     default: null,
   },
   isDraft: {
