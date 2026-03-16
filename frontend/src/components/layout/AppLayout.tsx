@@ -72,7 +72,7 @@ export default function AppLayout() {
 
               {isAuthenticated && (
                 <>
-                  <Link to="/dashboard">
+                  {/* <Link to="/dashboard">
                     <Button
                       variant={isActive('/dashboard') ? 'default' : 'ghost'}
                       size="sm"
@@ -84,7 +84,7 @@ export default function AppLayout() {
                       <LayoutDashboard className="mr-2 size-4" />
                       {t('sidebar.dashboard')}
                     </Button>
-                  </Link>
+                  </Link> */}
                   <Link to="/diary">
                     <Button
                       variant={isActive('/diary') ? 'default' : 'ghost'}

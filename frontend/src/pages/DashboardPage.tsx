@@ -261,7 +261,7 @@ export const DashboardPage = () => {
               ))
             ) : (
               <p className="text-muted-foreground py-4 text-center font-serif text-sm italic">
-                {t('dashboard.noDraftsYet')}
+                Chưa có bài viết nào
               </p>
             )}
           </div>

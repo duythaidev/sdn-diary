@@ -113,11 +113,11 @@ export const Navbar = () => {
               <LanguageSwitcher />
               {isAuthenticated ? (
                 <>
-                  <Link to="/dashboard">
+                  {/* <Link to="/dashboard">
                     <Button variant="ghost" size="sm">
                       Dashboard
                     </Button>
-                  </Link>
+                  </Link> */}
                   <Link to="/diary">
                     <Button variant="ghost" size="sm">
                       My Diaries

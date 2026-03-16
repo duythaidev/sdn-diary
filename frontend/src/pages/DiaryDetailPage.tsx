@@ -326,13 +326,17 @@ export const DiaryDetailPage = () => {
           {/* Engagement Card */}
           {diary.isPublic && !diary.isDraft && (
             <div className="rounded-xl border border-black/5 bg-white p-6 shadow-sm">
-              <h3 className="mb-4 flex items-center gap-2 font-serif font-bold">
-                <MessageCircle className="size-4" />
-                {t('common.discussion')}
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-700 text-sm font-medium text-gray-300">
-                  {comments.length}
-                </span>
-              </h3>
+              {diary.allowComments ? (
+                <h3 className="mb-4 flex items-center gap-2 font-serif font-bold">
+                  <MessageCircle className="size-4" />
+                  {t('common.discussion')}
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-700 text-sm font-medium text-gray-300">
+                    {comments.length}
+                  </span>
+                </h3>
+              ) : (
+                <h3 className="mb-4 flex items-center gap-2 font-serif italic">Bài viết không cho bình luận</h3>
+              )}
 
               {/* Like block */}
               {isAuthenticated && (

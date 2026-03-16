@@ -243,7 +243,7 @@ export function ProfilePage() {
                         />
                       </FormControl>
                       <FormDescription>{t('profile.bioDescription')}</FormDescription>
-                      <FormMessage className="text-xs text-red-500" />
+                      {/* <FormMessage className="text-xs text-red-500" /> */}
                     </FormItem>
                   )}
                 />

@@ -32,11 +32,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar()
 
   const navTabs = [
-    {
-      title: t('sidebar.dashboard'),
-      url: '/dashboard',
-      icon: Home,
-    },
+    // {
+    //   title: t('sidebar.dashboard'),
+    //   url: '/dashboard',
+    //   icon: Home,
+    // },
     {
       title: t('sidebar.myDiaries'),
       url: '/diary',

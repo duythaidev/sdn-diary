@@ -35,7 +35,7 @@ export function LoginPage() {
       const response = await authService.login(data.email, data.password)
       setUser(response.user)
       toast.success(t('auth.loginSuccess'))
-      navigate('/dashboard')
+      navigate('/diary')
     } catch (error) {
       toast.error(getAxiosErrorMessage(error, t('auth.loginFailed')))
     } finally {
@@ -139,7 +139,7 @@ export function LoginPage() {
           </div>
 
           <div className="space-y-4">
-            <button
+            {/* <button
               type="button"
               onClick={handleGoogleLogin}
               className="text-foreground/80 flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-black/10 bg-white text-sm font-medium shadow-xs transition-all hover:border-black/20 hover:bg-black/5"
@@ -169,7 +169,7 @@ export function LoginPage() {
               <div className="h-px flex-1 bg-black/8" />
               <span className="text-muted-foreground text-xs font-medium">{t('auth.orContinueWithEmail')}</span>
               <div className="h-px flex-1 bg-black/8" />
-            </div>
+            </div> */}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-3">

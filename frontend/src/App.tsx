@@ -16,7 +16,7 @@ const ProtectedRoute = lazy(() =>
 const PublicRoute = lazy(() =>
   import('./components/layout/PublicRoute').then((module) => ({ default: module.PublicRoute })),
 )
-const DashboardPage = lazy(() => import('./pages/DashboardPage').then((module) => ({ default: module.DashboardPage })))
+// const DashboardPage = lazy(() => import('./pages/DashboardPage').then((module) => ({ default: module.DashboardPage })))
 const DiaryListPage = lazy(() => import('./pages/DiaryListPage').then((module) => ({ default: module.DiaryListPage })))
 const DiaryDetailPage = lazy(() =>
   import('./pages/DiaryDetailPage').then((module) => ({ default: module.DiaryDetailPage })),
@@ -80,14 +80,14 @@ function AppContent() {
           <Route path="/" element={<PublicDiariesPage />} />
 
           {/* Protected routes */}
-          <Route
+          {/* <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
                 <DashboardPage />
               </ProtectedRoute>
             }
-          />
+          /> */}
           <Route
             path="/diary"
             element={

@@ -643,7 +643,7 @@ export const getDashboardData = async (req, res) => {
         const name =
           daysCount <= 7
             ? day.toLocaleString("vi-VN", { weekday: "long" })
-            : `${day.getMonth() + 1}/${day.getDate()}`;
+            : `${day.getDate()}/${day.getMonth() + 1}`;
         return { name, "Bài viết": entries };
       });
     }

@@ -88,7 +88,7 @@ export const refresh = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ message: "Không tìm thấy refresh token" });
+      return res.status(401).json({ message: "Không có quyền truy cập" });
     }
 
     const decoded = verifyRefreshToken(refreshToken);
@@ -198,7 +198,7 @@ export const googleCallback = async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
 
     res.redirect(
-      `${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`,
+      `${process.env.CLIENT_URL || "http://localhost:5173"}/diary`,
     );
   } catch (error) {
     console.error("Google OAuth callback error:", error);

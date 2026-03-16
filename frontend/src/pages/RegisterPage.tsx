@@ -35,24 +35,24 @@ export function RegisterPage() {
 
   const password = watch('password')
 
-  const strength = (() => {
-    if (!password) return 0
-    let s = 0
-    if (password.length >= 8) s++
-    if (/[A-Z]/.test(password)) s++
-    if (/[0-9]/.test(password)) s++
-    if (/[^A-Za-z0-9]/.test(password)) s++
-    return s
-  })()
+  // const strength = (() => {
+  //   if (!password) return 0
+  //   let s = 0
+  //   if (password.length >= 8) s++
+  //   if (/[A-Z]/.test(password)) s++
+  //   if (/[0-9]/.test(password)) s++
+  //   if (/[^A-Za-z0-9]/.test(password)) s++
+  //   return s
+  // })()
 
-  const strengthLabel = [
-    '',
-    t('auth.strength.weak'),
-    t('auth.strength.fair'),
-    t('auth.strength.good'),
-    t('auth.strength.strong'),
-  ][strength]
-  const strengthColor = ['', 'bg-red-400', 'bg-yellow-400', 'bg-blue-400', 'bg-green-500'][strength]
+  // const strengthLabel = [
+  //   '',
+  //   t('auth.strength.weak'),
+  //   t('auth.strength.fair'),
+  //   t('auth.strength.good'),
+  //   t('auth.strength.strong'),
+  // ][strength]
+  // const strengthColor = ['', 'bg-red-400', 'bg-yellow-400', 'bg-blue-400', 'bg-green-500'][strength]
 
   const onSubmit = async (data: RegisterForm) => {
     setLoading(true)
@@ -60,7 +60,7 @@ export function RegisterPage() {
       const response = await authService.register(data.name, data.email, data.password)
       setUser(response.user)
       toast.success(t('auth.registerSuccess'))
-      navigate('/dashboard')
+      navigate('/diary')
     } catch (error) {
       toast.error(getAxiosErrorMessage(error, t('auth.registerFailed')))
     } finally {
@@ -110,8 +110,8 @@ export function RegisterPage() {
             className="grid grid-cols-2 gap-4"
           >
             {[
-              { value: '12k+', label: t('auth.writers') },
-              { value: '84k+', label: t('auth.entries') },
+              { value: 'Dành cho', label: t('auth.writers') },
+              { value: 'Nhiều thể loại', label: t('auth.entries') },
               { value: t('auth.free'), label: t('auth.always') },
               { value: t('auth.private'), label: t('auth.byDefault') },
             ].map((stat, i) => (
@@ -158,7 +158,7 @@ export function RegisterPage() {
           </div>
 
           <div className="space-y-4">
-            <button
+            {/* <button
               type="button"
               onClick={handleGoogleRegister}
               className="text-foreground/80 flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-black/10 bg-white text-sm font-medium shadow-xs transition-all hover:border-black/20 hover:bg-black/5"
@@ -182,13 +182,13 @@ export function RegisterPage() {
                 />
               </svg>
               {t('auth.signUpWithGoogle')}
-            </button>
-
+            </button> */}
+{/* 
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-black/8" />
               <span className="text-muted-foreground text-xs font-medium">{t('auth.orRegisterWithEmail')}</span>
               <div className="h-px flex-1 bg-black/8" />
-            </div>
+            </div> */}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
               <div className="relative">
@@ -241,7 +241,7 @@ export function RegisterPage() {
                 </div>
                 {errors.password && <span className="ml-1 text-xs text-red-500">{errors.password.message}</span>}
 
-                {password && (
+                {/* {password && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
@@ -260,7 +260,7 @@ export function RegisterPage() {
                       <span className="text-foreground/70 font-semibold">{strengthLabel}</span>
                     </p>
                   </motion.div>
-                )}
+                )} */}
               </div>
 
               <div className="relative">

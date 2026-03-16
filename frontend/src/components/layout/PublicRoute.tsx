@@ -8,7 +8,7 @@ interface PublicRouteProps {
 export const PublicRoute = ({ children }: PublicRouteProps) => {
   const { isAuthenticated } = useProfile()
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to="/diary" replace />
   }
   return <>{children}</>
 }

@@ -107,7 +107,7 @@ export const extensions = [
   floatingToolbarExtension,
   contextMenuExtension,
   commandPaletteExtension,
-  new DraggableBlockExtension().configure({}),
+  // new DraggableBlockExtension().configure({}),
 ] as const
 
 // Create typed editor system
@@ -171,7 +171,7 @@ function EditorContent({
   if (!editor) return null
   return (
     <>
-      <div className="lexkit-editor-header">
+      {/* <div className="lexkit-editor-header">
         <Toolbar
           commands={commands}
           hasExtension={hasExtension}
@@ -179,7 +179,7 @@ function EditorContent({
           isDark={isDark}
           toggleTheme={toggleTheme}
         />
-      </div>
+      </div> */}
       <div className={cn(className, 'lexkit-editor')}>
         <div className="flex flex-1 flex-col">
           <RichTextPlugin
@@ -187,7 +187,7 @@ function EditorContent({
             placeholder={<div className="lexkit-placeholder">{t('editor.placeholder')}</div>}
             ErrorBoundary={ErrorBoundary}
           />
-          <FloatingToolbarRenderer />
+          {/* <FloatingToolbarRenderer /> */}
         </div>
       </div>
     </>
@@ -373,14 +373,14 @@ function FloatingToolbarRenderer() {
           >
             <Strikethrough size={14} />
           </button>
-          <div className="bg-border mx-1 h-6 w-px" />
-          <button
+          {/* <div className="bg-border mx-1 h-6 w-px" /> */}
+          {/* <button
             onClick={() => commands.formatText('code')}
             className={`lexkit-toolbar-button ${activeStates.code ? 'active' : ''}`}
             title="Inline Code"
           >
             <Code size={14} />
-          </button>
+          </button> */}
           {/* <button
             onClick={() => (activeStates.isLink ? commands.removeLink() : commands.insertLink())}
             className={`lexkit-toolbar-button ${activeStates.isLink ? 'active' : ''}`}
@@ -389,7 +389,7 @@ function FloatingToolbarRenderer() {
             {activeStates.isLink ? <Unlink size={14} /> : <Link size={14} />}
           </button> */}
           <div className="bg-border mx-1 h-6 w-px" />
-          {hasExtension('blockFormat') && (
+          {/* {hasExtension('blockFormat') && (
             <>
               <button
                 onClick={() => commands.toggleParagraph()}
@@ -447,7 +447,7 @@ function FloatingToolbarRenderer() {
                 <ListOrdered size={14} />
               </button>
             </>
-          )}
+          )} */}
         </>
       )}
     </div>,
@@ -517,8 +517,8 @@ function Toolbar({
     <>
       <div className="lexkit-toolbar">
         {/* Text Formatting */}
-        <div className="lexkit-toolbar-section">
-          <button
+        {/* <div className="lexkit-toolbar-section"> */}
+          {/* <button
             onClick={() => commands.toggleBold()}
             className={`lexkit-toolbar-button ${activeStates.bold ? 'active' : ''}`}
             title="Bold (Ctrl+B)"
@@ -549,15 +549,15 @@ function Toolbar({
             type='button'
           >
             <Strikethrough size={16} />
-          </button>
-          <button
+          </button> */}
+          {/* <button
             onClick={() => commands.formatText('code')}
             className={`lexkit-toolbar-button ${activeStates.code ? 'active' : ''}`}
             title="Inline Code"
             type='button'
           >
             <Code size={16} />
-          </button>
+          </button> */}
           {/* <button
             onClick={() => (activeStates.isLink ? commands.removeLink() : commands.insertLink())}
             className={`lexkit-toolbar-button ${activeStates.isLink ? 'active' : ''}`}
@@ -566,10 +566,10 @@ function Toolbar({
           >
             {activeStates.isLink ? <Unlink size={16} /> : <Link size={16} />}
           </button> */}
-        </div>
+        {/* </div> */}
 
         {/* Block Format */}
-        {hasExtension('blockFormat') && (
+        {/* {hasExtension('blockFormat') && (
           <div className="lexkit-toolbar-section">
             <Select
               value={currentBlockFormat}
@@ -578,10 +578,10 @@ function Toolbar({
               placeholder="Format"
             />
           </div>
-        )}
+        )} */}
 
         {/* Lists */}
-        {hasExtension('list') && (
+        {/* {hasExtension('list') && (
           <div className="lexkit-toolbar-section">
             <button
               onClick={() => commands.toggleUnorderedList()}
@@ -610,10 +610,10 @@ function Toolbar({
               </>
             )}
           </div>
-        )}
+        )} */}
 
         {/* Horizontal Rule */}
-        {hasExtension('horizontalRule') && (
+        {/* {hasExtension('horizontalRule') && (
           <div className="lexkit-toolbar-section">
             <button
               onClick={() => commands.insertHorizontalRule()}
@@ -624,10 +624,10 @@ function Toolbar({
               <Minus size={16} />
             </button>
           </div>
-        )}
+        )} */}
 
         {/* Table */}
-        {hasExtension('table') && (
+        {/* {hasExtension('table') && (
           <div className="lexkit-toolbar-section">
             <button
               onClick={() => setShowTableDialog(true)}
@@ -638,10 +638,10 @@ function Toolbar({
               <TableIcon size={16} />
             </button>
           </div>
-        )}
+        )} */}
 
         {/* Image */}
-        {hasExtension('image') && (
+        {/* {hasExtension('image') && (
           <div className="lexkit-toolbar-section">
             <Dropdown
               trigger={
@@ -676,7 +676,7 @@ function Toolbar({
               >
                 <Upload size={16} /> Tải File lên
               </button>
-            </Dropdown>
+            </Dropdown> */}
             {/* {activeStates.imageSelected && (
               <Dropdown
                 trigger={
@@ -725,7 +725,7 @@ function Toolbar({
                 </button>
               </Dropdown>
             )} */}
-            <input
+            {/* <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
@@ -733,10 +733,10 @@ function Toolbar({
               className="lexkit-file-input"
             />
           </div>
-        )}
+        )} */}
 
         {/* History */}
-        {hasExtension('history') && (
+        {/* {hasExtension('history') && (
           <div className="lexkit-toolbar-section">
             <button
               onClick={() => commands.undo()}
@@ -757,7 +757,7 @@ function Toolbar({
               <Redo size={16} />
             </button>
           </div>
-        )}
+        )} */}
 
         {/* Theme Toggle */}
         {/* <div className="lexkit-toolbar-section">

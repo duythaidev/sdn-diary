@@ -64,7 +64,7 @@ router.get('/drafts', verifyAccessToken, getUserDrafts);
 // Protected routes
 router.get('/', verifyAccessToken, getUserDiaries);
 router.get('/recent', verifyAccessToken, getUserRecentDiaries);
-router.get('/dashboard', verifyAccessToken, getDashboardData);
+// router.get('/dashboard', verifyAccessToken, getDashboardData);
 router.get('/mood/:mood', verifyAccessToken, getDiariesByMood);
 router.post('/', verifyAccessToken, diaryValidation, validate, createDiary);
 router.get('/:id', verifyAccessToken, getDiaryById);
