@@ -139,16 +139,6 @@ export const updateProfile = async (req, res, next) => {
     const { username, bio, profileImage, urls } = req.body;
     const userId = req.user.userId;
 
-    if (username) {
-      const existingUser = await User.findOne({
-        username,
-        _id: { $ne: userId },
-      });
-      if (existingUser) {
-        return res.status(400).json({ message: "Tên người dùng đã được sử dụng" });
-      }
-    }
-
     const user = await User.findByIdAndUpdate(
       userId,
       {

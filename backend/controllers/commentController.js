@@ -1,53 +1,65 @@
-import Comment from '../models/Comment.js';
-import Diary from '../models/Diary.js';
-// Create comment
+import Comment from "../models/Comment.js";
+import Diary from "../models/Diary.js";
+
 export const createComment = async (req, res) => {
   try {
     const { content, diaryId } = req.body;
-    // Check if diary exists and is public
+
     const diary = await Diary.findById(diaryId);
+
     if (!diary) {
-      return res.status(404).json({ message: 'Diary not found' });
+      return res.status(404).json({ message: "Không tìm thấy nhật ký" });
     }
+
     if (!diary.allowComments) {
-      return res.status(403).json({ message: 'Cannot comment on private diary' });
+      return res
+        .status(403)
+        .json({ message: "Không thể bình luận vào nhật ký này" });
     }
+
     const comment = new Comment({
       content,
       diaryId,
       userId: req.user.userId,
     });
+
     await comment.save();
-    await comment.populate('userId', 'username email');
+    await comment.populate("userId", "username email");
+
     res.status(201).json({
-      message: 'Comment added successfully',
-      comment
+      message: "Thêm bình luận thành công",
+      comment,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };
-// Delete comment
+
 export const deleteComment = async (req, res) => {
   try {
     const { id } = req.params;
+
     const comment = await Comment.findById(id);
+
     if (!comment) {
-      return res.status(404).json({ message: 'Comment not found' });
+      return res.status(404).json({ message: "Không tìm thấy bình luận" });
     }
-    // Get the diary to check ownership
+
     const diary = await Diary.findById(comment.diaryId);
-    // Check if user is the comment author or diary owner
+
     const isCommentAuthor = comment.userId.toString() === req.user.userId;
     const isDiaryOwner = diary && diary.userId.toString() === req.user.userId;
+
     if (!isCommentAuthor && !isDiaryOwner) {
       return res.status(403).json({
-        message: 'Not authorized to delete this comment'
+        message: "Bạn không có quyền xóa bình luận này",
       });
     }
+
     await Comment.findByIdAndDelete(id);
-    res.json({ message: 'Comment deleted successfully' });
+
+    res.json({ message: "Xóa bình luận thành công" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };

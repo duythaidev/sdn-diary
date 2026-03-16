@@ -10,10 +10,10 @@ const RECENT_DIARIES_LIMIT = 3;
 export const getUserDiaries = async (req, res) => {
   try {
     const {
-      dateFilter,
-      moodFilter,
-      tagsFilter,
-      queryFilter,
+      dateFilter, // newest | oldest
+      moodFilter, // all | happy | sad | angry | ...
+      tagsFilter, // all | tag1 | tag2 | ...
+      queryFilter, // search query
       statusFilter, // 'all' | 'public' | 'private' | 'draft'
       page = 1,
       limit = MAX_USER_DIARIES_PER_PAGE,

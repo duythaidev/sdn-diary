@@ -68,10 +68,10 @@ export function RegisterPage() {
     }
   }
 
-  const handleGoogleRegister = () => {
-    const googleAuthUrl = authService.getGoogleAuthUrl()
-    window.location.href = googleAuthUrl
-  }
+  // const handleGoogleRegister = () => {
+  //   const googleAuthUrl = authService.getGoogleAuthUrl()
+  //   window.location.href = googleAuthUrl
+  // }
 
   return (
     <div className="relative flex min-h-screen overflow-hidden bg-[#f8f5f2]">
@@ -122,7 +122,7 @@ export function RegisterPage() {
             ))}
           </motion.div>
         </div>
-
+{/* 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,7 +131,7 @@ export function RegisterPage() {
         >
           <p className="text-foreground/70 font-serif text-sm leading-relaxed italic">{t('auth.quote')}</p>
           <p className="text-muted-foreground mt-2 text-xs font-medium">— {t('auth.author')}</p>
-        </motion.div>
+        </motion.div> */}
       </div>
 
       <div className="relative flex w-full items-center justify-center p-8 lg:w-1/2">
