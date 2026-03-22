@@ -2,7 +2,7 @@
 
 A full-stack diary application built with a modern tech stack, featuring rich text editing, secure authentication, and a responsive user interface.
 
-## 🚀 Features
+## Features
 
 - **User Authentication**: Secure login and registration with JWT.
 - **Google OAuth**: Easy sign-in using Google accounts.
@@ -11,7 +11,7 @@ A full-stack diary application built with a modern tech stack, featuring rich te
 - **Responsive Design**: Built with Tailwind CSS and Radix UI for a seamless experience across devices.
 - **Masonry Layout**: Optimized display for diary entries.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Frontend
 
@@ -38,14 +38,14 @@ A full-stack diary application built with a modern tech stack, featuring rich te
 
 - **Containerization**: Docker, Docker Compose
 
-## 📦 Prerequisites
+## Prerequisites
 
 - **Node.js**: v18+
 - **npm**: v9+
 - **Docker & Docker Compose** (Optional, for containerized setup)
 - **MongoDB**: Running instance (Local or Atlas)
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Option 1: Using Docker (Recommended)
 
